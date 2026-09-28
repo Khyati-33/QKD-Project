@@ -214,90 +214,90 @@
       "episodes": 10
     },
     "Random": {
-      "overall_reward": -168.1857908904646,
-      "seed_reward_std": 127.57152058794263,
+      "overall_reward": -195.7172829276924,
+      "seed_reward_std": 168.0617052376861,
       "per_season": {
         "monsoon": {
-          "reward_median": -168.1857908904646,
-          "reward_std": 127.57152058794263,
+          "reward_median": -195.7172829276924,
+          "reward_std": 168.0617052376861,
           "seed_rewards": [
             {
-              "seed": 71000,
+              "seed": 70000,
               "source": "Mumbai",
               "destination": "Kolkata",
-              "reward": -208.97965202392857,
+              "reward": -215.44435634497546,
               "success": false,
               "hops": null
             },
             {
-              "seed": 71001,
+              "seed": 70001,
               "source": "Mumbai",
               "destination": "Kolkata",
-              "reward": -208.2633596747566,
+              "reward": -358.1899822588639,
               "success": false,
               "hops": null
             },
             {
-              "seed": 71002,
+              "seed": 70002,
               "source": "Mumbai",
               "destination": "Kolkata",
-              "reward": -162.10929057671137,
+              "reward": -175.99020951040933,
               "success": false,
               "hops": null
             },
             {
-              "seed": 71003,
+              "seed": 70003,
               "source": "Mumbai",
               "destination": "Kolkata",
-              "reward": -173.33732821514045,
+              "reward": -159.9508025012218,
               "success": false,
               "hops": null
             },
             {
-              "seed": 71004,
+              "seed": 70004,
               "source": "Mumbai",
               "destination": "Kolkata",
-              "reward": -163.0342535657888,
+              "reward": -311.10779674910094,
               "success": false,
               "hops": null
             },
             {
-              "seed": 71005,
+              "seed": 70005,
               "source": "Mumbai",
               "destination": "Kolkata",
-              "reward": -503.14334606706814,
+              "reward": -143.12370785539622,
               "success": false,
               "hops": null
             },
             {
-              "seed": 71006,
+              "seed": 70006,
               "source": "Mumbai",
               "destination": "Kolkata",
-              "reward": -89.30663851681783,
+              "reward": -126.29362286481057,
               "success": false,
               "hops": null
             },
             {
-              "seed": 71007,
+              "seed": 70007,
               "source": "Mumbai",
               "destination": "Kolkata",
-              "reward": -85.16566939129146,
+              "reward": -679.6881103659747,
               "success": false,
               "hops": null
             },
             {
-              "seed": 71008,
+              "seed": 70008,
               "source": "Mumbai",
               "destination": "Kolkata",
-              "reward": -347.28686811706336,
+              "reward": -219.12847435188212,
               "success": false,
               "hops": null
             },
             {
-              "seed": 71009,
+              "seed": 70009,
               "source": "Mumbai",
               "destination": "Kolkata",
-              "reward": -58.388614433566396,
+              "reward": -49.25316376480202,
               "success": false,
               "hops": null
             }
@@ -407,47 +407,51 @@
             "Bangalore--Mumbai_F12",
             "Bangalore--Mumbai_D12_F8",
             "Bangalore--Mumbai_F12",
-            "Bangalore--Mumbai_F11",
-            "Bangalore--Mumbai_D11_F8",
-            "Bangalore--Mumbai_D11_F7",
-            "Bangalore--Mumbai_D11_F6",
-            "Bangalore--Mumbai_D11_F7",
-            "Bangalore--Mumbai_D11_F8",
-            "Bangalore--Mumbai_F11",
-            "Bangalore--Mumbai_F12",
-            "Bangalore--Mumbai_F11",
-            "Bangalore--Mumbai_D12_F1",
-            "Bangalore--Mumbai_D12_F2",
-            "Bangalore--Mumbai_D12_F3",
-            "Bangalore--Mumbai_D12_F2",
-            "Bangalore--Mumbai_D12_F3",
-            "Bangalore--Mumbai_D12_F4",
-            "Bangalore--Mumbai_D12_F3",
-            "Bangalore--Mumbai_D12_F2",
-            "Bangalore--Mumbai_D12_F3",
-            "Bangalore--Mumbai_D12_F4",
-            "Bangalore--Mumbai_D12_F3",
-            "Bangalore--Mumbai_D12_F2",
-            "Bangalore--Mumbai_D12_F3",
-            "Bangalore--Mumbai_D12_F4",
-            "Bangalore--Mumbai_D12_F5",
-            "Bangalore--Mumbai_D12_F4",
-            "Bangalore--Mumbai_D12_F5",
-            "Bangalore--Mumbai_D12_F4",
-            "Bangalore--Mumbai_D12_F3",
-            "Bangalore--Mumbai_D12_F2",
-            "Bangalore--Mumbai_D12_F3",
-            "Bangalore--Mumbai_D12_F4",
-            "Bangalore--Mumbai_D12_F3",
-            "Bangalore--Mumbai_D12_F4"
+            "Mumbai",
+            "Kolkata--Mumbai_F23",
+            "Kolkata--Mumbai_F22",
+            "Kolkata--Mumbai_F21",
+            "Kolkata--Mumbai_F22",
+            "Kolkata--Mumbai_D23_F1",
+            "Kolkata--Mumbai_D23_F2",
+            "Kolkata--Mumbai_D23_F3",
+            "Kolkata--Mumbai_D23_F2",
+            "Kolkata--Mumbai_D23_F3",
+            "Kolkata--Mumbai_D23_F4",
+            "Kolkata--Mumbai_D23_F5",
+            "Kolkata--Mumbai_D23_F4",
+            "Kolkata--Mumbai_D23_F5",
+            "Kolkata--Mumbai_D23_F6",
+            "Kolkata--Mumbai_D23_F5",
+            "Kolkata--Mumbai_D23_F4",
+            "Kolkata--Mumbai_D23_F5",
+            "Kolkata--Mumbai_D23_F6",
+            "Kolkata--Mumbai_D23_F5",
+            "Kolkata--Mumbai_D23_F4",
+            "Kolkata--Mumbai_D23_F5",
+            "Kolkata--Mumbai_D23_F6",
+            "Kolkata--Mumbai_D23_F7",
+            "Kolkata--Mumbai_D23_F6",
+            "Kolkata--Mumbai_D23_F7",
+            "Kolkata--Mumbai_D23_F6",
+            "Kolkata--Mumbai_D23_F5",
+            "Kolkata--Mumbai_D23_F4",
+            "Kolkata--Mumbai_D23_F5",
+            "Kolkata--Mumbai_D23_F6",
+            "Kolkata--Mumbai_D23_F5",
+            "Kolkata--Mumbai_D23_F6",
+            "Kolkata--Mumbai_D23_F5",
+            "Kolkata--Mumbai_D23_F6",
+            "Kolkata--Mumbai_D23_F5",
+            "Kolkata--Mumbai_D23_F6"
           ],
-          "sample_revisits": 111,
+          "sample_revisits": 105,
           "qber_skr_validity": {
-            "checked_edges": 1298,
-            "valid_edges": 1298,
+            "checked_edges": 1603,
+            "valid_edges": 1603,
             "invalid_edges": 0,
             "valid_rate": 1.0,
-            "fallback_count": 16
+            "fallback_count": 23
           }
         }
       },
@@ -557,147 +561,151 @@
         "Bangalore--Mumbai_F12",
         "Bangalore--Mumbai_D12_F8",
         "Bangalore--Mumbai_F12",
-        "Bangalore--Mumbai_F11",
-        "Bangalore--Mumbai_D11_F8",
-        "Bangalore--Mumbai_D11_F7",
-        "Bangalore--Mumbai_D11_F6",
-        "Bangalore--Mumbai_D11_F7",
-        "Bangalore--Mumbai_D11_F8",
-        "Bangalore--Mumbai_F11",
-        "Bangalore--Mumbai_F12",
-        "Bangalore--Mumbai_F11",
-        "Bangalore--Mumbai_D12_F1",
-        "Bangalore--Mumbai_D12_F2",
-        "Bangalore--Mumbai_D12_F3",
-        "Bangalore--Mumbai_D12_F2",
-        "Bangalore--Mumbai_D12_F3",
-        "Bangalore--Mumbai_D12_F4",
-        "Bangalore--Mumbai_D12_F3",
-        "Bangalore--Mumbai_D12_F2",
-        "Bangalore--Mumbai_D12_F3",
-        "Bangalore--Mumbai_D12_F4",
-        "Bangalore--Mumbai_D12_F3",
-        "Bangalore--Mumbai_D12_F2",
-        "Bangalore--Mumbai_D12_F3",
-        "Bangalore--Mumbai_D12_F4",
-        "Bangalore--Mumbai_D12_F5",
-        "Bangalore--Mumbai_D12_F4",
-        "Bangalore--Mumbai_D12_F5",
-        "Bangalore--Mumbai_D12_F4",
-        "Bangalore--Mumbai_D12_F3",
-        "Bangalore--Mumbai_D12_F2",
-        "Bangalore--Mumbai_D12_F3",
-        "Bangalore--Mumbai_D12_F4",
-        "Bangalore--Mumbai_D12_F3",
-        "Bangalore--Mumbai_D12_F4"
+        "Mumbai",
+        "Kolkata--Mumbai_F23",
+        "Kolkata--Mumbai_F22",
+        "Kolkata--Mumbai_F21",
+        "Kolkata--Mumbai_F22",
+        "Kolkata--Mumbai_D23_F1",
+        "Kolkata--Mumbai_D23_F2",
+        "Kolkata--Mumbai_D23_F3",
+        "Kolkata--Mumbai_D23_F2",
+        "Kolkata--Mumbai_D23_F3",
+        "Kolkata--Mumbai_D23_F4",
+        "Kolkata--Mumbai_D23_F5",
+        "Kolkata--Mumbai_D23_F4",
+        "Kolkata--Mumbai_D23_F5",
+        "Kolkata--Mumbai_D23_F6",
+        "Kolkata--Mumbai_D23_F5",
+        "Kolkata--Mumbai_D23_F4",
+        "Kolkata--Mumbai_D23_F5",
+        "Kolkata--Mumbai_D23_F6",
+        "Kolkata--Mumbai_D23_F5",
+        "Kolkata--Mumbai_D23_F4",
+        "Kolkata--Mumbai_D23_F5",
+        "Kolkata--Mumbai_D23_F6",
+        "Kolkata--Mumbai_D23_F7",
+        "Kolkata--Mumbai_D23_F6",
+        "Kolkata--Mumbai_D23_F7",
+        "Kolkata--Mumbai_D23_F6",
+        "Kolkata--Mumbai_D23_F5",
+        "Kolkata--Mumbai_D23_F4",
+        "Kolkata--Mumbai_D23_F5",
+        "Kolkata--Mumbai_D23_F6",
+        "Kolkata--Mumbai_D23_F5",
+        "Kolkata--Mumbai_D23_F6",
+        "Kolkata--Mumbai_D23_F5",
+        "Kolkata--Mumbai_D23_F6",
+        "Kolkata--Mumbai_D23_F5",
+        "Kolkata--Mumbai_D23_F6"
       ],
-      "sample_path_revisits": 111,
+      "sample_path_revisits": 105,
       "sample_link_type_counts": {
-        "fiber": 16,
-        "fso": 116
+        "fiber": 18,
+        "fso": 118
       },
       "zero_success_epochs": 1,
       "qber_skr_validity": {
-        "checked_edges": 1298,
-        "valid_edges": 1298,
+        "checked_edges": 1603,
+        "valid_edges": 1603,
         "invalid_edges": 0,
         "valid_rate": 1.0,
-        "fallback_count": 16
+        "fallback_count": 23
       },
       "episodes": 10
     },
     "Dijkstra-km": {
-      "overall_reward": 175.90171231186804,
-      "seed_reward_std": 13.473567677187868,
+      "overall_reward": 163.4597521117018,
+      "seed_reward_std": 11.703555545196311,
       "per_season": {
         "monsoon": {
-          "reward_median": 175.90171231186804,
-          "reward_std": 13.473567677187868,
+          "reward_median": 163.4597521117018,
+          "reward_std": 11.703555545196311,
           "seed_rewards": [
             {
-              "seed": 72000,
+              "seed": 70000,
               "source": "Mumbai",
               "destination": "Kolkata",
-              "reward": 159.3372143292562,
+              "reward": 159.333798120732,
               "success": true,
               "hops": 179
             },
             {
-              "seed": 72001,
+              "seed": 70001,
               "source": "Mumbai",
               "destination": "Kolkata",
-              "reward": 173.18605982283185,
-              "success": true,
-              "hops": 197
-            },
-            {
-              "seed": 72002,
-              "source": "Mumbai",
-              "destination": "Kolkata",
-              "reward": 192.51122079836043,
-              "success": true,
-              "hops": 211
-            },
-            {
-              "seed": 72003,
-              "source": "Mumbai",
-              "destination": "Kolkata",
-              "reward": 184.28328602171626,
-              "success": true,
-              "hops": 203
-            },
-            {
-              "seed": 72004,
-              "source": "Mumbai",
-              "destination": "Kolkata",
-              "reward": 192.47850461472393,
-              "success": true,
-              "hops": 211
-            },
-            {
-              "seed": 72005,
-              "source": "Mumbai",
-              "destination": "Kolkata",
-              "reward": 175.9166123477006,
+              "reward": 175.91141816565778,
               "success": true,
               "hops": 195
             },
             {
-              "seed": 72006,
+              "seed": 70002,
               "source": "Mumbai",
               "destination": "Kolkata",
-              "reward": 175.88681227603544,
+              "reward": 159.31714360329804,
+              "success": true,
+              "hops": 179
+            },
+            {
+              "seed": 70003,
+              "source": "Mumbai",
+              "destination": "Kolkata",
+              "reward": 159.32050394912463,
+              "success": true,
+              "hops": 179
+            },
+            {
+              "seed": 70004,
+              "source": "Mumbai",
+              "destination": "Kolkata",
+              "reward": 175.8177997357433,
               "success": true,
               "hops": 195
             },
             {
-              "seed": 72007,
+              "seed": 70005,
               "source": "Mumbai",
               "destination": "Kolkata",
-              "reward": 184.2195440928912,
+              "reward": 151.2368638614695,
               "success": true,
-              "hops": 203
+              "hops": 171
             },
             {
-              "seed": 72008,
+              "seed": 70006,
               "source": "Mumbai",
               "destination": "Kolkata",
-              "reward": 167.6711520060749,
+              "reward": 181.21540777980545,
+              "success": true,
+              "hops": 200
+            },
+            {
+              "seed": 70007,
+              "source": "Mumbai",
+              "destination": "Kolkata",
+              "reward": 167.58570610267157,
               "success": true,
               "hops": 187
             },
             {
-              "seed": 72009,
+              "seed": 70008,
               "source": "Mumbai",
               "destination": "Kolkata",
-              "reward": 147.99421749504307,
+              "reward": 143.56555118002626,
               "success": true,
-              "hops": 168
+              "hops": 163
+            },
+            {
+              "seed": 70009,
+              "source": "Mumbai",
+              "destination": "Kolkata",
+              "reward": 175.88903852741723,
+              "success": true,
+              "hops": 195
             }
           ],
           "success_rate": 1.0,
-          "avg_hops_success": 194.9,
-          "hop_ratio_to_optimal": 8.47391304347826,
+          "avg_hops_success": 184.3,
+          "hop_ratio_to_optimal": 8.01304347826087,
           "episodes": 10,
           "sample_path": [
             "Mumbai",
@@ -732,14 +740,6 @@
             "Kolkata--Mumbai_D21_F2",
             "Kolkata--Mumbai_D21_F1",
             "Kolkata--Mumbai_F20",
-            "Kolkata--Mumbai_D20_F8",
-            "Kolkata--Mumbai_D20_F7",
-            "Kolkata--Mumbai_D20_F6",
-            "Kolkata--Mumbai_D20_F5",
-            "Kolkata--Mumbai_D20_F4",
-            "Kolkata--Mumbai_D20_F3",
-            "Kolkata--Mumbai_D20_F2",
-            "Kolkata--Mumbai_D20_F1",
             "Kolkata--Mumbai_F19",
             "Kolkata--Mumbai_D19_F8",
             "Kolkata--Mumbai_D19_F7",
@@ -778,6 +778,14 @@
             "Kolkata--Mumbai_D15_F2",
             "Kolkata--Mumbai_D15_F1",
             "Kolkata--Mumbai_F14",
+            "Kolkata--Mumbai_D14_F8",
+            "Kolkata--Mumbai_D14_F7",
+            "Kolkata--Mumbai_D14_F6",
+            "Kolkata--Mumbai_D14_F5",
+            "Kolkata--Mumbai_D14_F4",
+            "Kolkata--Mumbai_D14_F3",
+            "Kolkata--Mumbai_D14_F2",
+            "Kolkata--Mumbai_D14_F1",
             "Kolkata--Mumbai_F13",
             "Kolkata--Mumbai_D13_F8",
             "Kolkata--Mumbai_D13_F7",
@@ -788,15 +796,15 @@
             "Kolkata--Mumbai_D13_F2",
             "Kolkata--Mumbai_D13_F1",
             "Kolkata--Mumbai_F12",
-            "Kolkata--Mumbai_D12_F8",
-            "Kolkata--Mumbai_D12_F7",
-            "Kolkata--Mumbai_D12_F6",
-            "Kolkata--Mumbai_D12_F5",
-            "Kolkata--Mumbai_D12_F4",
-            "Kolkata--Mumbai_D12_F3",
-            "Kolkata--Mumbai_D12_F2",
-            "Kolkata--Mumbai_D12_F1",
             "Kolkata--Mumbai_F11",
+            "Kolkata--Mumbai_D11_F8",
+            "Kolkata--Mumbai_D11_F7",
+            "Kolkata--Mumbai_D11_F6",
+            "Kolkata--Mumbai_D11_F5",
+            "Kolkata--Mumbai_D11_F4",
+            "Kolkata--Mumbai_D11_F3",
+            "Kolkata--Mumbai_D11_F2",
+            "Kolkata--Mumbai_D11_F1",
             "Kolkata--Mumbai_F10",
             "Kolkata--Mumbai_D10_F8",
             "Kolkata--Mumbai_D10_F7",
@@ -883,30 +891,30 @@
           ],
           "sample_revisits": 0,
           "qber_skr_validity": {
-            "checked_edges": 1949,
-            "valid_edges": 1949,
+            "checked_edges": 1843,
+            "valid_edges": 1843,
             "invalid_edges": 0,
             "valid_rate": 1.0,
-            "fallback_count": 22
+            "fallback_count": 34
           }
         }
       },
       "success_rate": 1.0,
-      "avg_hops_success": 194.9,
+      "avg_hops_success": 184.3,
       "successful_hop_counts": [
         179,
-        197,
-        211,
-        203,
-        211,
         195,
+        179,
+        179,
         195,
-        203,
+        171,
+        200,
         187,
-        168
+        163,
+        195
       ],
       "optimal_hops": 23,
-      "avg_hop_ratio_to_optimal": 8.47391304347826,
+      "avg_hop_ratio_to_optimal": 8.01304347826087,
       "sample_path": [
         "Mumbai",
         "Kolkata--Mumbai_D24_F3",
@@ -940,14 +948,6 @@
         "Kolkata--Mumbai_D21_F2",
         "Kolkata--Mumbai_D21_F1",
         "Kolkata--Mumbai_F20",
-        "Kolkata--Mumbai_D20_F8",
-        "Kolkata--Mumbai_D20_F7",
-        "Kolkata--Mumbai_D20_F6",
-        "Kolkata--Mumbai_D20_F5",
-        "Kolkata--Mumbai_D20_F4",
-        "Kolkata--Mumbai_D20_F3",
-        "Kolkata--Mumbai_D20_F2",
-        "Kolkata--Mumbai_D20_F1",
         "Kolkata--Mumbai_F19",
         "Kolkata--Mumbai_D19_F8",
         "Kolkata--Mumbai_D19_F7",
@@ -986,6 +986,14 @@
         "Kolkata--Mumbai_D15_F2",
         "Kolkata--Mumbai_D15_F1",
         "Kolkata--Mumbai_F14",
+        "Kolkata--Mumbai_D14_F8",
+        "Kolkata--Mumbai_D14_F7",
+        "Kolkata--Mumbai_D14_F6",
+        "Kolkata--Mumbai_D14_F5",
+        "Kolkata--Mumbai_D14_F4",
+        "Kolkata--Mumbai_D14_F3",
+        "Kolkata--Mumbai_D14_F2",
+        "Kolkata--Mumbai_D14_F1",
         "Kolkata--Mumbai_F13",
         "Kolkata--Mumbai_D13_F8",
         "Kolkata--Mumbai_D13_F7",
@@ -996,15 +1004,15 @@
         "Kolkata--Mumbai_D13_F2",
         "Kolkata--Mumbai_D13_F1",
         "Kolkata--Mumbai_F12",
-        "Kolkata--Mumbai_D12_F8",
-        "Kolkata--Mumbai_D12_F7",
-        "Kolkata--Mumbai_D12_F6",
-        "Kolkata--Mumbai_D12_F5",
-        "Kolkata--Mumbai_D12_F4",
-        "Kolkata--Mumbai_D12_F3",
-        "Kolkata--Mumbai_D12_F2",
-        "Kolkata--Mumbai_D12_F1",
         "Kolkata--Mumbai_F11",
+        "Kolkata--Mumbai_D11_F8",
+        "Kolkata--Mumbai_D11_F7",
+        "Kolkata--Mumbai_D11_F6",
+        "Kolkata--Mumbai_D11_F5",
+        "Kolkata--Mumbai_D11_F4",
+        "Kolkata--Mumbai_D11_F3",
+        "Kolkata--Mumbai_D11_F2",
+        "Kolkata--Mumbai_D11_F1",
         "Kolkata--Mumbai_F10",
         "Kolkata--Mumbai_D10_F8",
         "Kolkata--Mumbai_D10_F7",
@@ -1096,48 +1104,24 @@
       },
       "zero_success_epochs": 0,
       "qber_skr_validity": {
-        "checked_edges": 1949,
-        "valid_edges": 1949,
+        "checked_edges": 1843,
+        "valid_edges": 1843,
         "invalid_edges": 0,
         "valid_rate": 1.0,
-        "fallback_count": 22
+        "fallback_count": 34
       },
       "episodes": 10
     },
     "BFS-hop": {
-      "overall_reward": 6.611972908889127,
-      "seed_reward_std": 1.2885317045076004,
+      "overall_reward": 7.899513011998853,
+      "seed_reward_std": 1.6490197041169605,
       "per_season": {
         "monsoon": {
-          "reward_median": 6.611972908889127,
-          "reward_std": 1.2885317045076004,
+          "reward_median": 7.899513011998853,
+          "reward_std": 1.6490197041169605,
           "seed_rewards": [
             {
-              "seed": 73000,
-              "source": "Mumbai",
-              "destination": "Kolkata",
-              "reward": 5.321464606212011,
-              "success": true,
-              "hops": 26
-            },
-            {
-              "seed": 73001,
-              "source": "Mumbai",
-              "destination": "Kolkata",
-              "reward": 5.323385416197001,
-              "success": true,
-              "hops": 26
-            },
-            {
-              "seed": 73002,
-              "source": "Mumbai",
-              "destination": "Kolkata",
-              "reward": 5.320871528041493,
-              "success": true,
-              "hops": 26
-            },
-            {
-              "seed": 73003,
+              "seed": 70000,
               "source": "Mumbai",
               "destination": "Kolkata",
               "reward": 7.899513011998853,
@@ -1145,7 +1129,7 @@
               "hops": 24
             },
             {
-              "seed": 73004,
+              "seed": 70001,
               "source": "Mumbai",
               "destination": "Kolkata",
               "reward": 7.899513011998853,
@@ -1153,15 +1137,31 @@
               "hops": 24
             },
             {
-              "seed": 73005,
+              "seed": 70002,
               "source": "Mumbai",
               "destination": "Kolkata",
-              "reward": 5.324432805779401,
+              "reward": 7.899513011998853,
+              "success": true,
+              "hops": 24
+            },
+            {
+              "seed": 70003,
+              "source": "Mumbai",
+              "destination": "Kolkata",
+              "reward": 7.899513011998853,
+              "success": true,
+              "hops": 24
+            },
+            {
+              "seed": 70004,
+              "source": "Mumbai",
+              "destination": "Kolkata",
+              "reward": 5.324298187994416,
               "success": true,
               "hops": 26
             },
             {
-              "seed": 73006,
+              "seed": 70005,
               "source": "Mumbai",
               "destination": "Kolkata",
               "reward": 7.899513011998853,
@@ -1169,15 +1169,7 @@
               "hops": 24
             },
             {
-              "seed": 73007,
-              "source": "Mumbai",
-              "destination": "Kolkata",
-              "reward": 5.322096915793333,
-              "success": true,
-              "hops": 26
-            },
-            {
-              "seed": 73008,
+              "seed": 70006,
               "source": "Mumbai",
               "destination": "Kolkata",
               "reward": 7.899513011998853,
@@ -1185,17 +1177,33 @@
               "hops": 24
             },
             {
-              "seed": 73009,
+              "seed": 70007,
               "source": "Mumbai",
               "destination": "Kolkata",
               "reward": 7.899513011998853,
               "success": true,
               "hops": 24
+            },
+            {
+              "seed": 70008,
+              "source": "Mumbai",
+              "destination": "Kolkata",
+              "reward": 7.899513011998853,
+              "success": true,
+              "hops": 24
+            },
+            {
+              "seed": 70009,
+              "source": "Mumbai",
+              "destination": "Kolkata",
+              "reward": 2.7487908617686245,
+              "success": true,
+              "hops": 28
             }
           ],
           "success_rate": 1.0,
-          "avg_hops_success": 25.0,
-          "hop_ratio_to_optimal": 1.0869565217391304,
+          "avg_hops_success": 24.6,
+          "hop_ratio_to_optimal": 1.0695652173913044,
           "episodes": 10,
           "sample_path": [
             "Mumbai",
@@ -1218,40 +1226,38 @@
             "Kolkata--Mumbai_F7",
             "Kolkata--Mumbai_F6",
             "Kolkata--Mumbai_F5",
-            "Kolkata--Mumbai_D5_F8",
-            "Kolkata--Mumbai_F5",
             "Kolkata--Mumbai_F4",
             "Kolkata--Mumbai_F3",
             "Kolkata--Mumbai_F2",
             "Kolkata--Mumbai_F1",
             "Kolkata"
           ],
-          "sample_revisits": 1,
+          "sample_revisits": 0,
           "qber_skr_validity": {
-            "checked_edges": 250,
-            "valid_edges": 250,
+            "checked_edges": 246,
+            "valid_edges": 246,
             "invalid_edges": 0,
             "valid_rate": 1.0,
-            "fallback_count": 5
+            "fallback_count": 3
           }
         }
       },
       "success_rate": 1.0,
-      "avg_hops_success": 25.0,
+      "avg_hops_success": 24.6,
       "successful_hop_counts": [
-        26,
-        26,
-        26,
+        24,
+        24,
         24,
         24,
         26,
         24,
-        26,
         24,
-        24
+        24,
+        24,
+        28
       ],
       "optimal_hops": 23,
-      "avg_hop_ratio_to_optimal": 1.0869565217391304,
+      "avg_hop_ratio_to_optimal": 1.0695652173913044,
       "sample_path": [
         "Mumbai",
         "Kolkata--Mumbai_F23",
@@ -1273,47 +1279,37 @@
         "Kolkata--Mumbai_F7",
         "Kolkata--Mumbai_F6",
         "Kolkata--Mumbai_F5",
-        "Kolkata--Mumbai_D5_F8",
-        "Kolkata--Mumbai_F5",
         "Kolkata--Mumbai_F4",
         "Kolkata--Mumbai_F3",
         "Kolkata--Mumbai_F2",
         "Kolkata--Mumbai_F1",
         "Kolkata"
       ],
-      "sample_path_revisits": 1,
+      "sample_path_revisits": 0,
       "sample_link_type_counts": {
         "fiber": 24,
-        "fso": 2
+        "fso": 0
       },
       "zero_success_epochs": 0,
       "qber_skr_validity": {
-        "checked_edges": 250,
-        "valid_edges": 250,
+        "checked_edges": 246,
+        "valid_edges": 246,
         "invalid_edges": 0,
         "valid_rate": 1.0,
-        "fallback_count": 5
+        "fallback_count": 3
       },
       "episodes": 10
     },
     "Max-SKR": {
       "overall_reward": -100.26975323771086,
-      "seed_reward_std": 3.241926623978643,
+      "seed_reward_std": 1.4210854715202004e-14,
       "per_season": {
         "monsoon": {
           "reward_median": -100.26975323771086,
-          "reward_std": 3.241926623978643,
+          "reward_std": 1.4210854715202004e-14,
           "seed_rewards": [
             {
-              "seed": 74000,
-              "source": "Mumbai",
-              "destination": "Kolkata",
-              "reward": -110.43211961821513,
-              "success": false,
-              "hops": null
-            },
-            {
-              "seed": 74001,
+              "seed": 70000,
               "source": "Mumbai",
               "destination": "Kolkata",
               "reward": -100.26975323771086,
@@ -1321,7 +1317,7 @@
               "hops": null
             },
             {
-              "seed": 74002,
+              "seed": 70001,
               "source": "Mumbai",
               "destination": "Kolkata",
               "reward": -100.26975323771086,
@@ -1329,7 +1325,7 @@
               "hops": null
             },
             {
-              "seed": 74003,
+              "seed": 70002,
               "source": "Mumbai",
               "destination": "Kolkata",
               "reward": -100.26975323771086,
@@ -1337,15 +1333,7 @@
               "hops": null
             },
             {
-              "seed": 74004,
-              "source": "Mumbai",
-              "destination": "Kolkata",
-              "reward": -105.50704960262303,
-              "success": false,
-              "hops": null
-            },
-            {
-              "seed": 74005,
+              "seed": 70003,
               "source": "Mumbai",
               "destination": "Kolkata",
               "reward": -100.26975323771086,
@@ -1353,7 +1341,7 @@
               "hops": null
             },
             {
-              "seed": 74006,
+              "seed": 70004,
               "source": "Mumbai",
               "destination": "Kolkata",
               "reward": -100.26975323771086,
@@ -1361,15 +1349,7 @@
               "hops": null
             },
             {
-              "seed": 74007,
-              "source": "Mumbai",
-              "destination": "Kolkata",
-              "reward": -102.89240405067949,
-              "success": false,
-              "hops": null
-            },
-            {
-              "seed": 74008,
+              "seed": 70005,
               "source": "Mumbai",
               "destination": "Kolkata",
               "reward": -100.26975323771086,
@@ -1377,7 +1357,31 @@
               "hops": null
             },
             {
-              "seed": 74009,
+              "seed": 70006,
+              "source": "Mumbai",
+              "destination": "Kolkata",
+              "reward": -100.26975323771086,
+              "success": false,
+              "hops": null
+            },
+            {
+              "seed": 70007,
+              "source": "Mumbai",
+              "destination": "Kolkata",
+              "reward": -100.26975323771086,
+              "success": false,
+              "hops": null
+            },
+            {
+              "seed": 70008,
+              "source": "Mumbai",
+              "destination": "Kolkata",
+              "reward": -100.26975323771086,
+              "success": false,
+              "hops": null
+            },
+            {
+              "seed": 70009,
               "source": "Mumbai",
               "destination": "Kolkata",
               "reward": -100.26975323771086,
@@ -1398,18 +1402,6 @@
             "Jaipur--Mumbai_F14",
             "Mumbai",
             "Jaipur--Mumbai_F14",
-            "Jaipur--Mumbai_D14_F8",
-            "Jaipur--Mumbai_D14_F7",
-            "Jaipur--Mumbai_D14_F8",
-            "Jaipur--Mumbai_D14_F7",
-            "Jaipur--Mumbai_D14_F6",
-            "Jaipur--Mumbai_D14_F5",
-            "Jaipur--Mumbai_D14_F6",
-            "Jaipur--Mumbai_D14_F7",
-            "Jaipur--Mumbai_D14_F6",
-            "Jaipur--Mumbai_D14_F7",
-            "Jaipur--Mumbai_D14_F8",
-            "Jaipur--Mumbai_F14",
             "Mumbai",
             "Jaipur--Mumbai_F14",
             "Mumbai",
@@ -1418,10 +1410,10 @@
             "Jaipur--Mumbai_F14",
             "Mumbai"
           ],
-          "sample_revisits": 21,
+          "sample_revisits": 13,
           "qber_skr_validity": {
-            "checked_edges": 156,
-            "valid_edges": 156,
+            "checked_edges": 140,
+            "valid_edges": 140,
             "invalid_edges": 0,
             "valid_rate": 1.0,
             "fallback_count": 0
@@ -1442,18 +1434,6 @@
         "Jaipur--Mumbai_F14",
         "Mumbai",
         "Jaipur--Mumbai_F14",
-        "Jaipur--Mumbai_D14_F8",
-        "Jaipur--Mumbai_D14_F7",
-        "Jaipur--Mumbai_D14_F8",
-        "Jaipur--Mumbai_D14_F7",
-        "Jaipur--Mumbai_D14_F6",
-        "Jaipur--Mumbai_D14_F5",
-        "Jaipur--Mumbai_D14_F6",
-        "Jaipur--Mumbai_D14_F7",
-        "Jaipur--Mumbai_D14_F6",
-        "Jaipur--Mumbai_D14_F7",
-        "Jaipur--Mumbai_D14_F8",
-        "Jaipur--Mumbai_F14",
         "Mumbai",
         "Jaipur--Mumbai_F14",
         "Mumbai",
@@ -1462,15 +1442,15 @@
         "Jaipur--Mumbai_F14",
         "Mumbai"
       ],
-      "sample_path_revisits": 21,
+      "sample_path_revisits": 13,
       "sample_link_type_counts": {
         "fiber": 14,
-        "fso": 12
+        "fso": 0
       },
       "zero_success_epochs": 1,
       "qber_skr_validity": {
-        "checked_edges": 156,
-        "valid_edges": 156,
+        "checked_edges": 140,
+        "valid_edges": 140,
         "invalid_edges": 0,
         "valid_rate": 1.0,
         "fallback_count": 0

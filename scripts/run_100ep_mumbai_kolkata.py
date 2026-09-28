@@ -87,7 +87,7 @@ def main() -> None:
         comparison[name] = evaluate_policy(
             BaselinePolicy(name, seed=71000 + index), seasons=("monsoon",),
             eval_seeds_per_season=10, env_kwargs=eval_kwargs,
-            seed_base=70000 + index * 1000)
+            seed_base=70000)
 
     graph = build_topology()
     fiber_graph = nx.Graph()
