@@ -1,0 +1,46 @@
+experiment_name: defence_monsoon_night_200ep_mumbai_kolkata
+seed: 20260928
+hidden_dim: 64
+cpu_threads: 8
+model:
+  dropedge_probability: 0.05
+environment:
+  source: Mumbai
+  destination: Kolkata
+  season: monsoon
+  use_case: defence
+  node_feature_mode: relative
+  time_of_day_hours: 22.0
+  time_jitter_hours: 1.0
+  dt_seconds: 300
+  max_steps: 400
+  fiber_outage_prob: 0.01
+  qber_hard: 0.11
+  reward_protection_overrides:
+    step_cost: -0.05
+    revisit: -0.6
+    switch: -0.2
+    security_penalty: -30.0
+    depletion_penalty: -60.0
+    backtrack: -0.5
+training:
+  bc_epochs: 1
+  bc_episodes_per_epoch: 2
+  bc_randomize_endpoints: false
+  bc_learning_rate: 0.001
+  bc_entropy_coef: 0.02
+  ppo_epochs: 200
+  steps_per_epoch: 16
+  update_epochs: 4
+  batch_size: 64
+  learning_rate: 3.0e-05
+  clip_epsilon: 0.1
+  entropy_start: 0.003
+  critic_warmup_epochs: 5
+  gamma: 0.99
+  gae_lambda: 0.9
+  actor_learning_rate: 3.0e-05
+  critic_learning_rate: 3.0e-05
+  value_clip_epsilon: 0.2
+  max_grad_norm: 0.5
+  reward_normalization: true
