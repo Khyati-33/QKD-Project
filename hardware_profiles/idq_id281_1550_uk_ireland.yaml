@@ -1,0 +1,67 @@
+profile_id: idq_id281_snspd_1550_uk_ireland_characterized
+display_name: ID Quantique ID281 SNSPD, 1550 nm characterized receiver
+profile_kind: published_device_characterization
+provenance:
+  experiment: Quantum Communications Feasibility Tests over a UK-Ireland 224 km Undersea Link
+  source_url: https://pmc.ncbi.nlm.nih.gov/articles/PMC10743312/
+  device_manufacturer_page: https://www.idquantique.com/quantum-detection-systems/products/id281-snspd-system/
+  notes: >-
+    The experiment reports two ID281 detector channels. This profile uses the
+    better-characterized channel figures reported by the paper/manufacturer
+    (93.0% system detection efficiency and dark counts below 70 Hz per channel).
+    It is an experimentally characterized receiver configuration, not a claim
+    that every ID281 unit has these exact values.
+channel:
+  wavelength_nm: 1550
+  channel_type: single_photon_detection
+  compatible_simulated_link_types:
+    - fiber
+  incompatible_or_unverified_link_types:
+    - fso_785nm
+detector:
+  manufacturer: ID Quantique
+  product_family: ID281 SNSPD
+  architecture: standard_snspd
+  system_detection_efficiency:
+    value: 0.93
+    unit: fraction
+    status: measured_in_published_experiment
+    uncertainty_or_range: null
+  dark_count_rate:
+    upper_bound: 70
+    unit: counts_per_second
+    status: measured_in_published_experiment_upper_bound
+  timing_jitter_fwhm:
+    value: null
+    unit: ps
+    status: not_reported_for_this_detector_channel
+    manufacturer_family_capability: "<40 ps FWHM for standard SNSPD; wavelength/design dependent"
+  recovery_time:
+    value: null
+    unit: ns
+    status: not_reported_for_this_detector_channel
+    manufacturer_family_capability: "typically <30 ns for standard SNSPD"
+  maximum_detection_rate:
+    value: null
+    unit: counts_per_second
+    status: not_reported_for_this_detector_channel
+    manufacturer_family_capability: ">30 Mcps for standard SNSPD; efficiency-rate tradeoff applies"
+  operating_temperature_k:
+    value: null
+    status: not_reported_for_this_detector_channel
+    manufacturer_system_options: "ID281 SO approximately 0.8 K; ID281 CO above 2 K"
+  cryostat_configuration: null
+  saturation_characterization: null
+  efficiency_curve_by_bias_current: null
+  afterpulse_probability: null
+  dead_time_characterization: null
+  polarization_dependence: null
+  coupling_and_connector_loss_db: null
+system_model_scope:
+  qber_or_skr_directly_measured_by_detector_profile: false
+  notes: >-
+    This file supplies detector inputs only. QBER/SKR also require a specified
+    source, QKD protocol, channel loss, receiver optics, timing window, error
+    correction and finite-key/security model. Do not interpret the experiment's
+    end-to-end rates as detector-only parameters. Do not apply this 1550 nm
+    characterized efficiency to the simulator's separate 785 nm FSO channel.

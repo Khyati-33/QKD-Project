@@ -1,0 +1,9 @@
+﻿torch
+gymnasium
+networkx
+torch_geometric
+folium
+nbclient
+nbformat
+pyyaml
+pytest
