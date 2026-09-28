@@ -343,9 +343,16 @@ def main():
                         dt_seconds=environment_cfg.get("dt_seconds", 300.0),
                         time_jitter_hours=environment_cfg.get("time_jitter_hours", 0.0),
                         max_steps=environment_cfg.get("max_steps", 100),
+                        key_rate_model=environment_cfg.get("key_rate_model", "asymptotic_proxy"),
                         disabled_reward_terms=set(environment_cfg.get("disabled_reward_terms", [])),
                         randomize_endpoints=environment_cfg.get("randomize_endpoints", False))
-    train_model(args.model, env, cfg, args.output, resume_from=args.resume)
+    training_cfg = dict(cfg.get("training", cfg))
+    # Keep top-level runtime settings available to train_model while honoring
+    # the documented nested training section.
+    for key in ("seed", "device", "hidden_dim", "cpu_threads", "model"):
+        if key in cfg and key not in training_cfg:
+            training_cfg[key] = cfg[key]
+    train_model(args.model, env, training_cfg, args.output, resume_from=args.resume)
 
 
 if __name__ == "__main__":

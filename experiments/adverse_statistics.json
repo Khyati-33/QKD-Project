@@ -1,0 +1,113 @@
+{
+  "comparison": "GNN-200ep minus BFS-hop",
+  "scenarios": {
+    "fixed_monsoon_night": {
+      "paired_reward_differences": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "reward_difference_bootstrap_median": 0.0,
+      "reward_difference_bootstrap_95ci": [
+        0.0,
+        0.0
+      ],
+      "success_difference": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "paired_sign_pvalue_reward": 1.0
+    },
+    "random_endpoints_all_seasons": {
+      "paired_reward_differences": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "reward_difference_bootstrap_median": 0.0,
+      "reward_difference_bootstrap_95ci": [
+        0.0,
+        0.0
+      ],
+      "success_difference": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "paired_sign_pvalue_reward": 1.0
+    },
+    "high_fiber_outage": {
+      "paired_reward_differences": [
+        10.079059563053768,
+        32.61797573607916,
+        30.6698239693605
+      ],
+      "reward_difference_bootstrap_median": 24.455619756164477,
+      "reward_difference_bootstrap_95ci": [
+        10.079059563053768,
+        32.61797573607916
+      ],
+      "success_difference": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "paired_sign_pvalue_reward": 0.25
+    },
+    "severe_time_jitter": {
+      "paired_reward_differences": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "reward_difference_bootstrap_median": 0.0,
+      "reward_difference_bootstrap_95ci": [
+        0.0,
+        0.0
+      ],
+      "success_difference": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "paired_sign_pvalue_reward": 1.0
+    },
+    "all_seasons": {
+      "paired_reward_differences": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "reward_difference_bootstrap_median": 0.0,
+      "reward_difference_bootstrap_95ci": [
+        0.0,
+        0.0
+      ],
+      "success_difference": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "paired_sign_pvalue_reward": 1.0
+    },
+    "high_outage_and_time_jitter": {
+      "paired_reward_differences": [
+        20.354675073033057,
+        13.844910700927297,
+        27.899593347652694
+      ],
+      "reward_difference_bootstrap_median": 20.699726373871016,
+      "reward_difference_bootstrap_95ci": [
+        13.844910700927295,
+        27.899593347652694
+      ],
+      "success_difference": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "paired_sign_pvalue_reward": 0.25
+    }
+  }
+}

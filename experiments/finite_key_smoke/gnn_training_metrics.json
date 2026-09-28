@@ -1,0 +1,24 @@
+[
+  {
+    "bc_loss": 0.0,
+    "bc_entropy": 0.0,
+    "bc_match_rate": 0.0,
+    "phase": "bc",
+    "epoch": 1
+  },
+  {
+    "phase": "ppo",
+    "epoch": 1,
+    "rollout_reward": -40.0,
+    "zero_success_epoch": 1.0,
+    "rollout_successes": 0.0,
+    "sample_path": [
+      "Delhi"
+    ],
+    "policy_loss": 0.0,
+    "value_loss": 11.243415117263794,
+    "entropy": 2.4849069118499756,
+    "total_loss": 5.621707558631897,
+    "entropy_coef": 0.003
+  }
+]

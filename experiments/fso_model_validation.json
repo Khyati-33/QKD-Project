@@ -1,0 +1,166 @@
+{
+  "status": "model_internal_validation_only",
+  "external_trace_calibration": "not_available",
+  "rows": [
+    {
+      "season": "normal",
+      "distance_km": 10.0,
+      "configured_availability": 0.93,
+      "sampled_availability": 0.927,
+      "availability_error": -0.0030000000000000027,
+      "median_transmittance": 0.4868851585563452,
+      "p05_transmittance": 0.4694544953041799,
+      "p95_transmittance": 0.5058178426765806
+    },
+    {
+      "season": "normal",
+      "distance_km": 15.0,
+      "configured_availability": 0.82,
+      "sampled_availability": 0.812,
+      "availability_error": -0.007999999999999896,
+      "median_transmittance": 0.4872939409808079,
+      "p05_transmittance": 0.46924904981849236,
+      "p95_transmittance": 0.5052282056086049
+    },
+    {
+      "season": "normal",
+      "distance_km": 30.0,
+      "configured_availability": 0.54,
+      "sampled_availability": 0.5365,
+      "availability_error": -0.0035000000000000586,
+      "median_transmittance": 0.48449817419855523,
+      "p05_transmittance": 0.4663143172773424,
+      "p95_transmittance": 0.5022626987167411
+    },
+    {
+      "season": "normal",
+      "distance_km": 78.0,
+      "configured_availability": 0.01,
+      "sampled_availability": 0.008,
+      "availability_error": -0.002,
+      "median_transmittance": 0.34044173588005533,
+      "p05_transmittance": 0.32793761174646846,
+      "p95_transmittance": 0.3526373784049809
+    },
+    {
+      "season": "summer",
+      "distance_km": 10.0,
+      "configured_availability": 0.9,
+      "sampled_availability": 0.898,
+      "availability_error": -0.0020000000000000018,
+      "median_transmittance": 0.48681288135471,
+      "p05_transmittance": 0.4694125250511221,
+      "p95_transmittance": 0.5057281779807317
+    },
+    {
+      "season": "summer",
+      "distance_km": 15.0,
+      "configured_availability": 0.76,
+      "sampled_availability": 0.756,
+      "availability_error": -0.0040000000000000036,
+      "median_transmittance": 0.4871260039335711,
+      "p05_transmittance": 0.46899032748429437,
+      "p95_transmittance": 0.5049922695960019
+    },
+    {
+      "season": "summer",
+      "distance_km": 30.0,
+      "configured_availability": 0.48,
+      "sampled_availability": 0.4765,
+      "availability_error": -0.003500000000000003,
+      "median_transmittance": 0.4837642058961024,
+      "p05_transmittance": 0.4656011241428229,
+      "p95_transmittance": 0.5016565835451052
+    },
+    {
+      "season": "summer",
+      "distance_km": 78.0,
+      "configured_availability": 0.005,
+      "sampled_availability": 0.0035,
+      "availability_error": -0.0015,
+      "median_transmittance": 0.33767307501237026,
+      "p05_transmittance": 0.32457917552637106,
+      "p95_transmittance": 0.35024914842022237
+    },
+    {
+      "season": "winter",
+      "distance_km": 10.0,
+      "configured_availability": 0.92,
+      "sampled_availability": 0.917,
+      "availability_error": -0.0030000000000000027,
+      "median_transmittance": 0.3894685712698114,
+      "p05_transmittance": 0.37200367769702386,
+      "p95_transmittance": 0.4083848820197694
+    },
+    {
+      "season": "winter",
+      "distance_km": 15.0,
+      "configured_availability": 0.8,
+      "sampled_availability": 0.792,
+      "availability_error": -0.008000000000000007,
+      "median_transmittance": 0.3899239378180577,
+      "p05_transmittance": 0.37199681447121824,
+      "p95_transmittance": 0.4078531872185822
+    },
+    {
+      "season": "winter",
+      "distance_km": 30.0,
+      "configured_availability": 0.52,
+      "sampled_availability": 0.514,
+      "availability_error": -0.006000000000000005,
+      "median_transmittance": 0.38775632561188716,
+      "p05_transmittance": 0.3698061649251586,
+      "p95_transmittance": 0.4056728354733029
+    },
+    {
+      "season": "winter",
+      "distance_km": 78.0,
+      "configured_availability": 0.008,
+      "sampled_availability": 0.007,
+      "availability_error": -0.001,
+      "median_transmittance": 0.2733554071784329,
+      "p05_transmittance": 0.2611163155063069,
+      "p95_transmittance": 0.2859589206124361
+    },
+    {
+      "season": "monsoon",
+      "distance_km": 10.0,
+      "configured_availability": 0.88,
+      "sampled_availability": 0.879,
+      "availability_error": -0.0010000000000000009,
+      "median_transmittance": 0.24230480666213705,
+      "p05_transmittance": 0.20862800735775738,
+      "p95_transmittance": 0.2796743684222563
+    },
+    {
+      "season": "monsoon",
+      "distance_km": 15.0,
+      "configured_availability": 0.7,
+      "sampled_availability": 0.6875,
+      "availability_error": -0.012499999999999956,
+      "median_transmittance": 0.2434980146488238,
+      "p05_transmittance": 0.20820171368696094,
+      "p95_transmittance": 0.27905793943541096
+    },
+    {
+      "season": "monsoon",
+      "distance_km": 30.0,
+      "configured_availability": 0.43,
+      "sampled_availability": 0.4245,
+      "availability_error": -0.005500000000000005,
+      "median_transmittance": 0.2411038421306664,
+      "p05_transmittance": 0.20582421794284736,
+      "p95_transmittance": 0.2752090519473227
+    },
+    {
+      "season": "monsoon",
+      "distance_km": 78.0,
+      "configured_availability": 0.001,
+      "sampled_availability": 0.0015,
+      "availability_error": 0.0005,
+      "median_transmittance": 0.16366134186064352,
+      "p05_transmittance": 0.13926587862054038,
+      "p95_transmittance": 0.189238629559436
+    }
+  ]
+}
