@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Any
 
 import folium
-from folium.plugins import Fullscreen
+import networkx as nx
 
 from topology import CITIES, CITY_COORDS, build_topology
 
@@ -43,15 +43,26 @@ def create_map(run_dir: Path, output: Path) -> Path:
     m = folium.Map(
         location=center,
         zoom_start=5,
-        tiles="OpenStreetMap",
+        tiles=None,
         control_scale=True,
         prefer_canvas=True,
     )
-    Fullscreen(position="topright", title="Expand map", title_cancel="Exit full screen").add_to(m)
+    # A coordinate graticule keeps the map geographically readable without
+    # requesting any third-party basemap or tile API.
+    for lat in range(10, 36, 5):
+        folium.PolyLine([[lat, 67], [lat, 94]], color="#cbd5dd", weight=0.8,
+                        opacity=0.8, dash_array="2 5",
+                        tooltip=f"{lat}° N").add_to(m)
+    for lon in range(70, 96, 5):
+        folium.PolyLine([[7, lon], [33, lon]], color="#cbd5dd", weight=0.8,
+                        opacity=0.8, dash_array="2 5",
+                        tooltip=f"{lon}° E").add_to(m)
 
     fiber_layer = folium.FeatureGroup(name="Modeled fiber backbone (80 km/link)", show=True)
     fso_layer = folium.FeatureGroup(name="Modeled FSO detours (10 km/link)", show=True)
     route_layer = folium.FeatureGroup(name="Epoch 50 learned route", show=True)
+    connectivity_layer = folium.FeatureGroup(
+        name="Mumbai–Kolkata connection (via Jaipur and Delhi)", show=True)
 
     for u, v, attrs in graph.edges(data=True):
         points = [graph.nodes[u]["pos"], graph.nodes[v]["pos"]]
@@ -73,6 +84,20 @@ def create_map(run_dir: Path, output: Path) -> Path:
                 tooltip=f"FSO | modeled {attrs['distance_km']:.0f} km | synthetic detour",
             ).add_to(fso_layer)
 
+    # The model has no direct Mumbai–Kolkata corridor. Show its shortest
+    # existing fiber connection explicitly so the network continuity is clear.
+    fiber_graph = nx.Graph()
+    fiber_graph.add_nodes_from(graph.nodes(data=True))
+    fiber_graph.add_edges_from((u, v, attrs) for u, v, attrs in graph.edges(data=True)
+                               if attrs["link_type"] == "fiber")
+    mumbai_kolkata_path = nx.shortest_path(fiber_graph, "Mumbai", "Kolkata",
+                                           weight="distance_km")
+    folium.PolyLine(
+        [graph.nodes[node]["pos"] for node in mumbai_kolkata_path],
+        color="#8e5bb7", weight=4, opacity=0.85,
+        tooltip="Modeled fiber connection: Mumbai → Jaipur → Delhi → Kolkata (no direct corridor)",
+    ).add_to(connectivity_layer)
+
     route_points = [graph.nodes[node]["pos"] for node in route]
     folium.PolyLine(
         route_points,
@@ -93,31 +118,43 @@ def create_map(run_dir: Path, output: Path) -> Path:
 
     fiber_layer.add_to(m)
     fso_layer.add_to(m)
+    connectivity_layer.add_to(m)
     route_layer.add_to(m)
 
     for city in CITIES:
         lat, lon = CITY_COORDS[city]
         is_endpoint = city in (route[0], route[-1])
+        color = "#d1493f" if is_endpoint else "#163a5f"
+        folium.CircleMarker(
+            [lat, lon], radius=6 if is_endpoint else 5, color="white", weight=1.5,
+            fill=True, fill_color=color, fill_opacity=1,
+            tooltip=f"{city} (approximate city-center coordinate)",
+        ).add_to(m)
         folium.Marker(
             [lat, lon],
-            tooltip=city,
-            popup=folium.Popup(f"<b>{city}</b><br>Approximate city-center coordinate", max_width=240),
-            icon=folium.Icon(color="red" if is_endpoint else "darkblue", icon="info-sign"),
+            icon=folium.DivIcon(html=(
+                '<div style="font:600 12px Arial,sans-serif;color:#172b3a;'
+                'text-shadow:0 1px 2px white,1px 0 2px white,-1px 0 2px white;'
+                'white-space:nowrap;transform:translate(8px,-7px);">'
+                f"{city}</div>")),
         ).add_to(m)
 
     folium.LayerControl(collapsed=False).add_to(m)
-    title = "QKD routing experiment · epoch 50"
+    title = "QKD routing experiment - epoch 50"
     note = (
-        "Illustrative map of a synthetic topology. City coordinates are approximate; "
-        "relay positions are linearly interpolated. Corridor geometry and modeled "
-        "link lengths are not surveyed infrastructure."
+        "Offline geographic schematic: no basemap tiles or API key. City coordinates "
+        "are approximate and relays are linearly interpolated. Mumbai connects to "
+        "Kolkata through Jaipur and Delhi; no direct corridor is modeled."
     )
     m.get_root().html.add_child(folium.Element(
-        f'''<div style="position:fixed;top:12px;left:50px;z-index:9999;background:#fff;"
-        "padding:9px 13px;border:1px solid #aaa;border-radius:4px;max-width:590px;"
-        "box-shadow:0 1px 4px #777;font-family:Arial,sans-serif;">
-        <div style="font-size:16px;font-weight:700">{title}</div>
-        <div style="font-size:11px;color:#444;margin-top:3px">{note}</div></div>'''
+        f'<div style="position:fixed;top:12px;left:12px;z-index:9999;background:#fff;'
+        f'padding:9px 13px;border:1px solid #9aa7b1;border-radius:4px;max-width:580px;'
+        f'box-shadow:0 1px 4px #777;font-family:Arial,sans-serif;">'
+        f'<div style="font-size:16px;font-weight:700">{title}</div>'
+        f'<div style="font-size:11px;color:#444;margin-top:3px">{note}</div></div>'
+    ))
+    m.get_root().header.add_child(folium.Element(
+        '<style>.leaflet-container{background:#f4f7f8!important;}</style>'
     ))
     m.fit_bounds([[8.0, 68.0], [31.5, 92.5]])
     output.parent.mkdir(parents=True, exist_ok=True)
