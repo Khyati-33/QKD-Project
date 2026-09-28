@@ -5,6 +5,7 @@ from typing import Any, Mapping, Sequence
 
 import numpy as np
 import torch
+from torch.distributions import Categorical
 
 from models import stack_observations
 
@@ -34,6 +35,21 @@ def act(model: torch.nn.Module, observation: Mapping[str, Any]) -> int:
     """Run one deterministic action with autograd fully disabled."""
     action, _, _, _ = model.act(observation, deterministic=True)
     return int(action)
+
+
+@torch.inference_mode()
+def entropy(model: torch.nn.Module, observation: Mapping[str, Any]) -> tuple[float, float]:
+    """Return policy entropy and entropy normalized by available actions."""
+    logits, _ = model(observation)
+    row = logits[0] if logits.ndim == 2 else logits
+    finite = torch.isfinite(row)
+    if not bool(finite.any()):
+        return 0.0, 0.0
+    distribution = Categorical(logits=row)
+    value = float(distribution.entropy().cpu())
+    available = int(finite.sum())
+    normalized = value / float(np.log(max(available, 2)))
+    return value, normalized
 
 
 @torch.inference_mode()
