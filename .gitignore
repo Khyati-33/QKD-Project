@@ -4,5 +4,7 @@ __pycache__/
 .ipynb_checkpoints/
 experiments/checkpoints/
 experiments/runs/
+experiments/smoke-training/
+experiments/section6-smoke/
 *.pt
 *.pth

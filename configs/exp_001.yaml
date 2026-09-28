@@ -1,0 +1,62 @@
+experiment_name: exp_001
+models: [LSTM, GNN]
+seed: 20260927
+hidden_dim: 64
+device: cpu
+
+environment:
+  season: normal
+  use_case: standard
+  node_feature_mode: geographic
+  time_of_day_hours: 12.0
+  time_jitter_hours: 0.0
+  dt_seconds: 300
+  max_steps: 100
+  disabled_reward_terms: []
+
+training:
+  bc_epochs: 15
+  bc_episodes_per_epoch: 8
+  bc_entropy_coef: 0.02
+  ppo_epochs: 100
+  steps_per_epoch: 144
+  update_epochs: 4
+  batch_size: 64
+  learning_rate: 0.00003
+  clip_epsilon: 0.1
+  entropy_start: 0.003
+  critic_warmup_epochs: 5
+  gamma: 0.99
+  gae_lambda: 0.95
+
+evaluation:
+  seasons: [normal, summer, winter, monsoon]
+  eval_seeds_per_season: 4
+  interval: 5
+
+protected_conditions:
+  source_destination:
+    value: {source: Delhi, destination: Chennai}
+    override: false
+  qber_hard: {value: 0.11, override: false}
+  fiber_outage_prob: {value: 0.01, override: false}
+  seasons:
+    value: [normal, summer, winter, monsoon]
+    override: false
+  eval_seeds_per_season: {value: 4, override: false}
+  trust_chain_reset_rule:
+    value: full_tn_clears_hop_qbers
+    override: false
+  reward_hacking_protections:
+    value:
+      step_cost: -0.1
+      revisit: -1.0
+      switch: -0.25
+      security_penalty: -10.0
+      depletion_penalty: -5.0
+      backtrack: -0.5
+    override: false
+  evaluation_baselines:
+    value: [Random, Dijkstra-km, BFS-hop, Max-SKR]
+    override: false
+  randomize_endpoints: {value: false, override: false}

@@ -1,0 +1,86 @@
+experiment_name: defence_monsoon_night_50ep_idq
+models: [GNN]
+seed: 20260927
+hidden_dim: 64
+device: cpu
+cpu_threads: 8
+model:
+  dropedge_probability: 0.05
+physics:
+  fiber_detector_profile: idq_id281_snspd_1550_uk_ireland_characterized
+  fso_channel_profile: 785nm_weather_turbulence_scenario
+
+environment:
+  source: Delhi
+  destination: Chennai
+  season: monsoon
+  use_case: defence
+  node_feature_mode: relative
+  time_of_day_hours: 22.0
+  time_jitter_hours: 1.0
+  dt_seconds: 300
+  max_steps: 144
+  disabled_reward_terms: []
+  randomize_endpoints: false
+  fiber_outage_prob: 0.01
+  qber_hard: 0.11
+  reward_protection_overrides:
+    step_cost: -0.05
+    revisit: -0.6
+    switch: -0.2
+    security_penalty: -30.0
+    depletion_penalty: -60.0
+    backtrack: -0.5
+
+training:
+  bc_epochs: 15
+  bc_episodes_per_epoch: 8
+  bc_learning_rate: 0.001
+  bc_entropy_coef: 0.02
+  ppo_epochs: 50
+  steps_per_epoch: 144
+  update_epochs: 4
+  batch_size: 64
+  learning_rate: 0.00003
+  clip_epsilon: 0.1
+  entropy_start: 0.003
+  critic_warmup_epochs: 5
+  gamma: 0.99
+  gae_lambda: 0.9
+  actor_learning_rate: 0.00003
+  critic_learning_rate: 0.00003
+  value_clip_epsilon: 0.2
+  max_grad_norm: 0.5
+  reward_normalization: true
+
+evaluation:
+  seasons: [normal, summer, winter, monsoon]
+  eval_seeds_per_season: 4
+  interval: 5
+
+protected_conditions:
+  source_destination:
+    value: {source: Delhi, destination: Chennai}
+    override: false
+  qber_hard: {value: 0.11, override: false}
+  fiber_outage_prob: {value: 0.01, override: false}
+  seasons:
+    value: [normal, summer, winter, monsoon]
+    override: false
+  eval_seeds_per_season: {value: 4, override: false}
+  trust_chain_reset_rule:
+    value: full_tn_clears_hop_qbers
+    override: false
+  reward_hacking_protections:
+    value:
+      step_cost: -0.05
+      revisit: -0.6
+      switch: -0.2
+      security_penalty: -30.0
+      depletion_penalty: -60.0
+      backtrack: -0.5
+    override: true
+  evaluation_baselines:
+    value: [Random, Dijkstra-km, BFS-hop, Max-SKR]
+    override: false
+  randomize_endpoints: {value: false, override: false}
