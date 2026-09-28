@@ -128,12 +128,18 @@ def test_behavior_cloning_teacher_uses_hops_before_skr_for_equal_distance_routes
                for _, _, attrs in env.graph.edges(data=True)))
     env._current_node = u
     fso_neighbor = next(n for n in env.graph.neighbors(u)
-                        if env.graph[u][n]["link_type"] == "fso")
+                        if env.graph[u][n]["link_type"] == "fso" and
+                        env.graph[u][n].get("detour_for") == frozenset((u, v)))
     fiber_key, fso_key = env._edge_key(u, v), env._edge_key(u, fso_neighbor)
     env._edge_states[fiber_key].update(qber=0.01, skr=0.02, outage=False)
     env._edge_states[fso_key].update(qber=0.01, skr=0.20, outage=False)
-    env._destination_distances = __import__("networkx").single_source_dijkstra_path_length(
-        env.graph, env.destination, weight="distance_km")
+    # Construct an equal-distance choice: road-aligned FSO spans are slightly
+    # shorter in straight-line distance than the winding fiber route geometry.
+    env._destination_distances = {node: 1e9 for node in env.graph.nodes}
+    env._destination_distances[v] = 100.0
+    env._destination_distances[fso_neighbor] = (
+        100.0 + env.graph[u][v]["distance_km"] -
+        env.graph[u][fso_neighbor]["distance_km"])
     obs = env._get_obs()
     assert env.graph[u][v]["distance_km"] + env._km_dist_to_dest(v) == pytest.approx(
         env.graph[u][fso_neighbor]["distance_km"] +
@@ -202,16 +208,22 @@ def test_invalid_chosen_neighbor_uses_shared_validity_fallback():
     state = env._edge_states[env._edge_key(env._current_node, invalid_neighbor)]
     state["qber"], state["skr"] = QBER_HARD, 0.0
     assert not env._edge_valid((env._current_node, invalid_neighbor))
+    expected_slot = min(valid, key=lambda i: env._km_dist_to_dest(neighbors[int(i)]))
     _, _, _, _, info = env.step(invalid)
     assert info["fallback"]
     assert info["qber"] < QBER_HARD
+    assert info["node"] == neighbors[int(expected_slot)]
 
 
 def test_security_and_pool_penalties_remain_active():
     env = QKDRoutingEnv(disabled_reward_terms={"security_penalty", "depletion_penalty"})
     env.reset(seed=18)
     obs = env._get_obs()
-    slot = int(np.flatnonzero(obs["edge_valid_mask"])[0])
+    valid_slots = np.flatnonzero(obs["edge_valid_mask"])
+    slot = next(int(i) for i in valid_slots
+                if env.graph.nodes[
+                    env.node_names[int(obs["neighbor_indices"][i])]
+                ].get("node_type") != "full_tn")
     neighbor_idx = int(obs["neighbor_indices"][slot])
     neighbor = env.node_names[neighbor_idx]
     edge_key = env._edge_key(env._current_node, neighbor)

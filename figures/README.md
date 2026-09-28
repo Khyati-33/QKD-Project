@@ -1,19 +1,28 @@
-# Epoch 50 route map
+# Road-aligned topology map
 
-`epoch50_geographic_route_map.html` is an interactive Folium map generated from
-the completed 50-epoch run. It shows the modeled fiber backbone, modeled FSO
-detours, the final GNN route, and the modeled Mumbai–Kolkata connection via
-Jaipur and Delhi in separate toggleable layers. It does not request basemap
-tiles or an API key.
+`india_road_corridor_map.html` shows the revised network: 17 road-routed city
+corridors, fiber relays at no more than 80 km along each route, and optional
+candidate FSO paths with links no longer than 10 km. Jaipur, Hyderabad, and
+Kolkata each connect by a routed corridor to every other modeled city. Mumbai
+has direct candidate corridors to Hyderabad and Kolkata.
 
-Suggested paper caption: *Geographic visualization of the epoch 50 GNN route
-for the Delhi–Chennai evaluation in the synthetic QKD topology. City positions
-are approximate and relay positions are linearly interpolated; link geometry
-does not represent surveyed infrastructure.*
+The red path is the **shortest fiber baseline**, not a learned-policy result.
+The previous `epoch50_geographic_route_map.html` is an archived view of the
+older abstract topology; its 50-epoch route metrics do not apply to this revised
+graph. The revised network needs a new training and evaluation run.
 
-The map uses an offline latitude/longitude graticule. Its corridors are
-synthetic and are not surveyed infrastructure. Regenerate it with:
+Suggested paper caption: *Proposed QKD backbone over fastest OpenStreetMap road
+corridors among seven Indian metropolitan nodes. Fiber repeater spacing is at
+most 80 km; candidate FSO links are at most 10 km and assume unverified line of
+sight. The displayed paths are road-alignment proxies, not verified telecom
+fiber routes. Map data from OpenStreetMap contributors,
+<https://www.openstreetmap.org/copyright>.*
+
+The HTML map does not request basemap tiles or a tile API key. Regenerate it
+from the committed route snapshot with:
 
 ```powershell
-python make_folium_map.py --run-dir experiments/runs/defence_monsoon_night_50ep_idq_20260928T044715Z_c84be8c5 --output figures/epoch50_geographic_route_map.html
+python make_folium_map.py
 ```
+
+For source, route retrieval, and licensing details, see [data/README.md](../data/README.md).

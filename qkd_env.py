@@ -85,7 +85,7 @@ class QKDRoutingEnv(gym.Env):
                  fiber_outage_prob: float = FIBER_OUTAGE_PROB,
                  qber_hard: float = QBER_HARD,
                  reward_protection_overrides: dict[str, float] | None = None,
-                 max_steps: int = 100, time_of_day_hours: float = 12.0,
+                 max_steps: int = 400, time_of_day_hours: float = 12.0,
                  dt_seconds: float = 300.0, time_jitter_hours: float = 0.0):
         super().__init__()
         if season not in SEASONS:
@@ -127,12 +127,11 @@ class QKDRoutingEnv(gym.Env):
         self.node_to_idx = {n: i for i, n in enumerate(self.node_names)}
         self.max_neighbors = max(dict(self.graph.degree()).values())
         self.max_edge_km = max(d["distance_km"] for _, _, d in self.graph.edges(data=True))
-        # Use a stable global max rather than a degree/hop proxy.
-        self.longest_route_km = max(
-            max(nx.single_source_dijkstra_path_length(self.graph, n, weight="distance_km").values())
-            for n in self.graph.nodes
-        )
+        # Bound progress normalization using configured city-pair routes. An
+        # all-node-pairs search is needlessly expensive for the road-aligned
+        # graph, which has several thousand candidate relays.
         self.norm_constants = calibrate_norm_constants_over_pairs(self.graph)
+        self.longest_route_km = self.norm_constants["max_pair_distance_km"]
         self.action_space = spaces.Discrete(self.max_neighbors)
         self.observation_space = spaces.Dict({
             "node_features": spaces.Box(-np.inf, np.inf, (len(self.node_names), 5), dtype=np.float32),
@@ -183,6 +182,8 @@ class QKDRoutingEnv(gym.Env):
                 qber_hard=self.qber_hard,
                 outage_uniform=(self._detour_outage_draws.get(attrs.get("detour_for"))
                                 if attrs["link_type"] == "fso" else None),
+                outage_distance_km=(attrs.get("outage_reference_distance_km")
+                                    if attrs["link_type"] == "fso" else None),
             )
             self._edge_states[self._edge_key(u, v)] = dict(state)
 
@@ -326,7 +327,10 @@ class QKDRoutingEnv(gym.Env):
             fallback = True
         elif not mask[int(action)]:
             # Shared _edge_valid() powers _candidate_mask(), also used above.
-            action = min(valid_slots, key=lambda i: self.graph[old_node][neighbors[i]]["distance_km"])
+            # On mixed 80 km fiber / 10 km FSO graphs, selecting the shortest
+            # adjacent edge can send an agent back into the FSO chain it just
+            # left. Fall forward by the remaining destination distance.
+            action = min(valid_slots, key=lambda i: self._km_dist_to_dest(neighbors[i]))
             fallback = True
         next_node = neighbors[int(action)]
         edge_attrs = self.graph[old_node][next_node]

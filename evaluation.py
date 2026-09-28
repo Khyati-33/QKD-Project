@@ -182,6 +182,8 @@ def probabilistic_reachability_check(*, trials_per_hour: int = 10,
                                               season, hour, rng,
                                               fiber_outage_prob=FIBER_OUTAGE_PROB,
                                               outage_uniform=(detour_draws.get(attrs.get("detour_for"))
+                                                  if attrs["link_type"] == "fso" else None),
+                                              outage_distance_km=(attrs.get("outage_reference_distance_km")
                                                   if attrs["link_type"] == "fso" else None))
                     if state["qber"] < QBER_HARD and state["skr"] > 0:
                         sampled.add_edge(u, v)

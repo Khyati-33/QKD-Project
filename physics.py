@@ -87,7 +87,8 @@ def sample_link_state(link_type: Literal["fiber", "fso"], distance_km: float,
                       rng: random.Random | None = None,
                       fiber_outage_prob: float = FIBER_OUTAGE_PROB,
                       qber_hard: float = QBER_HARD,
-                      outage_uniform: float | None = None) -> dict[str, float | bool]:
+                      outage_uniform: float | None = None,
+                      outage_distance_km: float | None = None) -> dict[str, float | bool]:
     """Sample availability and return QBER, SKR, and outage information."""
     rng = rng or random.Random()
     if link_type == "fiber":
@@ -107,7 +108,11 @@ def sample_link_state(link_type: Literal["fiber", "fso"], distance_km: float,
         outage_draw = rng.random() if outage_uniform is None else float(outage_uniform)
         if not 0.0 <= outage_draw <= 1.0:
             raise ValueError("outage_uniform must be in [0, 1]")
-        outage = outage_draw >= fso_viability_probability(distance_km, season)
+        availability_distance = (distance_km if outage_distance_km is None
+                                 else float(outage_distance_km))
+        if availability_distance <= 0:
+            raise ValueError("outage_distance_km must be positive")
+        outage = outage_draw >= fso_viability_probability(availability_distance, season)
         # Mirror the reference notebook's FSOLink conditions and optical
         # budget: diurnal Cn2, seasonal turbulence/atmospheric factors,
         # diffraction, scintillation loss, pointing, and solar background.

@@ -19,7 +19,7 @@ environment:
   time_of_day_hours: 22.0
   time_jitter_hours: 1.0
   dt_seconds: 300
-  max_steps: 144
+  max_steps: 400
   disabled_reward_terms: []
   randomize_endpoints: false
   fiber_outage_prob: 0.01

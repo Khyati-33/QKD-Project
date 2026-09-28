@@ -10,7 +10,7 @@ Audit date: 2026-09-27
 - **Scenario assumption**: chosen to make a runnable simulator; it is not an empirical claim.
 - **Derived**: computed from the topology or another listed value.
 
-**Current conclusion:** this repository has no end-to-end QBER/SKR/outage parameter set calibrated to a single matching QKD hardware system and Indian corridor weather dataset. The publications below are useful anchors, but none validates the present 80 km fiber hops or the full 80 km FSO detours as deployed links.
+**Current conclusion:** this repository has no end-to-end QBER/SKR/outage parameter set calibrated to a single matching QKD hardware system and Indian corridor weather dataset. The publications below are useful anchors, but none validates the current road-proxy fiber corridors or candidate FSO links as deployed links.
 
 ## Current code values
 
@@ -43,7 +43,7 @@ Sources: [published undersea-link experiment](https://pmc.ncbi.nlm.nih.gov/artic
 | Code quantity | Current value / rule | Status | Evidence and audit note |
 |---|---:|---|---|
 | FSO availability anchors | Normal: 0.93/0.82/0.54/0.01; summer: 0.90/0.76/0.48/0.005; winter: 0.92/0.80/0.52/0.008; monsoon: 0.88/0.70/0.43/0.001 at 10/15/30/78 km | Inherited target / scenario assumption | These are handoff target values, not a fitted India dataset or a measured QKD link. Log interpolation between them is also a modeling choice. |
-| FSO outage sampling | One shared draw per eight-segment detour | Scenario assumption | Models a detour as fully available or unavailable together. No measured corridor outage-correlation data supports this structure. |
+| FSO outage sampling | One shared draw per candidate FSO alternative across a fiber span | Scenario assumption | The correlation structure is not fitted to observed Indian weather or measured corridor outage traces. |
 | Turbulence/weather | `Cn2` base 1e-14, diurnal envelope, season multipliers; monsoon multiplier 5 | Scenario assumption | No local `Cn2`, visibility, rain, aerosol, or turbulence time series was used to fit these distributions. |
 | Effective turbulence scale | `Cn2 * 1e-3` | Explicit numerical calibration, unsupported | The code comment says this was introduced to avoid near-zero transmittance and retain target viability. It is not calibrated from a cited experiment. |
 | FSO optics | 785 nm, 80 mm beam waist, 200 mm receiver radius (400 mm diameter), 60% detector efficiency, 1 µrad pointing jitter | Inherited target / scenario assumption | No matching device profile or measured end-to-end optical budget is documented. |
@@ -54,7 +54,7 @@ Derived outputs are saved in `experiments/physics_profile_report_idq.json` and c
 
 For 10 km monsoon FSO, the 1,000-sample model report gives configured availability 88% and empirical availability 88.5%. Median total detection probability (the code field called transmittance includes detector efficiency) and normalized SKR proxy are 0.2426 and 0.2035 at 22:00; at 14:00 they are 0.2267 and 0.1902. Median Rytov variance is 0.00162 at 22:00 and 0.1389 at 14:00. These are model-derived conditional statistics, not Indian weather observations or field measurements. The chosen `Cn2 * 1e-3` path calibration remains unsupported by measurement.
 
-## 50-epoch agent response check
+## Archived 50-epoch agent response check (old topology)
 
 The GNN was trained for 15 BC epochs and 50 PPO epochs in monsoon starting at 22:00 with ±1 hour jitter. Across the final checkpoint's four-season, four-seed evaluation, it achieved 100% success, 23.375 mean hops (23-hop reference), no revisits in the logged representative route, and 100% validity among 374 traversed QBER/SKR edges. Its representative route used 23 fiber edges and zero FSO edges.
 
@@ -75,11 +75,14 @@ The 1.7 km experiment's 10 km result is explicitly an extrapolation, not a 10 km
 
 `physics.py` now consumes the selected ID281 fiber-detector values (0.93 SDE and 70 cps as a conservative upper bound). Its separate FSO model remains at 785 nm with a 0.60 detector-efficiency scenario value and assumed 100 Hz baseline dark count. That FSO detector is **not** characterized by the selected 1550 nm device profile. The FSO channel keeps weather-dependent availability, seasonal atmospheric transmission, diurnal turbulence, and daylight background. Fiber QBER no longer receives an ambient-time-of-day dark-count multiplier. The resulting QBER and SKR values are device-informed simulation outputs, not measured performance or security-proof key rates.
 
-## Topology and distance audit (`topology.py`)
+## Archived topology and distance audit (pre-road-alignment graph)
 
-Computed directly from `build_topology()`:
+The following audit records the former straight-line synthetic graph used by
+the archived run. It is retained to explain the earlier results and is not the
+output of the current topology audit script. The road-aligned replacement is
+summarized below.
 
-The audit is reproducible with `python audit_physics_topology.py`.
+The revised graph can be audited with `python audit_physics_topology.py`.
 
 - 289 nodes, 319 total edges: 87 fiber edges and 232 FSO edges.
 - Every fiber edge is assigned 80 km.
@@ -100,17 +103,60 @@ The listed city coordinates are approximate. The following check compares each c
 | Delhi–Kolkata | 1,360 km | 1,304 km | 1.04 | Plausible lower-bound check only |
 | Kolkata–Chennai | 1,840 km | 1,358 km | 1.35 | Possible, but not an actual surveyed route |
 
-Thus the current graph is a controlled abstract topology, not a geographically consistent India fiber map. Its FSO detours are also synthetic parallel chains, not surveyed line-of-sight corridors. The 80 km fiber and FSO spans should not be interpreted as validated deployment distances.
+Thus the former graph was a controlled abstract topology, not a geographically consistent India fiber map. Its FSO detours were synthetic parallel chains, not surveyed line-of-sight corridors. These archived 80 km fiber and FSO spans should not be interpreted as validated deployment distances.
 
 ## Required work before claiming empirical realism
 
 1. Select one reference QKD system and protocol, with published device settings and measured QBER/SKR data. Keep the 810 nm Ecker et al. experiment as a candidate profile only; it does not match current assumptions without changes.
-2. Replace city-center straight-line corridors with surveyed fiber routes or explicitly label the graph synthetic. Ensure every route distance is at least the endpoint geodesic.
+2. Replace the road-route proxy with surveyed or verified OFC alignments. Split relay spans using those route distances and document placement uncertainty.
 3. Use India-specific, time-resolved weather/visibility data for each modeled FSO corridor; document source, time span, spatial resolution, and missing-data treatment. Fit outage/attenuation distributions and temporal correlation from those data.
 4. Derive QBER and SKR from the selected protocol/device model and measured channel loss/count data. Keep measured points separate from extrapolated ranges.
 5. Reproduce published reference curves/points and validate on held-out sites or time periods before training or interpreting routing choices.
 
 Until these steps are complete, policy results should be described as performance in the **assumption-based simulator**, not as expected real Indian QKD network performance.
+
+## Revised road-corridor topology (2026-09-28)
+
+The preceding 50-epoch metrics, 289-node/319-link counts, and abstract 23-hop
+Delhi-to-Chennai route describe the archived topology. They do **not** evaluate
+the revised graph described here. A new model training and evaluation run is
+required before making performance claims for it.
+
+The Department of Telecommunications reports that large PSU, state, and
+private optical-fiber inventories are mapped on the PM GatiShakti National
+Master Plan platform ([DoT/PIB release](https://www.pib.gov.in/Pressreleaseshare.aspx?PRID=2088195&lang=2&reg=48)).
+The public sources used here did not provide the detailed operator cable
+centerlines. NATMO's public national-highway layer is catalogued at 1:14,000,000
+scale and records 2014 mapping / 2019 digitization
+([NATMO dataset metadata](https://geoportal.natmo.gov.in/dataset/national-highways)),
+too coarse for placement of relay nodes. We therefore routed over OpenStreetMap
+roads as a transparent alignment proxy, not as evidence of actual OFC routes.
+
+`data/osm_road_corridors.json` stores 17 fastest driving routes from approximate
+city-center coordinates, fetched 2026-09-28 through the
+[OSRM Route service](https://project-osrm.org/docs/v5.24.0/api/) using
+OpenStreetMap road data. The selected paths mix National Highways, State
+Highways, expressways, and local access roads; they are not filtered to NH-only
+segments. The geometry was simplified with a 60 m maximum-deviation tolerance.
+The source metadata and road reference summaries are preserved with the data.
+OpenStreetMap attribution and ODbL notes are in `data/README.md`.
+
+Jaipur, Hyderabad, and Kolkata each have routed corridors to all six other
+modeled cities; Mumbai has direct routed corridors to Hyderabad and Kolkata.
+Each routed road corridor is subdivided into fiber spans no longer than 80 km.
+Candidate FSO paths split each span at about 9.9 km; the modeled straight-line
+distance of every FSO edge is checked to be at most 10 km. FSO outages are
+correlated across each alternate span using the conservative 10 km availability
+reference. The network contains 2,370 nodes, 2,653 links (273 fiber and 2,380
+candidate FSO), and 17 city corridors. The shortest modeled Delhi-to-Chennai
+fiber route is 28 hops and about 2,156.97 routed km.
+
+FSO visibility is not checked against elevation, buildings, vegetation,
+weather observations, or candidate installation sites. The links are not
+verified line of sight. The assumed fiber follows public road routes, but
+operators can place OFC elsewhere. These corrections make the topology's
+geometry more inspectable; they do not make the simulator an as-built telecom
+network model.
 
 ## Follow-up implementation after the archived 50-epoch run
 
@@ -126,8 +172,7 @@ Randomized endpoint evaluation now records the actual source and destination
 for every episode. `configs/defence_monsoon_night_50ep_idq.yaml` randomizes
 endpoints in behavior-cloning demonstrations while retaining the protected
 Delhi-to-Chennai evaluation condition. This broadens supervision but does not
-make the synthetic topology geographically valid or calibrate its channel
-physics.
+verify operator fiber alignment or calibrate its channel physics.
 
 ## Updated 50-epoch rerun (2026-09-28)
 
