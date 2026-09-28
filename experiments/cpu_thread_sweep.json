@@ -1,0 +1,18 @@
+{
+  "1": {
+    "batch_of_42_seconds_median": 0.4873778999899514,
+    "per_decision_milliseconds": 11.604235714046462
+  },
+  "2": {
+    "batch_of_42_seconds_median": 0.3894938000012189,
+    "per_decision_milliseconds": 9.273661904790927
+  },
+  "4": {
+    "batch_of_42_seconds_median": 0.23415489999752026,
+    "per_decision_milliseconds": 5.5751166666076255
+  },
+  "8": {
+    "batch_of_42_seconds_median": 0.31577800000377465,
+    "per_decision_milliseconds": 7.518523809613683
+  }
+}
