@@ -1,0 +1,35 @@
+profile_id: fso_785nm_assumed_v1
+display_name: 785 nm FSO receiver assumptions (not field characterized)
+profile_kind: engineering_assumption
+provenance:
+  status: unvalidated_assumption
+  notes: >-
+    These values are simulation inputs for sensitivity analysis. They are not
+    a characterization of an installed Indian FSO QKD terminal.
+channel:
+  wavelength_nm: 785
+  link_type: terrestrial_fso
+  maximum_candidate_span_km: 10
+  turbulence_model: lognormal_Cn2_AR1
+  temporal_correlation: 0.85
+  line_of_sight_validation: false
+optics:
+  beam_waist_m: 0.08
+  receiver_aperture_radius_m: 0.20
+  pointing_error_rms_rad: 1.0e-6
+  atmospheric_transmission_model: bounded_random_atmospheric_factor
+detector:
+  detector_efficiency: 0.60
+  dark_count_rate_hz: 100
+  timing_jitter_ps: null
+  dead_time_ns: null
+  afterpulse_probability: null
+  spectral_filter_bandwidth_nm: null
+background:
+  solar_background_model: simplified_sun_elevation_proxy
+  calibrated_sky_radiance: null
+validation_requirements:
+  - measured_Cn2_or_scintillation_time_series
+  - measured_pointing_jitter_distribution
+  - detector_efficiency_dark_count_dead_time
+  - background_count_rate_by_time_and_weather

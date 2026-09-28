@@ -4,7 +4,7 @@ import pytest
 
 from physics import (FIBER_OUTAGE_PROB, QBER_HARD, SEASONS, fiber_qber,
                      edge_is_valid, fso_viability_probability, sample_fiber_outage,
-                     sample_link_state, temperature_at_time)
+                     sample_correlated_fso_cn2, sample_link_state, temperature_at_time)
 
 
 def test_fiber_qber_and_outage():
@@ -56,3 +56,18 @@ def test_shared_validity_boundary_is_strict():
     assert not edge_is_valid(QBER_HARD, 1.0)
     assert edge_is_valid(QBER_HARD - 1e-8, 1.0)
     assert not edge_is_valid(0.01, 0.0)
+
+
+def test_correlated_fso_turbulence_has_temporal_memory():
+    rng = random.Random(707)
+    previous = None
+    values = []
+    for _ in range(300):
+        value, previous = sample_correlated_fso_cn2(
+            "monsoon", 22.0, rng, previous, correlation=0.85)
+        values.append(previous)
+    x, y = values[:-1], values[1:]
+    mean_x, mean_y = sum(x) / len(x), sum(y) / len(y)
+    corr = sum((a - mean_x) * (b - mean_y) for a, b in zip(x, y)) / (
+        sum((a - mean_x) ** 2 for a in x) * sum((b - mean_y) ** 2 for b in y)) ** 0.5
+    assert corr > 0.65

@@ -11,8 +11,9 @@ import networkx as nx
 import numpy as np
 from gymnasium import spaces
 
-from physics import (FIBER_OUTAGE_PROB, QBER_HARD, SEASONS, chain_parity_error,
-                     edge_is_valid, sample_link_state)
+from physics import (FIBER_OUTAGE_PROB, FSO_TURBULENCE_CORRELATION, QBER_HARD,
+                     SEASONS, chain_parity_error, edge_is_valid,
+                     sample_correlated_fso_cn2, sample_link_state)
 from topology import (CITIES, DEFAULT_DESTINATION, DEFAULT_SOURCE, build_topology)
 
 
@@ -86,7 +87,8 @@ class QKDRoutingEnv(gym.Env):
                  qber_hard: float = QBER_HARD,
                  reward_protection_overrides: dict[str, float] | None = None,
                  max_steps: int = 400, time_of_day_hours: float = 12.0,
-                 dt_seconds: float = 300.0, time_jitter_hours: float = 0.0):
+                 dt_seconds: float = 300.0, time_jitter_hours: float = 0.0,
+                 fso_temporal_correlation: float = FSO_TURBULENCE_CORRELATION):
         super().__init__()
         if season not in SEASONS:
             raise ValueError(f"season must be one of {SEASONS}")
@@ -122,6 +124,9 @@ class QKDRoutingEnv(gym.Env):
         if time_jitter_hours < 0 or time_jitter_hours > 12:
             raise ValueError("time_jitter_hours must be between 0 and 12")
         self.time_jitter_hours = float(time_jitter_hours)
+        if not 0.0 <= fso_temporal_correlation < 1.0:
+            raise ValueError("fso_temporal_correlation must be in [0, 1)")
+        self.fso_temporal_correlation = float(fso_temporal_correlation)
         self.disabled_reward_terms = set(disabled_reward_terms or ()) & ALLOWED_ABLATIONS
         self.node_names = list(self.graph.nodes)
         self.node_to_idx = {n: i for i, n in enumerate(self.node_names)}
@@ -153,6 +158,7 @@ class QKDRoutingEnv(gym.Env):
         # five-minute step can make an agent enter a detour and then have its
         # forward edges vanish midway through the relay chain.
         self._detour_outage_draws: dict[tuple[str, str], float] = {}
+        self._fso_cn2_state: dict[tuple[str, str], float] = {}
         self._hop_qbers: list[float] = []
         self._visited: set[str] = set()
         self._key_pool: defaultdict[frozenset, float] = defaultdict(lambda: 1.0)
@@ -168,6 +174,18 @@ class QKDRoutingEnv(gym.Env):
 
     def _refresh_link_states(self) -> None:
         self._edge_states = {}
+        fso_cn2_draws = {}
+        for _, _, attrs in self.graph.edges(data=True):
+            if attrs["link_type"] != "fso":
+                continue
+            detour = attrs.get("detour_for")
+            if detour in fso_cn2_draws:
+                continue
+            cn2, log_cn2 = sample_correlated_fso_cn2(
+                self.season, self.time_of_day_hours, self._rng,
+                self._fso_cn2_state.get(detour), self.fso_temporal_correlation)
+            fso_cn2_draws[detour] = cn2
+            self._fso_cn2_state[detour] = log_cn2
         # All links in a detour share an episode-scale corridor outage draw.
         for _, _, attrs in self.graph.edges(data=True):
             if attrs["link_type"] == "fso":
@@ -182,8 +200,10 @@ class QKDRoutingEnv(gym.Env):
                 qber_hard=self.qber_hard,
                 outage_uniform=(self._detour_outage_draws.get(attrs.get("detour_for"))
                                 if attrs["link_type"] == "fso" else None),
-                outage_distance_km=(attrs.get("outage_reference_distance_km")
-                                    if attrs["link_type"] == "fso" else None),
+                      outage_distance_km=(attrs.get("outage_reference_distance_km")
+                                          if attrs["link_type"] == "fso" else None),
+                cn2_override=(fso_cn2_draws.get(attrs.get("detour_for"))
+                              if attrs["link_type"] == "fso" else None),
             )
             self._edge_states[self._edge_key(u, v)] = dict(state)
 
@@ -304,6 +324,7 @@ class QKDRoutingEnv(gym.Env):
         self._key_pool = defaultdict(lambda: 1.0)
         self._previous_link_type = None
         self._detour_outage_draws = {}
+        self._fso_cn2_state = {}
         self._destination_distances = nx.single_source_dijkstra_path_length(
             self.graph, self.destination, weight="distance_km")
         self._refresh_link_states()

@@ -18,6 +18,12 @@ FSO_VIABILITY_ANCHORS = {
     "monsoon": (0.88, 0.70, 0.43, 0.001),
 }
 
+# Correlated atmospheric state: the simulator advances this latent state once
+# per environment decision instead of drawing independent turbulence for every
+# FSO observation. This is a model parameter until it is fitted to a measured
+# site time series.
+FSO_TURBULENCE_CORRELATION = 0.85
+
 # 1550 nm fiber receiver: ID Quantique ID281 channel characterized in the
 # UK-Ireland undersea-link experiment (93.0% SDE, <70 dark counts/s). We use
 # the reported upper bound of 70 cps conservatively. These values apply only
@@ -82,13 +88,45 @@ def fso_viability_probability(distance_km: float, season: str) -> float:
     return p78
 
 
+def sample_correlated_fso_cn2(season: str, time_of_day_hours: float,
+                              rng: random.Random,
+                              previous_log_cn2: float | None = None,
+                              correlation: float = FSO_TURBULENCE_CORRELATION
+                              ) -> tuple[float, float]:
+    """Draw log-normal turbulence with an AR(1) temporal correlation.
+
+    Returns ``(Cn2, log(Cn2))``. The seasonal and diurnal mean follows the
+    existing channel model; only the innovation process is correlated. This
+    keeps the marginal distribution unchanged while avoiding independent
+    five-minute atmospheric draws.
+    """
+    if season not in SEASONS:
+        raise ValueError(f"unknown season {season!r}; expected one of {SEASONS}")
+    if not 0.0 <= correlation < 1.0:
+        raise ValueError("correlation must be in [0, 1)")
+    weather_factors = {"monsoon": 5.0, "winter": 0.5,
+                       "summer": 2.0, "normal": 1.0}
+    hour = time_of_day_hours % 24.0
+    cn2_base = max(1e-14 * math.exp(-((hour - 13.0) ** 2) / 18.0), 1e-17)
+    mean_log = math.log(cn2_base * weather_factors[season])
+    sigma = 0.5
+    innovation = rng.normalvariate(0.0, sigma)
+    if previous_log_cn2 is None:
+        log_cn2 = mean_log + innovation
+    else:
+        log_cn2 = (mean_log + correlation * (previous_log_cn2 - mean_log) +
+                   math.sqrt(1.0 - correlation ** 2) * innovation)
+    return math.exp(log_cn2), log_cn2
+
+
 def sample_link_state(link_type: Literal["fiber", "fso"], distance_km: float,
                       season: str = "normal", time_of_day_hours: float = 12.0,
                       rng: random.Random | None = None,
                       fiber_outage_prob: float = FIBER_OUTAGE_PROB,
                       qber_hard: float = QBER_HARD,
                       outage_uniform: float | None = None,
-                      outage_distance_km: float | None = None) -> dict[str, float | bool]:
+                      outage_distance_km: float | None = None,
+                      cn2_override: float | None = None) -> dict[str, float | bool]:
     """Sample availability and return QBER, SKR, and outage information."""
     rng = rng or random.Random()
     if link_type == "fiber":
@@ -127,7 +165,8 @@ def sample_link_state(link_type: Literal["fiber", "fso"], distance_km: float,
         cn2_base = max(1e-14 * math.exp(-((hour - 13.0) ** 2) / 18.0), 1e-17)
         cn2_mean = cn2_base * cn2_factor
         atm_mean = min(0.9 * atm_factor, 0.98)
-        cn2 = rng.lognormvariate(math.log(cn2_mean), 0.5 * cn2_spread)
+        cn2 = (float(cn2_override) if cn2_override is not None else
+               rng.lognormvariate(math.log(cn2_mean), 0.5 * cn2_spread))
         eta_atm = min(1.0, max(0.05, rng.normalvariate(atm_mean, 0.02 * atm_spread)))
         sun_elevation = max(0.0, math.sin(math.pi * (hour - 6.0) / 12.0))
 
