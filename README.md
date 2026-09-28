@@ -75,6 +75,7 @@ Experiments should record the resolved configuration, code revision, metrics, ch
 - QBER and SKR are simplified simulation proxies, not measured results or a full finite-key security calculation.
 - The chosen fiber-device profile informs fiber parameters; the FSO detector and optical settings remain separate assumptions.
 - The environment is a partially observed channel-control problem: FSO turbulence now has a correlated latent log-Cn2 state, while future channel states remain hidden from the policy.
+- An opt-in vacuum-plus-weak-decoy finite-key BB84 engineering estimator is available through `key_rate_model: finite_key_decoy_bb84`; the default asymptotic proxy remains available for controlled comparisons.
 - See [RESEARCH_MODEL.md](RESEARCH_MODEL.md) for the MDP/POMDP interpretation, PPO rationale, constraints, noise-model scope, and validation requirements.
 
 See [PHYSICS_EVIDENCE.md](PHYSICS_EVIDENCE.md) for details, references, and the work needed before making empirical performance claims.

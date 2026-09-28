@@ -60,6 +60,17 @@ decoy-state estimation, finite-key bounds, error-correction leakage, detector
 dead time, afterpulsing, timing jitter, and composable security must be added
 before making device-secure-key claims.
 
+The repository now includes an opt-in `finite_key_decoy_bb84` path. It uses a
+vacuum-plus-weak-decoy source profile, detector click/noise terms, Hoeffding
+gain intervals, clipped single-photon yield/error bounds, and explicit finite
+security/correctness penalties. It is an engineering estimator for sensitivity
+studies. It must not be described as a complete composable proof until the
+protocol estimator is independently validated against a formal security
+analysis and measured count data. Source intensity and detector efficiency/
+dark-count uncertainties are represented explicitly as traceable profile
+parameters; the estimator uses conservative widened values for its current
+block.
+
 ## Required validation before a journal claim
 
 1. Fit fiber and FSO parameters to measured or traceable device/channel data.

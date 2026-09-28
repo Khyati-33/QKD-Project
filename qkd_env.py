@@ -14,6 +14,7 @@ from gymnasium import spaces
 from physics import (FIBER_OUTAGE_PROB, FSO_TURBULENCE_CORRELATION, QBER_HARD,
                      SEASONS, chain_parity_error, edge_is_valid,
                      sample_correlated_fso_cn2, sample_link_state)
+from quantum_protocol import DecoyBB84Profile, DetectorNoiseProfile
 from topology import (CITIES, DEFAULT_DESTINATION, DEFAULT_SOURCE, build_topology)
 
 
@@ -88,7 +89,10 @@ class QKDRoutingEnv(gym.Env):
                  reward_protection_overrides: dict[str, float] | None = None,
                  max_steps: int = 400, time_of_day_hours: float = 12.0,
                  dt_seconds: float = 300.0, time_jitter_hours: float = 0.0,
-                 fso_temporal_correlation: float = FSO_TURBULENCE_CORRELATION):
+                 fso_temporal_correlation: float = FSO_TURBULENCE_CORRELATION,
+                 key_rate_model: str = "asymptotic_proxy",
+                 decoy_profile: DecoyBB84Profile | None = None,
+                 detector_profile: DetectorNoiseProfile | None = None):
         super().__init__()
         if season not in SEASONS:
             raise ValueError(f"season must be one of {SEASONS}")
@@ -127,6 +131,11 @@ class QKDRoutingEnv(gym.Env):
         if not 0.0 <= fso_temporal_correlation < 1.0:
             raise ValueError("fso_temporal_correlation must be in [0, 1)")
         self.fso_temporal_correlation = float(fso_temporal_correlation)
+        if key_rate_model not in {"asymptotic_proxy", "finite_key_decoy_bb84"}:
+            raise ValueError("unknown key_rate_model")
+        self.key_rate_model = key_rate_model
+        self.decoy_profile = decoy_profile
+        self.detector_profile = detector_profile
         self.disabled_reward_terms = set(disabled_reward_terms or ()) & ALLOWED_ABLATIONS
         self.node_names = list(self.graph.nodes)
         self.node_to_idx = {n: i for i, n in enumerate(self.node_names)}
@@ -204,6 +213,9 @@ class QKDRoutingEnv(gym.Env):
                                           if attrs["link_type"] == "fso" else None),
                 cn2_override=(fso_cn2_draws.get(attrs.get("detour_for"))
                               if attrs["link_type"] == "fso" else None),
+                key_rate_model=self.key_rate_model,
+                decoy_profile=self.decoy_profile,
+                detector_profile=self.detector_profile,
             )
             self._edge_states[self._edge_key(u, v)] = dict(state)
 

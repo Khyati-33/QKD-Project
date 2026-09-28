@@ -1,0 +1,30 @@
+profile_id: vacuum_weak_decoy_bb84_v1
+profile_kind: protocol_assumption
+provenance:
+  status: engineering_baseline
+  notes: >-
+    Vacuum plus weak-decoy BB84 inputs for finite-key sensitivity analysis.
+    The implementation uses conservative Hoeffding intervals and must not be
+    presented as a complete composable security proof.
+source:
+  signal_mu: 0.50
+  decoy_mu: 0.10
+  vacuum_probability: 0.10
+  decoy_probability: 0.20
+  signal_probability: 0.70
+  pulses: 1000000
+  intensity_relative_uncertainty: 0.02
+  intensity_uncertainty_distribution: lognormal
+detector:
+  efficiency: 0.60
+  dark_count_hz: 100
+  repetition_rate_hz: 100000000
+  dead_time_ns: 30
+  afterpulse_probability: 0.005
+  timing_jitter_ps: 100
+  efficiency_relative_uncertainty: 0.05
+  dark_count_relative_uncertainty: 0.10
+security:
+  error_correction_efficiency: 1.16
+  security_epsilon: 1.0e-10
+  correctness_epsilon: 1.0e-10

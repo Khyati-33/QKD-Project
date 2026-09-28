@@ -5,6 +5,9 @@ import math
 import random
 from typing import Literal
 
+from quantum_protocol import (DecoyBB84Profile, DetectorNoiseProfile,
+                              finite_key_decoy_bb84)
+
 QBER_HARD = 0.11
 FIBER_OUTAGE_PROB = 0.01
 SEASONS = ("normal", "summer", "winter", "monsoon")
@@ -126,7 +129,11 @@ def sample_link_state(link_type: Literal["fiber", "fso"], distance_km: float,
                       qber_hard: float = QBER_HARD,
                       outage_uniform: float | None = None,
                       outage_distance_km: float | None = None,
-                      cn2_override: float | None = None) -> dict[str, float | bool]:
+                      cn2_override: float | None = None,
+                      key_rate_model: Literal["asymptotic_proxy", "finite_key_decoy_bb84"] =
+                      "asymptotic_proxy",
+                      decoy_profile: DecoyBB84Profile | None = None,
+                      detector_profile: DetectorNoiseProfile | None = None) -> dict[str, float | bool]:
     """Sample availability and return QBER, SKR, and outage information."""
     rng = rng or random.Random()
     if link_type == "fiber":
@@ -208,8 +215,19 @@ def sample_link_state(link_type: Literal["fiber", "fso"], distance_km: float,
                       "rytov_variance": rytov_variance}
     else:
         raise ValueError(f"unknown link type {link_type!r}")
-    skr = secure_key_rate(qber, distance_km, outage=outage,
-                          qber_hard=qber_hard, transmission=transmission)
+    if key_rate_model == "asymptotic_proxy":
+        skr = secure_key_rate(qber, distance_km, outage=outage,
+                              qber_hard=qber_hard, transmission=transmission)
+        finite_key = None
+    elif key_rate_model == "finite_key_decoy_bb84":
+        finite_key = finite_key_decoy_bb84(
+            transmission=transmission, qber=qber,
+            source=decoy_profile, detector=detector_profile, rng=rng)
+        skr = 0.0 if outage else float(finite_key["secure_key_rate"])
+    else:
+        raise ValueError(f"unknown key_rate_model {key_rate_model!r}")
+    if finite_key is not None:
+        conditions["finite_key"] = finite_key
     return {"qber": qber, "skr": skr, "outage": outage,
             "conditions": conditions, "time_of_day_hours": time_of_day_hours % 24.0}
 
