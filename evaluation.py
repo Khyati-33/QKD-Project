@@ -52,6 +52,7 @@ def _run_episode(policy, env: QKDRoutingEnv, seed: int, max_steps: int | None = 
         if terminated or truncated:
             break
     return {"reward": reward, "success": success,
+            "source": env.source, "destination": env.destination,
             "hops": len(route) - 1 if success else None,
             "route": route, "revisits": len(route) - len(set(route)),
             "qber_skr_validity": {"checked_edges": len(physical_checks),
@@ -100,7 +101,8 @@ def evaluate_policy(policy, *, seasons: tuple[str, ...] = SEASONS,
         summaries[season] = {
             "reward_median": float(statistics.median(r["reward"] for r in runs)),
             "reward_std": float(np.std([r["reward"] for r in runs])),
-            "seed_rewards": [{"seed": r["seed"], "reward": r["reward"],
+            "seed_rewards": [{"seed": r["seed"], "source": r["source"],
+                              "destination": r["destination"], "reward": r["reward"],
                               "success": r["success"], "hops": r["hops"]} for r in runs],
             "success_rate": len(successes) / len(runs),
             "avg_hops_success": float(np.mean([r["hops"] for r in successes])) if successes else None,

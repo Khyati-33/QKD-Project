@@ -35,6 +35,7 @@ environment:
 training:
   bc_epochs: 15
   bc_episodes_per_epoch: 8
+  bc_randomize_endpoints: true
   bc_learning_rate: 0.001
   bc_entropy_coef: 0.02
   ppo_epochs: 50

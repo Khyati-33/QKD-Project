@@ -5,7 +5,8 @@ import pytest
 
 from physics import QBER_HARD, chain_parity_error
 from qkd_env import (C_SEC, FAILURE_PENALTY, REVISIT_PENALTY, STEP_COST,
-                     SWITCH_PENALTY, QKDRoutingEnv)
+                     SWITCH_PENALTY, QKDRoutingEnv, distance_normalized_skr_reward)
+from train import _teacher_slot
 
 
 def test_reset_random_steps_and_scalars():
@@ -68,6 +69,28 @@ def test_fso_outages_are_correlated_within_each_detour():
     assert all(len(set(outages)) == 1 for outages in groups.values())
 
 
+def test_fso_detour_outage_is_stable_for_the_episode():
+    env = QKDRoutingEnv(season="monsoon")
+    env.reset(seed=712)
+
+    def outage_by_detour():
+        groups = {}
+        for u, v, attrs in env.graph.edges(data=True):
+            if attrs["link_type"] == "fso":
+                groups.setdefault(attrs["detour_for"], set()).add(
+                    env._edge_states[env._edge_key(u, v)]["outage"])
+        assert all(len(states) == 1 for states in groups.values())
+        return {key: next(iter(states)) for key, states in groups.items()}
+
+    initial = outage_by_detour()
+    for hour in (2.0, 14.0, 22.0):
+        env.time_of_day_hours = hour
+        env._refresh_link_states()
+        assert outage_by_detour() == initial
+    env.reset(seed=712)
+    assert outage_by_detour() == initial
+
+
 def test_actor_observes_pool_switch_and_revisit_state():
     env = QKDRoutingEnv()
     obs, _ = env.reset(seed=10)
@@ -93,6 +116,38 @@ def test_actor_observes_destination_distance_progress():
         neighbor = env.node_names[int(neighbor_idx)]
         expected = (env._km_dist_to_dest(current) - env._km_dist_to_dest(neighbor)) / max(env.max_edge_km, 1.0)
         assert obs["edge_features"][slot, 8] == pytest.approx(expected)
+
+
+def test_behavior_cloning_teacher_uses_hops_before_skr_for_equal_distance_routes():
+    env = QKDRoutingEnv(season="normal", fiber_outage_prob=0.0)
+    env.reset(seed=222)
+    route = __import__("topology").shortest_fiber_route(env.graph)
+    u, v = next((u, v) for u, v in zip(route, route[1:])
+        if any(attrs["link_type"] == "fso" and
+               set(attrs.get("detour_for", ())) == {u, v}
+               for _, _, attrs in env.graph.edges(data=True)))
+    env._current_node = u
+    fso_neighbor = next(n for n in env.graph.neighbors(u)
+                        if env.graph[u][n]["link_type"] == "fso")
+    fiber_key, fso_key = env._edge_key(u, v), env._edge_key(u, fso_neighbor)
+    env._edge_states[fiber_key].update(qber=0.01, skr=0.02, outage=False)
+    env._edge_states[fso_key].update(qber=0.01, skr=0.20, outage=False)
+    env._destination_distances = __import__("networkx").single_source_dijkstra_path_length(
+        env.graph, env.destination, weight="distance_km")
+    obs = env._get_obs()
+    assert env.graph[u][v]["distance_km"] + env._km_dist_to_dest(v) == pytest.approx(
+        env.graph[u][fso_neighbor]["distance_km"] +
+        env._km_dist_to_dest(fso_neighbor), abs=1e-6)
+    chosen = _teacher_slot(env, obs)
+    assert env.node_names[int(obs["neighbor_indices"][chosen])] == v
+
+
+def test_skr_reward_does_not_increase_when_one_span_is_split_into_segments():
+    fiber_span = distance_normalized_skr_reward(0.20, 80.0, 80.0, 1.2)
+    eight_fso_segments = sum(
+        distance_normalized_skr_reward(0.20, 10.0, 80.0, 1.2)
+        for _ in range(8))
+    assert eight_fso_segments == pytest.approx(fiber_span)
 
 
 def test_chain_parity_regression():

@@ -100,9 +100,11 @@ def run_test(checkpoint: Path, samples_per_condition: int = 32) -> dict:
                     "fso_better_skr": fso["skr"] > fiber["skr"],
                 })
             key = f"{season}_{int(hour):02d}h"
-            policy_vs_skr_corr = np.corrcoef(
-                [t["fso_probability"] for t in trials],
-                [t["fso_skr"] for t in trials])[0, 1]
+            probabilities = np.asarray([t["fso_probability"] for t in trials])
+            fso_rates = np.asarray([t["fso_skr"] for t in trials])
+            policy_vs_skr_corr = (float(np.corrcoef(probabilities, fso_rates)[0, 1])
+                if len(trials) >= 2 and np.std(probabilities) > 0 and np.std(fso_rates) > 0
+                else None)
             condition_results[key] = {
                 "season": season, "hour": hour,
                 "fso_marginal_availability": fso_viability_probability(10.0, season),
@@ -110,7 +112,7 @@ def run_test(checkpoint: Path, samples_per_condition: int = 32) -> dict:
                 "fiber_sde": FIBER_DETECTOR_EFFICIENCY,
                 "trials_conditional_on_fso_clear": samples_per_condition,
                 "mean_fso_probability": statistics.mean(t["fso_probability"] for t in trials),
-                "pearson_correlation_fso_probability_vs_fso_skr_proxy": float(policy_vs_skr_corr),
+                "pearson_correlation_fso_probability_vs_fso_skr_proxy": policy_vs_skr_corr,
                 "fso_selected_rate": sum(t["selected"] == "fso" for t in trials) / len(trials),
                 "fso_higher_skr_rate": sum(t["fso_better_skr"] for t in trials) / len(trials),
                 "median_fso_skr_proxy": statistics.median(t["fso_skr"] for t in trials),

@@ -111,3 +111,20 @@ Thus the current graph is a controlled abstract topology, not a geographically c
 5. Reproduce published reference curves/points and validate on held-out sites or time periods before training or interpreting routing choices.
 
 Until these steps are complete, policy results should be described as performance in the **assumption-based simulator**, not as expected real Indian QKD network performance.
+
+## Follow-up implementation after the archived 50-epoch run
+
+The run above used code from the pre-experiment baseline commit. Subsequent
+debugging added a monotone log-SKR action prior, distance-normalized SKR reward,
+route-cost and hop-aware behavior-cloning tie breaks, and episode-persistent
+FSO corridor outage draws. These changes address policy sensitivity, reward
+inflation from segmenting a detour, and routes stranded by a per-step outage
+redraw. The archived metrics above are unchanged and do not measure these new
+methods; small regression and retraining checks are recorded in the Git history.
+
+Randomized endpoint evaluation now records the actual source and destination
+for every episode. `configs/defence_monsoon_night_50ep_idq.yaml` randomizes
+endpoints in behavior-cloning demonstrations while retaining the protected
+Delhi-to-Chennai evaluation condition. This broadens supervision but does not
+make the synthetic topology geographically valid or calibrate its channel
+physics.

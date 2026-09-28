@@ -12,6 +12,21 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def test_success_checkpoint_uses_reward_then_hops_as_tiebreakers():
+    sys.path.insert(0, str(ROOT))
+    from train import _is_better_success_checkpoint
+
+    rank = _is_better_success_checkpoint
+    assert rank(1.0, 9.0, 24.0, best_success=0.9, best_reward=100.0,
+                best_avg_hops=23.0)
+    assert rank(1.0, 10.0, 25.0, best_success=1.0, best_reward=9.0,
+                best_avg_hops=23.0)
+    assert rank(1.0, 10.0, 22.0, best_success=1.0, best_reward=10.0,
+                best_avg_hops=23.0)
+    assert not rank(1.0, 10.0, 24.0, best_success=1.0, best_reward=10.0,
+                    best_avg_hops=23.0)
+
+
 def test_process_termination_resumes_from_last_epoch(tmp_path):
     config = yaml.safe_load((ROOT / "configs" / "smoke_test.yaml").read_text(encoding="utf8"))
     config["experiment_name"] = "kill_resume_smoke"

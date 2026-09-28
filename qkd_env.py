@@ -42,6 +42,15 @@ BACKTRACK_PENALTY = -0.5
 ALLOWED_ABLATIONS = {"margin", "skr", "pool", "latency", "energy", "congestion"}
 
 
+def distance_normalized_skr_reward(skr: float, distance_km: float,
+                                   max_edge_km: float, scale: float) -> float:
+    """Return SKR utility proportional to distance, avoiding segment-count gain."""
+    if max_edge_km <= 0 or distance_km < 0:
+        raise ValueError("link distances must be nonnegative and max_edge_km positive")
+    return (float(scale) * min(1.0, max(0.0, float(skr))) *
+            float(distance_km) / float(max_edge_km))
+
+
 def calibrate_norm_constants_over_pairs(graph: nx.Graph | None = None) -> dict[str, float]:
     """Calibrate latency/energy scales over every ordered city pair."""
     graph = graph or build_topology()
@@ -141,6 +150,10 @@ class QKDRoutingEnv(gym.Env):
         })
         self._rng = random.Random()
         self._edge_states: dict[frozenset, dict[str, Any]] = {}
+        # Corridor outage is a persistent episode event. Redrawing it every
+        # five-minute step can make an agent enter a detour and then have its
+        # forward edges vanish midway through the relay chain.
+        self._detour_outage_draws: dict[tuple[str, str], float] = {}
         self._hop_qbers: list[float] = []
         self._visited: set[str] = set()
         self._key_pool: defaultdict[frozenset, float] = defaultdict(lambda: 1.0)
@@ -156,23 +169,19 @@ class QKDRoutingEnv(gym.Env):
 
     def _refresh_link_states(self) -> None:
         self._edge_states = {}
-        # Closely spaced links along one 80 km FSO bypass share an atmospheric
-        # corridor. Correlate their weather-outage draw while retaining each
-        # link's marginal probability; treating eight adjacent segments as
-        # independent would make a single corridor unrealistically fragile.
-        detour_draws = {}
+        # All links in a detour share an episode-scale corridor outage draw.
         for _, _, attrs in self.graph.edges(data=True):
             if attrs["link_type"] == "fso":
                 detour = attrs.get("detour_for")
-                if detour not in detour_draws:
-                    detour_draws[detour] = self._rng.random()
+                if detour not in self._detour_outage_draws:
+                    self._detour_outage_draws[detour] = self._rng.random()
         for u, v, attrs in self.graph.edges(data=True):
             state = sample_link_state(
                 attrs["link_type"], attrs["distance_km"], self.season,
                 self.time_of_day_hours, self._rng,
                 fiber_outage_prob=self.fiber_outage_prob,
                 qber_hard=self.qber_hard,
-                outage_uniform=(detour_draws.get(attrs.get("detour_for"))
+                outage_uniform=(self._detour_outage_draws.get(attrs.get("detour_for"))
                                 if attrs["link_type"] == "fso" else None),
             )
             self._edge_states[self._edge_key(u, v)] = dict(state)
@@ -293,6 +302,7 @@ class QKDRoutingEnv(gym.Env):
         self._visited = {self.source}
         self._key_pool = defaultdict(lambda: 1.0)
         self._previous_link_type = None
+        self._detour_outage_draws = {}
         self._destination_distances = nx.single_source_dijkstra_path_length(
             self.graph, self.destination, weight="distance_km")
         self._refresh_link_states()
@@ -358,7 +368,9 @@ class QKDRoutingEnv(gym.Env):
         raw = {
             "progress": profile["progress"] * progress_distance,
             "margin": progress_sign * profile["margin"] * max(0.0, (self.qber_hard - projected) / self.qber_hard),
-            "skr": progress_sign * profile["skr"] * min(1.0, float(state["skr"])),
+            "skr": progress_sign * distance_normalized_skr_reward(
+                float(state["skr"]), edge_attrs["distance_km"],
+                self.max_edge_km, profile["skr"]),
             "pool_level": progress_sign * profile["pool"] * self._key_pool[edge_key],
             "pool_delta": progress_sign * profile["pool"] * (self._key_pool[edge_key] - old_pool),
             "latency": -profile["latency"] * (edge_attrs["distance_km"] / 200000.0)

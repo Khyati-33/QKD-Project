@@ -15,6 +15,7 @@ from models import GNNActorCritic, LSTMActorCritic, stack_observations
 from ppo import (BC_ENTROPY_COEF, CLIP_EPSILON, CRITIC_WARMUP_EPOCHS,
                  INITIAL_ENTROPY_COEF, LEARNING_RATE, RolloutBuffer, RunningRewardNormalizer,
                  compute_gae, load_checkpoint, ppo_update, save_checkpoint)
+from topology import CITIES
 
 
 MODEL_TYPES = {"GNN": GNNActorCritic, "LSTM": LSTMActorCritic}
@@ -23,28 +24,47 @@ MODEL_TYPES = {"GNN": GNNActorCritic, "LSTM": LSTMActorCritic}
 def _teacher_slot(env, observation) -> int:
     current = env.node_names[int(observation["current_node"])]
     destination = env.node_names[int(observation["destination_node"])]
-    try:
-        path = __import__("networkx").shortest_path(env.graph, current, destination,
-                                                     weight="distance_km")
-        if len(path) > 1:
-            teacher_neighbor = path[1]
-            neighbors = list(env.graph.neighbors(current))
-            slot = neighbors.index(teacher_neighbor)
-            if observation["edge_valid_mask"][slot]:
-                return slot
-    except (ValueError, __import__("networkx").NetworkXNoPath):
-        pass
     valid_slots = np.flatnonzero(observation["edge_valid_mask"])
     if not len(valid_slots):
         return -1
-    return int(min(valid_slots, key=lambda i: env._km_dist_to_dest(
-        env.node_names[int(observation["neighbor_indices"][i])])) )
+    nx = __import__("networkx")
+    route_costs = {}
+    hop_counts = {}
+    for i in valid_slots:
+        neighbor = env.node_names[int(observation["neighbor_indices"][i])]
+        route_costs[int(i)] = (env.graph[current][neighbor]["distance_km"] +
+                               env._km_dist_to_dest(neighbor))
+        hop_counts[int(i)] = 1 + nx.shortest_path_length(
+            env.graph, neighbor, destination)
+    best_route_cost = min(route_costs.values())
+    shortest_ties = [i for i, cost in route_costs.items()
+                     if math.isclose(cost, best_route_cost, rel_tol=0.0, abs_tol=1e-6)]
+    fewest_hops = min(hop_counts[i] for i in shortest_ties)
+    hop_ties = [i for i in shortest_ties if hop_counts[i] == fewest_hops]
+    # Prefer quality only when both total distance and route hop count tie.
+    # This avoids teaching the agent to expand every fiber hop into an eight
+    # segment FSO chain just because its per-link rate is larger.
+    return int(max(hop_ties, key=lambda i: float(observation["edge_features"][i, 1])))
+
+
+def _is_better_success_checkpoint(success: float, reward: float,
+                                 avg_hops: float | None, *,
+                                 best_success: float, best_reward: float,
+                                 best_avg_hops: float) -> bool:
+    """Rank route checkpoints by success first, reward then hop count."""
+    if success != best_success:
+        return success > best_success
+    if reward != best_reward:
+        return reward > best_reward
+    hops = float(avg_hops) if avg_hops is not None else math.inf
+    return hops < best_avg_hops
 
 
 def behavior_clone(model, env, *, epochs: int = 15, episodes_per_epoch: int = 8,
                    entropy_coef: float = BC_ENTROPY_COEF, learning_rate: float = 1e-3,
                    checkpoint_dir: str | Path | None = None,
-                   start_epoch: int = 0, optimizer=None) -> tuple[Any, list[dict[str, float]]]:
+                   start_epoch: int = 0, optimizer=None,
+                   randomize_endpoints: bool = False) -> tuple[Any, list[dict[str, float]]]:
     optimizer = optimizer or torch.optim.Adam(model.parameters(), lr=learning_rate)
     # BC is a supervised warm start and needs a useful step size. The main
     # training optimizer is deliberately initialized with PPO's much smaller
@@ -53,10 +73,21 @@ def behavior_clone(model, env, *, epochs: int = 15, episodes_per_epoch: int = 8,
     for group in optimizer.param_groups:
         group["lr"] = float(learning_rate)
     history = []
+    original_pair = (env.source, env.destination)
+    original_randomize = env.randomize_endpoints
+    env.randomize_endpoints = False
     for epoch in range(start_epoch, epochs):
         states, labels = [], []
         for episode in range(episodes_per_epoch):
-            obs, _ = env.reset(seed=10_000 + epoch * episodes_per_epoch + episode)
+            seed = 10_000 + epoch * episodes_per_epoch + episode
+            options = None
+            if randomize_endpoints:
+                pair_rng = random.Random(seed)
+                source = pair_rng.choice(CITIES)
+                destination = pair_rng.choice(tuple(
+                    city for city in CITIES if city != source))
+                options = {"source": source, "destination": destination}
+            obs, _ = env.reset(seed=seed, options=options)
             for _ in range(env.max_steps):
                 action = _teacher_slot(env, obs)
                 if action < 0:
@@ -89,6 +120,10 @@ def behavior_clone(model, env, *, epochs: int = 15, episodes_per_epoch: int = 8,
                             training_state={"phase": "bc", "bc_epoch": epoch + 1, "ppo_epoch": 0},
                             metadata={"model_name": type(model).__name__,
                                       "hidden_dim": model.hidden_dim})
+    env.randomize_endpoints = False
+    env.reset(seed=10_000 + epochs * episodes_per_epoch,
+              options={"source": original_pair[0], "destination": original_pair[1]})
+    env.randomize_endpoints = original_randomize
     return optimizer, history
 
 
@@ -162,6 +197,8 @@ def train_model(model_name: str, env, config: dict[str, Any], output_dir: str | 
     history = []
     best_reward = -math.inf
     best_success = -math.inf
+    best_success_reward = -math.inf
+    best_success_hops = math.inf
     if resume_from:
         payload = load_checkpoint(resume_from, model, optimizer, map_location=device)
         state = payload.get("training_state", {})
@@ -170,6 +207,8 @@ def train_model(model_name: str, env, config: dict[str, Any], output_dir: str | 
             reward_normalizer.load_state_dict(state["reward_normalizer"])
         best_reward = float(state.get("best_reward", best_reward))
         best_success = float(state.get("best_success_rate", best_success))
+        best_success_reward = float(state.get("best_success_reward", best_success_reward))
+        best_success_hops = float(state.get("best_success_avg_hops", best_success_hops))
         if state.get("phase") == "bc":
             start_bc_epoch = int(state.get("bc_epoch", 0))
         else:
@@ -180,7 +219,8 @@ def train_model(model_name: str, env, config: dict[str, Any], output_dir: str | 
             model, env, epochs=bc_epochs, episodes_per_epoch=int(config.get("bc_episodes_per_epoch", 8)),
             entropy_coef=config.get("bc_entropy_coef", BC_ENTROPY_COEF),
             learning_rate=config.get("bc_learning_rate", 1e-3),
-            checkpoint_dir=checkpoint_dir, start_epoch=start_bc_epoch, optimizer=optimizer)
+            checkpoint_dir=checkpoint_dir, start_epoch=start_bc_epoch, optimizer=optimizer,
+            randomize_endpoints=bool(config.get("bc_randomize_endpoints", False)))
         history.extend(bc_history)
         critic_parameters = {id(p) for p in model.critic.parameters()}
         for group in optimizer.param_groups:
@@ -222,15 +262,24 @@ def train_model(model_name: str, env, config: dict[str, Any], output_dir: str | 
         metrics.update(evaluation or {})
         reward_score = float((evaluation or {}).get("overall_reward", rollout["rollout_reward"]))
         success_score = float((evaluation or {}).get("success_rate", rollout["rollout_successes"]))
+        avg_hops_score = (evaluation or {}).get("avg_hops_success")
         new_best_reward = reward_score > best_reward
-        new_best_success = success_score > best_success
+        new_best_success = _is_better_success_checkpoint(
+            success_score, reward_score, avg_hops_score,
+            best_success=best_success, best_reward=best_success_reward,
+            best_avg_hops=best_success_hops)
         if new_best_reward:
             best_reward = reward_score
         if new_best_success:
             best_success = success_score
+            best_success_reward = reward_score
+            best_success_hops = (float(avg_hops_score) if avg_hops_score is not None
+                                 else math.inf)
         latest_state = {"phase": "ppo", "bc_epoch": bc_epochs, "ppo_epoch": epoch,
                         "history": history, "best_reward": best_reward,
                         "best_success_rate": best_success,
+                        "best_success_reward": best_success_reward,
+                        "best_success_avg_hops": best_success_hops,
                         "reward_normalizer": (reward_normalizer.state_dict()
                             if reward_normalizer is not None else None)}
         save_checkpoint(latest_path, model=model, optimizer=optimizer,

@@ -37,6 +37,16 @@ to fixed protection magnitudes use an explicit protected-condition override in
   actor/critic trunk, and one disjoint-graph message-passing call per PPO
   minibatch. Dynamic QBER/SKR-invalid links contribute zero messages in both
   directions; the action head retains its hard `-inf` mask.
+- The action head includes a monotone log-SKR prior. Its distance progress prior
+  remains explicit, so the controlled equal-progress link-choice diagnostic is
+  separate from full-route tradeoffs. Behavior-cloning ties use total route
+  distance, then hop count, then SKR. The optional
+  `training.bc_randomize_endpoints` setting adds endpoint variety to teacher
+  demonstrations while leaving the protected evaluation endpoint condition
+  unchanged.
+- Per-link SKR reward is prorated by link distance. Splitting one modeled span
+  into eight shorter links therefore does not multiply its SKR reward by eight;
+  extra relay hops still incur the configured step cost.
 - DropEdge is optional and symmetric. The defence config uses 0.05; this
   affects representation regularization only and never weakens the physics mask.
 - Relative node features replace geographic coordinates with destination-
@@ -46,9 +56,11 @@ to fixed protection magnitudes use an explicit protected-condition override in
   gradient clipping, and GAE lambda are explicit configuration fields. The
   running normalizer state is saved with checkpoints for exact resume.
 - The environment samples independent fiber outages and time-varying FSO
-  atmospheric conditions at every simulated step. FSO outage draws are shared
-  across the adjacent segments in one detour corridor, preserving each segment's
-  marginal viability while modeling correlated weather. The adverse-condition config adds a seeded ±1 hour
+  atmospheric conditions at every simulated step. An FSO detour's outage draw
+  is shared across its segments and stays fixed for the episode, so a route
+  cannot enter a corridor that disappears between relay hops. This episode-scale
+  persistence is a simulator assumption, not a measured weather model. The
+  adverse-condition config adds a seeded ±1 hour
   start-time jitter around 22:00 in monsoon; evaluation spans all four seasons
   with four seeds per season.
 - CPU intra-op threads are configurable. PPO samples are generated online, so

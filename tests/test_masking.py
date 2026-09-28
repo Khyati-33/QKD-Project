@@ -49,6 +49,25 @@ def test_attention_score_uses_all_eight_candidate_state_features():
         assert not torch.allclose(score, baseline)
 
 
+def test_attention_has_monotone_log_skr_prior_for_equivalent_candidates():
+    head = QKDAttentionHead(hidden_dim=8, edge_feature_dim=9)
+    # Remove the learned residual and progress term to isolate the structural
+    # rate preference. Equal candidate context with higher positive SKR must
+    # receive the higher action logit.
+    with torch.no_grad():
+        for parameter in head.parameters():
+            parameter.zero_()
+    current = torch.zeros((1, 8))
+    destination = torch.zeros((1, 8))
+    neighbors = torch.zeros((1, 2, 8))
+    features = torch.zeros((1, 2, 9))
+    features[0, :, 8] = 0.25
+    features[0, :, 1] = torch.tensor([0.017, 0.20])
+    logits = head(current, destination, neighbors, features,
+                  torch.ones((1, 2), dtype=torch.bool))
+    assert logits[0, 1] > logits[0, 0]
+
+
 def test_model_forward_shapes_synthetic_batch():
     env = QKDRoutingEnv()
     observations = [env.reset(seed=s)[0] for s in (3, 4)]
