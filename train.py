@@ -60,6 +60,18 @@ def _is_better_success_checkpoint(success: float, reward: float,
     return hops < best_avg_hops
 
 
+def _checkpoint_scores(evaluation: dict[str, Any], rollout: dict[str, Any], *,
+                       has_epoch_callback: bool) -> tuple[float, float, float | None] | None:
+    """Return comparable checkpoint metrics, skipping unscheduled evaluations."""
+    if has_epoch_callback:
+        if "overall_reward" not in evaluation or "success_rate" not in evaluation:
+            return None
+        return (float(evaluation["overall_reward"]),
+                float(evaluation["success_rate"]), evaluation.get("avg_hops_success"))
+    return (float(rollout["rollout_reward"]),
+            float(rollout["rollout_successes"]), None)
+
+
 def behavior_clone(model, env, *, epochs: int = 15, episodes_per_epoch: int = 8,
                    entropy_coef: float = BC_ENTROPY_COEF, learning_rate: float = 1e-3,
                    checkpoint_dir: str | Path | None = None,
@@ -199,6 +211,8 @@ def train_model(model_name: str, env, config: dict[str, Any], output_dir: str | 
     best_success = -math.inf
     best_success_reward = -math.inf
     best_success_hops = math.inf
+    selection_mode = ("evaluated_routes_v1" if epoch_callback is not None
+                      else "rollout_v1")
     if resume_from:
         payload = load_checkpoint(resume_from, model, optimizer, map_location=device)
         state = payload.get("training_state", {})
@@ -209,6 +223,9 @@ def train_model(model_name: str, env, config: dict[str, Any], output_dir: str | 
         best_success = float(state.get("best_success_rate", best_success))
         best_success_reward = float(state.get("best_success_reward", best_success_reward))
         best_success_hops = float(state.get("best_success_avg_hops", best_success_hops))
+        if state.get("checkpoint_selection_mode") != selection_mode:
+            best_reward = best_success = best_success_reward = -math.inf
+            best_success_hops = math.inf
         if state.get("phase") == "bc":
             start_bc_epoch = int(state.get("bc_epoch", 0))
         else:
@@ -260,26 +277,29 @@ def train_model(model_name: str, env, config: dict[str, Any], output_dir: str | 
         history.append(metrics)
         evaluation = epoch_callback(model, epoch + 1) if epoch_callback else {}
         metrics.update(evaluation or {})
-        reward_score = float((evaluation or {}).get("overall_reward", rollout["rollout_reward"]))
-        success_score = float((evaluation or {}).get("success_rate", rollout["rollout_successes"]))
-        avg_hops_score = (evaluation or {}).get("avg_hops_success")
-        new_best_reward = reward_score > best_reward
-        new_best_success = _is_better_success_checkpoint(
-            success_score, reward_score, avg_hops_score,
-            best_success=best_success, best_reward=best_success_reward,
-            best_avg_hops=best_success_hops)
-        if new_best_reward:
-            best_reward = reward_score
-        if new_best_success:
-            best_success = success_score
-            best_success_reward = reward_score
-            best_success_hops = (float(avg_hops_score) if avg_hops_score is not None
-                                 else math.inf)
+        scores = _checkpoint_scores(evaluation or {}, rollout,
+                                    has_epoch_callback=epoch_callback is not None)
+        new_best_reward = new_best_success = False
+        if scores is not None:
+            reward_score, success_score, avg_hops_score = scores
+            new_best_reward = reward_score > best_reward
+            new_best_success = _is_better_success_checkpoint(
+                success_score, reward_score, avg_hops_score,
+                best_success=best_success, best_reward=best_success_reward,
+                best_avg_hops=best_success_hops)
+            if new_best_reward:
+                best_reward = reward_score
+            if new_best_success:
+                best_success = success_score
+                best_success_reward = reward_score
+                best_success_hops = (float(avg_hops_score) if avg_hops_score is not None
+                                     else math.inf)
         latest_state = {"phase": "ppo", "bc_epoch": bc_epochs, "ppo_epoch": epoch,
                         "history": history, "best_reward": best_reward,
                         "best_success_rate": best_success,
                         "best_success_reward": best_success_reward,
                         "best_success_avg_hops": best_success_hops,
+                        "checkpoint_selection_mode": selection_mode,
                         "reward_normalizer": (reward_normalizer.state_dict()
                             if reward_normalizer is not None else None)}
         save_checkpoint(latest_path, model=model, optimizer=optimizer,

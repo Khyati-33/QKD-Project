@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def test_success_checkpoint_uses_reward_then_hops_as_tiebreakers():
     sys.path.insert(0, str(ROOT))
-    from train import _is_better_success_checkpoint
+    from train import _checkpoint_scores, _is_better_success_checkpoint
 
     rank = _is_better_success_checkpoint
     assert rank(1.0, 9.0, 24.0, best_success=0.9, best_reward=100.0,
@@ -25,6 +25,10 @@ def test_success_checkpoint_uses_reward_then_hops_as_tiebreakers():
                 best_avg_hops=23.0)
     assert not rank(1.0, 10.0, 24.0, best_success=1.0, best_reward=10.0,
                     best_avg_hops=23.0)
+    rollout = {"rollout_reward": 65.0, "rollout_successes": 4.0}
+    assert _checkpoint_scores({}, rollout, has_epoch_callback=True) is None
+    assert _checkpoint_scores({"overall_reward": 10.0, "success_rate": 1.0},
+                              rollout, has_epoch_callback=True) == (10.0, 1.0, None)
 
 
 def test_process_termination_resumes_from_last_epoch(tmp_path):

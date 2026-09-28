@@ -128,3 +128,15 @@ endpoints in behavior-cloning demonstrations while retaining the protected
 Delhi-to-Chennai evaluation condition. This broadens supervision but does not
 make the synthetic topology geographically valid or calibrate its channel
 physics.
+
+## Updated 50-epoch rerun (2026-09-28)
+
+The updated approach was trained with `configs/defence_monsoon_night_50ep_idq.yaml` for 15 behavior-cloning epochs and 50 PPO epochs. Run artifacts are in `experiments/runs/defence_monsoon_night_50ep_idq_20260928T044715Z_c84be8c5/`. The run completed all 50 epochs and evaluated every five epochs.
+
+At epoch 50, evaluation completed 16/16 Delhi-to-Chennai episodes (four seeds in each of four seasons). Mean successful route length was 23.125 hops against a 23-hop all-fiber reference. Normal, Summer, and Monsoon averaged 23 hops; Winter averaged 23.5. All 370/370 traversed links met the simulator's QBER/SKR edge constraints, with no fallback actions. The representative route had 23 fiber links, no FSO links, and no revisits. Dijkstra-by-kilometers and BFS-by-hops each also succeeded in 16/16 episodes, with 23.25 mean hops; Random and Max-SKR had no successful episodes.
+
+The controlled link-choice diagnostic sampled 32 matched-progress decisions for each of 12 season/hour conditions (384 total). On clear FSO samples, the FSO SKR proxy exceeded the fiber proxy in all 384 comparisons and was selected in all 384. Mean FSO action probability was about 0.790 across conditions. This tests relative preference conditional on clear FSO and matched route context; it does not represent marginal weather availability or prove that full routes should use FSO. The logged representative end-to-end route still used fiber.
+
+The run exposed a checkpoint bookkeeping defect: because evaluations are scheduled every five epochs, unscheduled epochs had compared rollout metrics against scheduled-evaluation metrics. The saved `best_by_reward.pt` and `best_by_success_rate.pt` therefore both point to epoch 27 and should not be used for this run. `latest.pt` and the epoch-50 evaluation are the valid final artifacts. The checkpoint-selection fix in the subsequent commit only updates best checkpoints on scheduled evaluations and resets stored selection scores when resuming with a different selection mode. This fix was added after the experiment; it did not change the completed run's training or metrics.
+
+These are results in the assumption-based simulator, not measured QKD performance or validation of a geographically realistic Indian network. The randomized behavior-cloning endpoints are not an independent held-out evaluation set.
