@@ -1,6 +1,6 @@
 {
   "status": "in_progress",
-  "refreshed_utc": "2026-10-02T12:08:40.636685+00:00",
+  "refreshed_utc": "2026-10-02T12:37:09.521119+00:00",
   "campaign_dir": "experiments\\runs\\training_seed_stability_20261002T094438Z",
   "planned_seeds": [
     20261002,
@@ -30,7 +30,7 @@
     {
       "training_seed": 20261004,
       "run_dir": "experiments\\runs\\qkd_gnn_seed_stability_20261004_20261002T114241Z_75a69157",
-      "checkpoint_updated_utc": "2026-10-02T12:08:28.647622+00:00",
+      "checkpoint_updated_utc": "2026-10-02T12:36:24.610756+00:00",
       "status": "no final summary yet"
     },
     {

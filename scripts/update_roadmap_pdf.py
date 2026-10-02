@@ -52,6 +52,10 @@ def main() -> None:
                         "small_graph_oracle_20261002.json")
     parser.add_argument("--transfer-report", type=Path, default=ROOT / "paper" / "supplementary" /
                         "pair_season_matrix_20261002.json")
+    parser.add_argument("--inference-profile", type=Path, default=ROOT / "paper" / "supplementary" /
+                        "inference_profile_20261002.json")
+    parser.add_argument("--ablation-report", type=Path, default=ROOT / "paper" / "supplementary" /
+                        "matched_budget_ablations_20261002.json")
     parser.add_argument("--roadmap", type=Path, default=ROOT /
                         "QKD_Routing_Agent_Research_Roadmap_QSMS_Style.pdf")
     parser.add_argument("--output", type=Path)
@@ -70,6 +74,11 @@ def main() -> None:
     training_progress = read_json(args.training_progress) if args.training_progress.exists() else None
     oracle_report = read_json(args.oracle_report) if args.oracle_report.exists() else None
     transfer_report = read_json(args.transfer_report) if args.transfer_report.exists() else None
+    inference_profile = read_json(args.inference_profile) if args.inference_profile.exists() else None
+    ablation_report = read_json(args.ablation_report) if args.ablation_report.exists() else None
+    ablation_progress_files = sorted((ROOT / "experiments" / "runs").glob(
+        "matched_ablations_*/progress.json"), key=lambda path: path.stat().st_mtime)
+    ablation_progress = read_json(ablation_progress_files[-1]) if ablation_progress_files else None
     dated = date.today().isoformat()
     out_pdf = args.output or ROOT / "paper" / "roadmap_status_addendum.pdf"
     out_pdf.parent.mkdir(parents=True, exist_ok=True)
@@ -202,9 +211,32 @@ def main() -> None:
             f"({gnn_transfer['success_rate']:.1%}; Wilson 95% CI "
             f"{transfer_ci[0]:.1%}-{transfer_ci[1]:.1%}); successful mean hops "
             f"{transfer_hops}. BFS-hop success was "
-            f"{bfs_transfer['success_rate']:.1%}.",
+            f"{bfs_transfer['successes']}/{bfs_transfer['episodes']} "
+            f"({bfs_transfer['success_rate']:.1%}), with "
+            f"{bfs_transfer['successful_mean_hops']:.2f} successful mean hops. "
+            "GNN did not outperform BFS on success or hops.",
             "Six ordered pairs, four seasons and selected day/night times, paired seeds. "
             "BC endpoint randomization means these are not strict end-to-end endpoint holdouts."])
+    if inference_profile:
+        thread_keys = sorted(inference_profile["summary_by_threads"], key=int)
+        latency_text = "; ".join(
+            f"{thread_key} thread(s): p50/p95/p99 "
+            f"{inference_profile['summary_by_threads'][thread_key]['p50_ms']:.2f}/"
+            f"{inference_profile['summary_by_threads'][thread_key]['p95_ms']:.2f}/"
+            f"{inference_profile['summary_by_threads'][thread_key]['p99_ms']:.2f} ms"
+            for thread_key in thread_keys)
+        rss = inference_profile["memory"]["process_rss_after_bytes"] / (1024 * 1024)
+        model_mb = inference_profile["memory"]["model_parameter_bytes"] / (1024 * 1024)
+        work_rows.append(["Repeated inference profile",
+            f"{latency_text}. Process RSS after run {rss:.1f} MiB; model parameters {model_mb:.1f} MiB.",
+            "42 ordered pairs, deterministic single-decision calls, encoder cache disabled. "
+            "One host/topology; graph-size scaling and deployment profiling remain open."])
+    if ablation_progress:
+        completed_variants = ablation_progress.get("completed_variants", [])
+        work_rows.append(["Matched-budget ablation campaign",
+            f"{len(completed_variants)}/{len(ablation_progress.get('planned_variants', []))} "
+            "conditions complete at the shared 50-epoch budget.",
+            "Single training seed; progress is not a completed comparative result."])
     work_table = Table([[paragraph(str(cell), styles["RoadCellHead"] if i == 0 else styles["RoadCell"])
                          for cell in row] for i, row in enumerate(work_rows)],
                        colWidths=[1.05 * inch, 3.25 * inch, 2.88 * inch], repeatRows=1)
@@ -278,12 +310,19 @@ def main() -> None:
           training_report.get("status") == "complete" and training_report.get("training_seed_count") == 5 else
           "Five independent full-budget training runs are not present. Evaluation episodes for one checkpoint do not substitute for training-seed replication.")],
         ["P1 endpoint / weather holdouts", "PARTIAL - transfer matrix" if transfer_report else "PARTIAL",
-         (f"Paired across-pair and season/time matrix is archived ({transfer_report['summary_by_method']['GNN-PPO']['episodes']} episodes per policy) with Wilson intervals. BC endpoint randomization prevents a strict endpoint-holdout claim; broader pair coverage remains." if transfer_report else
+         (f"Paired across-pair and season/time matrix is archived ({transfer_report['summary_by_method']['GNN-PPO']['episodes']} episodes per policy) with Wilson intervals. GNN success was {transfer_report['summary_by_method']['GNN-PPO']['success_rate']:.1%} versus BFS {transfer_report['summary_by_method']['BFS-hop']['success_rate']:.1%}; successful mean hops were {transfer_report['summary_by_method']['GNN-PPO']['successful_mean_hops']:.2f} versus {transfer_report['summary_by_method']['BFS-hop']['successful_mean_hops']:.2f}. BC endpoint randomization prevents a strict endpoint-holdout claim." if transfer_report else
           "The current checkpoint was run on 42 ordered pairs (31/42 success), plus earlier adverse-condition episodes. These are coverage diagnostics, not held-out endpoint/weather tests.")],
-        ["P1 architecture / feature ablations", "TODO",
-         "No matched-budget GNN depth, attention, feature, or reward ablation set is archived."],
-        ["P1 inference cost", "PARTIAL",
-         "Current checkpoint: 42-pair local inference had 3.83 ms median and 4.34 ms p95 decision latency. It is one host/scenario; report a full hardware profile and scaling before deployment claims."],
+        ["P1 architecture / feature ablations",
+         "DONE - single-seed scope" if ablation_report else
+         (f"IN PROGRESS ({len(ablation_progress.get('completed_variants', []))}/"
+          f"{len(ablation_progress.get('planned_variants', []))})" if ablation_progress else "TODO"),
+         ("Matched-budget results archive width, node-feature, DropEdge, and SKR reward sensitivities. "
+          "Single-seed results do not quantify training-seed variability." if ablation_report else
+          ("Matched 50-epoch baseline, geographic-feature, no-SKR-reward, no-DropEdge, and width-32 runs are underway." if ablation_progress else
+           "No matched-budget GNN feature, architecture, or reward ablation set is archived."))],
+        ["P1 inference cost", "PARTIAL - profiled" if inference_profile else "PARTIAL",
+         ("Repeated per-decision CPU latency, p50/p95/p99, thread counts, host details, and process/model memory are archived across 42 ordered pairs. This remains a one-host, one-topology simulator profile; no graph-size scaling or deployment claim." if inference_profile else
+          "Current checkpoint: 42-pair local inference had 3.83 ms median and 4.34 ms p95 decision latency. It is one host/scenario; report tail latency, memory, and scaling before deployment claims.")],
         ["P1 exact small-graph oracle", "DONE - toy scope" if oracle_report else "TODO",
          ("Exhaustive simple-path reward oracle and policy regret archived for generated 7-node graphs with frozen episode channels. "
           "Does not establish optimality on the full dynamic network." if oracle_report else

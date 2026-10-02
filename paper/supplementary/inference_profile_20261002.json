@@ -1,0 +1,285 @@
+{
+  "status": "complete",
+  "checkpoint": "experiments\\runs\\qkd_gnn_seed_stability_20261002_20261002T094441Z_c020fe10\\checkpoints\\GNN\\latest.pt",
+  "protocol": {
+    "ordered_city_pairs": 42,
+    "repeats_per_pair": 20,
+    "thread_counts": [
+      1,
+      4,
+      8
+    ],
+    "season": "monsoon",
+    "time_of_day_hours": 22.0,
+    "feature_mode": "relative",
+    "fiber_outage_prob": 0.01,
+    "qber_hard": 0.11,
+    "max_steps": 144,
+    "encoder_cache": "disabled",
+    "timed_operation": "one deterministic model.act decision",
+    "note": "One machine and one fixed simulator topology; no graph-size scaling claim."
+  },
+  "host": {
+    "platform": "Windows-11-10.0.26200-SP0",
+    "processor": "Intel64 Family 6 Model 141 Stepping 1, GenuineIntel",
+    "logical_cpu_count": 16,
+    "physical_cpu_count": 8,
+    "torch_version": "2.14.0+cpu"
+  },
+  "memory": {
+    "process_rss_before_bytes": 347463680,
+    "process_rss_after_bytes": 365301760,
+    "model_parameter_bytes": 552452
+  },
+  "summary_by_threads": {
+    "1": {
+      "decisions": 840,
+      "p50_ms": 26.5238,
+      "p95_ms": 70.36900499999997,
+      "p99_ms": 94.68113000000004,
+      "mean_ms": 35.055955714285716,
+      "max_ms": 126.4373,
+      "std_ms": 17.435175955268452
+    },
+    "4": {
+      "decisions": 840,
+      "p50_ms": 22.13345,
+      "p95_ms": 45.11545499999998,
+      "p99_ms": 64.57536500000002,
+      "mean_ms": 24.327152857142856,
+      "max_ms": 97.5239,
+      "std_ms": 11.589719100756394
+    },
+    "8": {
+      "decisions": 840,
+      "p50_ms": 12.75675,
+      "p95_ms": 16.885589999999993,
+      "p99_ms": 22.583004000000003,
+      "mean_ms": 13.124607976190475,
+      "max_ms": 37.6019,
+      "std_ms": 2.5270051746204385
+    }
+  },
+  "pair_seeds": [
+    {
+      "source": "Delhi",
+      "destination": "Mumbai",
+      "seed": 962001
+    },
+    {
+      "source": "Delhi",
+      "destination": "Chennai",
+      "seed": 962002
+    },
+    {
+      "source": "Delhi",
+      "destination": "Kolkata",
+      "seed": 962003
+    },
+    {
+      "source": "Delhi",
+      "destination": "Bangalore",
+      "seed": 962004
+    },
+    {
+      "source": "Delhi",
+      "destination": "Jaipur",
+      "seed": 962005
+    },
+    {
+      "source": "Delhi",
+      "destination": "Hyderabad",
+      "seed": 962006
+    },
+    {
+      "source": "Mumbai",
+      "destination": "Delhi",
+      "seed": 962100
+    },
+    {
+      "source": "Mumbai",
+      "destination": "Chennai",
+      "seed": 962102
+    },
+    {
+      "source": "Mumbai",
+      "destination": "Kolkata",
+      "seed": 962103
+    },
+    {
+      "source": "Mumbai",
+      "destination": "Bangalore",
+      "seed": 962104
+    },
+    {
+      "source": "Mumbai",
+      "destination": "Jaipur",
+      "seed": 962105
+    },
+    {
+      "source": "Mumbai",
+      "destination": "Hyderabad",
+      "seed": 962106
+    },
+    {
+      "source": "Chennai",
+      "destination": "Delhi",
+      "seed": 962200
+    },
+    {
+      "source": "Chennai",
+      "destination": "Mumbai",
+      "seed": 962201
+    },
+    {
+      "source": "Chennai",
+      "destination": "Kolkata",
+      "seed": 962203
+    },
+    {
+      "source": "Chennai",
+      "destination": "Bangalore",
+      "seed": 962204
+    },
+    {
+      "source": "Chennai",
+      "destination": "Jaipur",
+      "seed": 962205
+    },
+    {
+      "source": "Chennai",
+      "destination": "Hyderabad",
+      "seed": 962206
+    },
+    {
+      "source": "Kolkata",
+      "destination": "Delhi",
+      "seed": 962300
+    },
+    {
+      "source": "Kolkata",
+      "destination": "Mumbai",
+      "seed": 962301
+    },
+    {
+      "source": "Kolkata",
+      "destination": "Chennai",
+      "seed": 962302
+    },
+    {
+      "source": "Kolkata",
+      "destination": "Bangalore",
+      "seed": 962304
+    },
+    {
+      "source": "Kolkata",
+      "destination": "Jaipur",
+      "seed": 962305
+    },
+    {
+      "source": "Kolkata",
+      "destination": "Hyderabad",
+      "seed": 962306
+    },
+    {
+      "source": "Bangalore",
+      "destination": "Delhi",
+      "seed": 962400
+    },
+    {
+      "source": "Bangalore",
+      "destination": "Mumbai",
+      "seed": 962401
+    },
+    {
+      "source": "Bangalore",
+      "destination": "Chennai",
+      "seed": 962402
+    },
+    {
+      "source": "Bangalore",
+      "destination": "Kolkata",
+      "seed": 962403
+    },
+    {
+      "source": "Bangalore",
+      "destination": "Jaipur",
+      "seed": 962405
+    },
+    {
+      "source": "Bangalore",
+      "destination": "Hyderabad",
+      "seed": 962406
+    },
+    {
+      "source": "Jaipur",
+      "destination": "Delhi",
+      "seed": 962500
+    },
+    {
+      "source": "Jaipur",
+      "destination": "Mumbai",
+      "seed": 962501
+    },
+    {
+      "source": "Jaipur",
+      "destination": "Chennai",
+      "seed": 962502
+    },
+    {
+      "source": "Jaipur",
+      "destination": "Kolkata",
+      "seed": 962503
+    },
+    {
+      "source": "Jaipur",
+      "destination": "Bangalore",
+      "seed": 962504
+    },
+    {
+      "source": "Jaipur",
+      "destination": "Hyderabad",
+      "seed": 962506
+    },
+    {
+      "source": "Hyderabad",
+      "destination": "Delhi",
+      "seed": 962600
+    },
+    {
+      "source": "Hyderabad",
+      "destination": "Mumbai",
+      "seed": 962601
+    },
+    {
+      "source": "Hyderabad",
+      "destination": "Chennai",
+      "seed": 962602
+    },
+    {
+      "source": "Hyderabad",
+      "destination": "Kolkata",
+      "seed": 962603
+    },
+    {
+      "source": "Hyderabad",
+      "destination": "Bangalore",
+      "seed": 962604
+    },
+    {
+      "source": "Hyderabad",
+      "destination": "Jaipur",
+      "seed": 962605
+    }
+  ],
+  "measurement_context": {
+    "other_python_processes_at_start": [
+      {
+        "pid": 8480,
+        "name": "python.exe",
+        "role": "8-thread five-seed stability training campaign"
+      }
+    ],
+    "concurrent_load_note": "The five-seed training campaign ran concurrently on this host. Treat these timings as under concurrent CPU load."
+  }
+}
