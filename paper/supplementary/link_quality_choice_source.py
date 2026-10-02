@@ -7,9 +7,11 @@ diagnostic of learned action preferences, not a route-level performance score.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import random
 import statistics
+import subprocess
 from pathlib import Path
 
 import numpy as np
@@ -197,8 +199,16 @@ def run_test(checkpoint: Path, samples_per_condition: int = 32) -> dict:
                 "quality_samples": trials,
             }
 
+    source_path = Path(__file__).resolve()
+    source_sha256 = hashlib.sha256(source_path.read_bytes()).hexdigest()
+    git_commit = subprocess.run(["git", "rev-parse", "HEAD"], cwd=source_path.parent,
+        check=True, capture_output=True, text=True).stdout.strip()
     return {
         "checkpoint": str(checkpoint),
+        "checkpoint_sha256": hashlib.sha256(checkpoint.read_bytes()).hexdigest(),
+        "source": source_path.name,
+        "source_sha256": source_sha256,
+        "git_commit": git_commit,
         "test": "matched-progress twin candidate counterfactual, 10 km FSO detour vs 80 km fiber",
         "shared_state": {"seasonal_outages_conditioned_clear": True,
                          "same_neighbor_embedding": True,

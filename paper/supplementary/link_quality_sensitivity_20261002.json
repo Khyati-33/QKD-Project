@@ -1,5 +1,9 @@
 {
   "checkpoint": "paper\\supplementary\\checkpoint_gnn_latest_50ep_idq_20260928.pt",
+  "checkpoint_sha256": "154c8a81e4335b2bd609999155d785b5f1eaeedf8f5cd90e62023d795a368b27",
+  "source": "link_quality_choice_test.py",
+  "source_sha256": "a6227292d9100efaff375d21623198a92571a21ccde8cd2906895300c6991f33",
+  "git_commit": "709f65597ff0449427091b008481bf920e579969",
   "test": "matched-progress twin candidate counterfactual, 10 km FSO detour vs 80 km fiber",
   "shared_state": {
     "seasonal_outages_conditioned_clear": true,
