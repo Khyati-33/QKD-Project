@@ -14,7 +14,7 @@
   "training_state": {
     "phase": "ppo",
     "bc_epoch": 15,
-    "ppo_epoch": 11,
+    "ppo_epoch": 25,
     "target_ppo_epochs": 50
   }
 }
