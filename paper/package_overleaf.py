@@ -44,6 +44,9 @@ files = {
     "training_seed_stability_source.py": "scripts/run_training_seed_stability.py",
     "training_seed_progress_source.py": "scripts/refresh_training_seed_progress.py",
     "link_quality_choice_source.py": "link_quality_choice_test.py",
+    "small_graph_oracle_source.py": "scripts/run_small_graph_oracle.py",
+    "pair_season_matrix_source.py": "scripts/run_pair_season_matrix.py",
+    "archive_training_seed_source.py": "scripts/archive_training_seed_evidence.py",
     "seed_stability_50ep.yaml": "configs/seed_stability_50ep.yaml",
     "configuration_test.py": "tests/test_config.py",
 }

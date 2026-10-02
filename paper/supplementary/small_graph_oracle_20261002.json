@@ -1,0 +1,584 @@
+{
+  "protocol": "exact exhaustive simple-path reward oracle; static episode channel states",
+  "scope_note": "Toy generated graphs only. This is not an oracle for the full dynamic network or a globally optimal real QKD route.",
+  "channel_protocol": {
+    "link_type": "fiber-only",
+    "independent_per_edge_episode_outage_probability": 0.05,
+    "channels_are_frozen_after_reset": true
+  },
+  "checkpoint": "experiments\\runs\\qkd_gnn_seed_stability_20261002_20261002T094441Z_c020fe10\\checkpoints\\GNN\\latest.pt",
+  "checkpoint_sha256": "f6e311c2566fc28f95b88e06c36bb0d41bc16bd0763139f7d6e173a12b4664e6",
+  "source": "run_small_graph_oracle.py",
+  "source_sha256": "acbbaedf7f4c316e8d8ca79531bb5cc0522a65271aa8ac3888b87041bed5ad7a",
+  "git_commit": "d5c92f2e1f528fb1d604f2139b5f534caefcf135",
+  "graph_seeds": [
+    4101,
+    4102,
+    4103,
+    4104,
+    4105
+  ],
+  "channel_seeds": [
+    81,
+    82,
+    83,
+    84
+  ],
+  "summary": {
+    "episodes": 20,
+    "with_feasible_oracle": 20,
+    "policy_success_rate": 0.9,
+    "mean_reward_regret": 2.2088431683931375,
+    "median_reward_regret": 0.0,
+    "successful_policy_episodes": 18,
+    "successful_policy_mean_reward_regret": 0.6633476589582326,
+    "successful_policy_median_reward_regret": 0.0,
+    "successful_policy_reward_optimal_fraction": 0.6111111111111112,
+    "policy_reward_optimal_fraction": 0.55
+  },
+  "episodes": [
+    {
+      "graph_seed": 4101,
+      "channel_seed": 81,
+      "nodes": 7,
+      "edges": 11,
+      "enumerated_simple_paths": 12,
+      "feasible_simple_paths": 12,
+      "oracle_success": true,
+      "oracle_route": [
+        "Delhi",
+        "Mumbai",
+        "Chennai"
+      ],
+      "oracle_reward": 5.40849209808599,
+      "policy_success": true,
+      "policy_route": [
+        "Delhi",
+        "Mumbai",
+        "Chennai"
+      ],
+      "policy_reward": 5.40849209808599,
+      "policy_fallbacks": 0,
+      "reward_regret": 0.0,
+      "policy_route_simple": true,
+      "oracle_rank_of_policy_reward": 1
+    },
+    {
+      "graph_seed": 4101,
+      "channel_seed": 82,
+      "nodes": 7,
+      "edges": 11,
+      "enumerated_simple_paths": 12,
+      "feasible_simple_paths": 12,
+      "oracle_success": true,
+      "oracle_route": [
+        "Delhi",
+        "Mumbai",
+        "Chennai"
+      ],
+      "oracle_reward": 5.40849209808599,
+      "policy_success": true,
+      "policy_route": [
+        "Delhi",
+        "Mumbai",
+        "Chennai"
+      ],
+      "policy_reward": 5.40849209808599,
+      "policy_fallbacks": 0,
+      "reward_regret": 0.0,
+      "policy_route_simple": true,
+      "oracle_rank_of_policy_reward": 1
+    },
+    {
+      "graph_seed": 4101,
+      "channel_seed": 83,
+      "nodes": 7,
+      "edges": 11,
+      "enumerated_simple_paths": 12,
+      "feasible_simple_paths": 8,
+      "oracle_success": true,
+      "oracle_route": [
+        "Delhi",
+        "Mumbai",
+        "Chennai"
+      ],
+      "oracle_reward": 5.40849209808599,
+      "policy_success": true,
+      "policy_route": [
+        "Delhi",
+        "Mumbai",
+        "Chennai"
+      ],
+      "policy_reward": 5.40849209808599,
+      "policy_fallbacks": 0,
+      "reward_regret": 0.0,
+      "policy_route_simple": true,
+      "oracle_rank_of_policy_reward": 1
+    },
+    {
+      "graph_seed": 4101,
+      "channel_seed": 84,
+      "nodes": 7,
+      "edges": 11,
+      "enumerated_simple_paths": 12,
+      "feasible_simple_paths": 6,
+      "oracle_success": true,
+      "oracle_route": [
+        "Delhi",
+        "Hyderabad",
+        "Kolkata",
+        "Chennai"
+      ],
+      "oracle_reward": 4.866910387993595,
+      "policy_success": false,
+      "policy_route": [
+        "Delhi",
+        "Mumbai",
+        "Delhi",
+        "Mumbai",
+        "Delhi",
+        "Mumbai",
+        "Delhi",
+        "Mumbai"
+      ],
+      "policy_reward": -10.829423553371587,
+      "policy_fallbacks": 0,
+      "reward_regret": 15.696333941365182,
+      "policy_route_simple": false,
+      "oracle_rank_of_policy_reward": 7
+    },
+    {
+      "graph_seed": 4102,
+      "channel_seed": 81,
+      "nodes": 7,
+      "edges": 11,
+      "enumerated_simple_paths": 8,
+      "feasible_simple_paths": 8,
+      "oracle_success": true,
+      "oracle_route": [
+        "Delhi",
+        "Mumbai",
+        "Chennai"
+      ],
+      "oracle_reward": 5.795789682843343,
+      "policy_success": true,
+      "policy_route": [
+        "Delhi",
+        "Hyderabad",
+        "Chennai"
+      ],
+      "policy_reward": 4.877048456197516,
+      "policy_fallbacks": 0,
+      "reward_regret": 0.9187412266458272,
+      "policy_route_simple": true,
+      "oracle_rank_of_policy_reward": 2
+    },
+    {
+      "graph_seed": 4102,
+      "channel_seed": 82,
+      "nodes": 7,
+      "edges": 11,
+      "enumerated_simple_paths": 8,
+      "feasible_simple_paths": 8,
+      "oracle_success": true,
+      "oracle_route": [
+        "Delhi",
+        "Mumbai",
+        "Chennai"
+      ],
+      "oracle_reward": 5.795789682843343,
+      "policy_success": true,
+      "policy_route": [
+        "Delhi",
+        "Hyderabad",
+        "Chennai"
+      ],
+      "policy_reward": 4.877048456197516,
+      "policy_fallbacks": 0,
+      "reward_regret": 0.9187412266458272,
+      "policy_route_simple": true,
+      "oracle_rank_of_policy_reward": 2
+    },
+    {
+      "graph_seed": 4102,
+      "channel_seed": 83,
+      "nodes": 7,
+      "edges": 11,
+      "enumerated_simple_paths": 8,
+      "feasible_simple_paths": 7,
+      "oracle_success": true,
+      "oracle_route": [
+        "Delhi",
+        "Mumbai",
+        "Chennai"
+      ],
+      "oracle_reward": 5.795789682843343,
+      "policy_success": true,
+      "policy_route": [
+        "Delhi",
+        "Hyderabad",
+        "Delhi",
+        "Mumbai",
+        "Chennai"
+      ],
+      "policy_reward": 2.745138584958514,
+      "policy_fallbacks": 0,
+      "reward_regret": 3.050651097884829,
+      "policy_route_simple": false,
+      "oracle_rank_of_policy_reward": 4
+    },
+    {
+      "graph_seed": 4102,
+      "channel_seed": 84,
+      "nodes": 7,
+      "edges": 11,
+      "enumerated_simple_paths": 8,
+      "feasible_simple_paths": 5,
+      "oracle_success": true,
+      "oracle_route": [
+        "Delhi",
+        "Hyderabad",
+        "Chennai"
+      ],
+      "oracle_reward": 4.877048456197516,
+      "policy_success": true,
+      "policy_route": [
+        "Delhi",
+        "Hyderabad",
+        "Chennai"
+      ],
+      "policy_reward": 4.877048456197516,
+      "policy_fallbacks": 0,
+      "reward_regret": 0.0,
+      "policy_route_simple": true,
+      "oracle_rank_of_policy_reward": 1
+    },
+    {
+      "graph_seed": 4103,
+      "channel_seed": 81,
+      "nodes": 7,
+      "edges": 11,
+      "enumerated_simple_paths": 15,
+      "feasible_simple_paths": 15,
+      "oracle_success": true,
+      "oracle_route": [
+        "Delhi",
+        "Mumbai",
+        "Chennai"
+      ],
+      "oracle_reward": 4.768818367376516,
+      "policy_success": true,
+      "policy_route": [
+        "Delhi",
+        "Mumbai",
+        "Chennai"
+      ],
+      "policy_reward": 4.768818367376516,
+      "policy_fallbacks": 0,
+      "reward_regret": 0.0,
+      "policy_route_simple": true,
+      "oracle_rank_of_policy_reward": 1
+    },
+    {
+      "graph_seed": 4103,
+      "channel_seed": 82,
+      "nodes": 7,
+      "edges": 11,
+      "enumerated_simple_paths": 15,
+      "feasible_simple_paths": 15,
+      "oracle_success": true,
+      "oracle_route": [
+        "Delhi",
+        "Mumbai",
+        "Chennai"
+      ],
+      "oracle_reward": 4.768818367376516,
+      "policy_success": true,
+      "policy_route": [
+        "Delhi",
+        "Mumbai",
+        "Chennai"
+      ],
+      "policy_reward": 4.768818367376516,
+      "policy_fallbacks": 0,
+      "reward_regret": 0.0,
+      "policy_route_simple": true,
+      "oracle_rank_of_policy_reward": 1
+    },
+    {
+      "graph_seed": 4103,
+      "channel_seed": 83,
+      "nodes": 7,
+      "edges": 11,
+      "enumerated_simple_paths": 15,
+      "feasible_simple_paths": 7,
+      "oracle_success": true,
+      "oracle_route": [
+        "Delhi",
+        "Mumbai",
+        "Chennai"
+      ],
+      "oracle_reward": 4.768818367376516,
+      "policy_success": true,
+      "policy_route": [
+        "Delhi",
+        "Mumbai",
+        "Chennai"
+      ],
+      "policy_reward": 4.768818367376516,
+      "policy_fallbacks": 0,
+      "reward_regret": 0.0,
+      "policy_route_simple": true,
+      "oracle_rank_of_policy_reward": 1
+    },
+    {
+      "graph_seed": 4103,
+      "channel_seed": 84,
+      "nodes": 7,
+      "edges": 11,
+      "enumerated_simple_paths": 15,
+      "feasible_simple_paths": 6,
+      "oracle_success": true,
+      "oracle_route": [
+        "Delhi",
+        "Hyderabad",
+        "Kolkata",
+        "Chennai"
+      ],
+      "oracle_reward": 4.026940268467109,
+      "policy_success": true,
+      "policy_route": [
+        "Delhi",
+        "Mumbai",
+        "Hyderabad",
+        "Mumbai",
+        "Hyderabad",
+        "Kolkata",
+        "Chennai"
+      ],
+      "policy_reward": -2.740634733016972,
+      "policy_fallbacks": 0,
+      "reward_regret": 6.767575001484081,
+      "policy_route_simple": false,
+      "oracle_rank_of_policy_reward": 7
+    },
+    {
+      "graph_seed": 4104,
+      "channel_seed": 81,
+      "nodes": 7,
+      "edges": 11,
+      "enumerated_simple_paths": 15,
+      "feasible_simple_paths": 15,
+      "oracle_success": true,
+      "oracle_route": [
+        "Delhi",
+        "Kolkata",
+        "Bangalore",
+        "Chennai"
+      ],
+      "oracle_reward": 4.532841813701953,
+      "policy_success": true,
+      "policy_route": [
+        "Delhi",
+        "Kolkata",
+        "Chennai"
+      ],
+      "policy_reward": 4.437992044172746,
+      "policy_fallbacks": 0,
+      "reward_regret": 0.09484976952920743,
+      "policy_route_simple": true,
+      "oracle_rank_of_policy_reward": 2
+    },
+    {
+      "graph_seed": 4104,
+      "channel_seed": 82,
+      "nodes": 7,
+      "edges": 11,
+      "enumerated_simple_paths": 15,
+      "feasible_simple_paths": 15,
+      "oracle_success": true,
+      "oracle_route": [
+        "Delhi",
+        "Kolkata",
+        "Bangalore",
+        "Chennai"
+      ],
+      "oracle_reward": 4.532841813701953,
+      "policy_success": true,
+      "policy_route": [
+        "Delhi",
+        "Kolkata",
+        "Chennai"
+      ],
+      "policy_reward": 4.437992044172746,
+      "policy_fallbacks": 0,
+      "reward_regret": 0.09484976952920743,
+      "policy_route_simple": true,
+      "oracle_rank_of_policy_reward": 2
+    },
+    {
+      "graph_seed": 4104,
+      "channel_seed": 83,
+      "nodes": 7,
+      "edges": 11,
+      "enumerated_simple_paths": 15,
+      "feasible_simple_paths": 8,
+      "oracle_success": true,
+      "oracle_route": [
+        "Delhi",
+        "Kolkata",
+        "Bangalore",
+        "Chennai"
+      ],
+      "oracle_reward": 4.532841813701953,
+      "policy_success": true,
+      "policy_route": [
+        "Delhi",
+        "Kolkata",
+        "Chennai"
+      ],
+      "policy_reward": 4.437992044172746,
+      "policy_fallbacks": 0,
+      "reward_regret": 0.09484976952920743,
+      "policy_route_simple": true,
+      "oracle_rank_of_policy_reward": 2
+    },
+    {
+      "graph_seed": 4104,
+      "channel_seed": 84,
+      "nodes": 7,
+      "edges": 11,
+      "enumerated_simple_paths": 15,
+      "feasible_simple_paths": 8,
+      "oracle_success": true,
+      "oracle_route": [
+        "Delhi",
+        "Hyderabad",
+        "Jaipur",
+        "Bangalore",
+        "Chennai"
+      ],
+      "oracle_reward": 2.38325584655822,
+      "policy_success": false,
+      "policy_route": [
+        "Delhi",
+        "Hyderabad",
+        "Delhi",
+        "Hyderabad",
+        "Delhi",
+        "Hyderabad",
+        "Delhi",
+        "Hyderabad"
+      ],
+      "policy_reward": -14.157015718691163,
+      "policy_fallbacks": 0,
+      "reward_regret": 16.540271565249384,
+      "policy_route_simple": false,
+      "oracle_rank_of_policy_reward": 9
+    },
+    {
+      "graph_seed": 4105,
+      "channel_seed": 81,
+      "nodes": 7,
+      "edges": 11,
+      "enumerated_simple_paths": 12,
+      "feasible_simple_paths": 12,
+      "oracle_success": true,
+      "oracle_route": [
+        "Delhi",
+        "Kolkata",
+        "Chennai"
+      ],
+      "oracle_reward": 4.576384495833249,
+      "policy_success": true,
+      "policy_route": [
+        "Delhi",
+        "Kolkata",
+        "Chennai"
+      ],
+      "policy_reward": 4.576384495833249,
+      "policy_fallbacks": 0,
+      "reward_regret": 0.0,
+      "policy_route_simple": true,
+      "oracle_rank_of_policy_reward": 1
+    },
+    {
+      "graph_seed": 4105,
+      "channel_seed": 82,
+      "nodes": 7,
+      "edges": 11,
+      "enumerated_simple_paths": 12,
+      "feasible_simple_paths": 12,
+      "oracle_success": true,
+      "oracle_route": [
+        "Delhi",
+        "Kolkata",
+        "Chennai"
+      ],
+      "oracle_reward": 4.576384495833249,
+      "policy_success": true,
+      "policy_route": [
+        "Delhi",
+        "Kolkata",
+        "Chennai"
+      ],
+      "policy_reward": 4.576384495833249,
+      "policy_fallbacks": 0,
+      "reward_regret": 0.0,
+      "policy_route_simple": true,
+      "oracle_rank_of_policy_reward": 1
+    },
+    {
+      "graph_seed": 4105,
+      "channel_seed": 83,
+      "nodes": 7,
+      "edges": 11,
+      "enumerated_simple_paths": 12,
+      "feasible_simple_paths": 8,
+      "oracle_success": true,
+      "oracle_route": [
+        "Delhi",
+        "Kolkata",
+        "Chennai"
+      ],
+      "oracle_reward": 4.576384495833249,
+      "policy_success": true,
+      "policy_route": [
+        "Delhi",
+        "Kolkata",
+        "Chennai"
+      ],
+      "policy_reward": 4.576384495833249,
+      "policy_fallbacks": 0,
+      "reward_regret": 0.0,
+      "policy_route_simple": true,
+      "oracle_rank_of_policy_reward": 1
+    },
+    {
+      "graph_seed": 4105,
+      "channel_seed": 84,
+      "nodes": 7,
+      "edges": 11,
+      "enumerated_simple_paths": 12,
+      "feasible_simple_paths": 6,
+      "oracle_success": true,
+      "oracle_route": [
+        "Delhi",
+        "Mumbai",
+        "Chennai"
+      ],
+      "oracle_reward": 4.190586095342517,
+      "policy_success": true,
+      "policy_route": [
+        "Delhi",
+        "Mumbai",
+        "Chennai"
+      ],
+      "policy_reward": 4.190586095342517,
+      "policy_fallbacks": 0,
+      "reward_regret": 0.0,
+      "policy_route_simple": true,
+      "oracle_rank_of_policy_reward": 1
+    }
+  ]
+}

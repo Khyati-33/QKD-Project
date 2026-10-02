@@ -48,6 +48,10 @@ def main() -> None:
                         "training_seed_stability_20261002.json")
     parser.add_argument("--training-progress", type=Path, default=ROOT / "paper" / "supplementary" /
                         "training_seed_stability_progress_20261002.json")
+    parser.add_argument("--oracle-report", type=Path, default=ROOT / "paper" / "supplementary" /
+                        "small_graph_oracle_20261002.json")
+    parser.add_argument("--transfer-report", type=Path, default=ROOT / "paper" / "supplementary" /
+                        "pair_season_matrix_20261002.json")
     parser.add_argument("--roadmap", type=Path, default=ROOT /
                         "QKD_Routing_Agent_Research_Roadmap_QSMS_Style.pdf")
     parser.add_argument("--output", type=Path)
@@ -64,6 +68,8 @@ def main() -> None:
     test_report = read_json(args.test_report) if args.test_report.exists() else None
     training_report = read_json(args.training_seeds) if args.training_seeds.exists() else None
     training_progress = read_json(args.training_progress) if args.training_progress.exists() else None
+    oracle_report = read_json(args.oracle_report) if args.oracle_report.exists() else None
+    transfer_report = read_json(args.transfer_report) if args.transfer_report.exists() else None
     dated = date.today().isoformat()
     out_pdf = args.output or ROOT / "paper" / "roadmap_status_addendum.pdf"
     out_pdf.parent.mkdir(parents=True, exist_ok=True)
@@ -174,6 +180,31 @@ def main() -> None:
         work_rows.append(["Five-seed stability campaign", progress_text,
             "Inter-seed spread and confidence summaries are withheld until all planned seeds finish. "
             "A training-seed interval is distinct from an episode-level interval."])
+    if oracle_report:
+        oracle_summary = oracle_report["summary"]
+        work_rows.append(["Exact toy-graph route oracle",
+            f"Exhaustive simple-path reward search covered {oracle_summary['episodes']} graph/channel "
+            f"cases with a feasible oracle in {oracle_summary['with_feasible_oracle']}. The policy "
+            f"succeeded in {oracle_summary['policy_success_rate']:.0%}; it exactly matched oracle "
+            f"reward in {oracle_summary['policy_reward_optimal_fraction']:.0%} of all cases and "
+            f"{oracle_summary['successful_policy_reward_optimal_fraction']:.0%} of successful cases.",
+            "Five generated 7-node graphs; episode link states frozen with 5% per-edge outage. "
+            "This exact result is limited to the toy static-channel protocol, not the full dynamic graph."])
+    if transfer_report:
+        gnn_transfer = transfer_report["summary_by_method"]["GNN-PPO"]
+        bfs_transfer = transfer_report["summary_by_method"]["BFS-hop"]
+        transfer_ci = gnn_transfer["success_rate_wilson_95pct"]
+        transfer_hops = ("n/a" if gnn_transfer["successful_mean_hops"] is None else
+                         f"{gnn_transfer['successful_mean_hops']:.2f}")
+        work_rows.append(["Paired endpoint / season / time transfer",
+            f"Across {gnn_transfer['episodes']} GNN episodes, success was "
+            f"{gnn_transfer['successes']}/{gnn_transfer['episodes']} "
+            f"({gnn_transfer['success_rate']:.1%}; Wilson 95% CI "
+            f"{transfer_ci[0]:.1%}-{transfer_ci[1]:.1%}); successful mean hops "
+            f"{transfer_hops}. BFS-hop success was "
+            f"{bfs_transfer['success_rate']:.1%}.",
+            "Six ordered pairs, four seasons and selected day/night times, paired seeds. "
+            "BC endpoint randomization means these are not strict end-to-end endpoint holdouts."])
     work_table = Table([[paragraph(str(cell), styles["RoadCellHead"] if i == 0 else styles["RoadCell"])
                          for cell in row] for i, row in enumerate(work_rows)],
                        colWidths=[1.05 * inch, 3.25 * inch, 2.88 * inch], repeatRows=1)
@@ -246,14 +277,17 @@ def main() -> None:
           "establish endpoint/weather generalization." if training_report and
           training_report.get("status") == "complete" and training_report.get("training_seed_count") == 5 else
           "Five independent full-budget training runs are not present. Evaluation episodes for one checkpoint do not substitute for training-seed replication.")],
-        ["P1 endpoint / weather holdouts", "PARTIAL",
-         "The current checkpoint was run on 42 ordered pairs (31/42 success), plus earlier adverse-condition episodes. These are coverage diagnostics, not held-out endpoint/weather tests."],
+        ["P1 endpoint / weather holdouts", "PARTIAL - transfer matrix" if transfer_report else "PARTIAL",
+         (f"Paired across-pair and season/time matrix is archived ({transfer_report['summary_by_method']['GNN-PPO']['episodes']} episodes per policy) with Wilson intervals. BC endpoint randomization prevents a strict endpoint-holdout claim; broader pair coverage remains." if transfer_report else
+          "The current checkpoint was run on 42 ordered pairs (31/42 success), plus earlier adverse-condition episodes. These are coverage diagnostics, not held-out endpoint/weather tests.")],
         ["P1 architecture / feature ablations", "TODO",
          "No matched-budget GNN depth, attention, feature, or reward ablation set is archived."],
         ["P1 inference cost", "PARTIAL",
          "Current checkpoint: 42-pair local inference had 3.83 ms median and 4.34 ms p95 decision latency. It is one host/scenario; report a full hardware profile and scaling before deployment claims."],
-        ["P1 exact small-graph oracle", "TODO",
-         "No exact feasible-path regret study on generated small graphs is archived."],
+        ["P1 exact small-graph oracle", "DONE - toy scope" if oracle_report else "TODO",
+         ("Exhaustive simple-path reward oracle and policy regret archived for generated 7-node graphs with frozen episode channels. "
+          "Does not establish optimality on the full dynamic network." if oracle_report else
+          "No exact feasible-path regret study on generated small graphs is archived.")],
         ["P2 network-service study", "BLOCKED BY MODEL SCOPE",
          "Requires absolute key generation and QKP capacity, time-indexed demand, consumption/refill, blocking, load balance, controller message semantics, prediction baselines, and executable demand-level ILP."],
         ["P3 external validation", "BLOCKED BY DATA / HARDWARE",

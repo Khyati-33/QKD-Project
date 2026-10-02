@@ -1,6 +1,6 @@
 {
   "status": "in_progress",
-  "refreshed_utc": "2026-10-02T10:57:40.417797+00:00",
+  "refreshed_utc": "2026-10-02T12:08:40.636685+00:00",
   "campaign_dir": "experiments\\runs\\training_seed_stability_20261002T094438Z",
   "planned_seeds": [
     20261002,
@@ -9,7 +9,7 @@
     20261005,
     20261006
   ],
-  "completed_seed_count": 1,
+  "completed_seed_count": 2,
   "completed": [
     {
       "training_seed": 20261002,
@@ -17,19 +17,20 @@
       "final_ppo_epoch": 50,
       "success_rate": 0.9375,
       "avg_hops_success": 69.8
+    },
+    {
+      "training_seed": 20261003,
+      "run_dir": "experiments\\runs\\qkd_gnn_seed_stability_20261003_20261002T103817Z_1dd8c844",
+      "final_ppo_epoch": 50,
+      "success_rate": 0.375,
+      "avg_hops_success": 58.166666666666664
     }
   ],
   "not_yet_complete": [
     {
-      "training_seed": 20261003,
-      "run_dir": "experiments\\runs\\qkd_gnn_seed_stability_20261003_20261002T103817Z_1dd8c844",
-      "checkpoint_updated_utc": "2026-10-02T10:57:18.118537+00:00",
-      "status": "no final summary yet"
-    },
-    {
       "training_seed": 20261004,
-      "run_dir": null,
-      "checkpoint_updated_utc": null,
+      "run_dir": "experiments\\runs\\qkd_gnn_seed_stability_20261004_20261002T114241Z_75a69157",
+      "checkpoint_updated_utc": "2026-10-02T12:08:28.647622+00:00",
       "status": "no final summary yet"
     },
     {
