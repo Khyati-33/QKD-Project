@@ -9,6 +9,7 @@ import time
 from pathlib import Path
 
 import numpy as np
+import networkx as nx
 import psutil
 import torch
 
@@ -26,10 +27,13 @@ def main() -> None:
     parser.add_argument("--output", type=Path, default=ROOT / "paper" / "supplementary" /
                         "inference_profile_20261002.json")
     parser.add_argument("--repeats-per-pair", type=int, default=20)
+    parser.add_argument("--scaling-repeats", type=int, default=100)
     parser.add_argument("--threads", type=int, nargs="+", default=[1, 4, 8])
     args = parser.parse_args()
     if args.repeats_per_pair < 5:
         parser.error("--repeats-per-pair must be at least 5 for tail quantiles")
+    if args.scaling_repeats < 20:
+        parser.error("--scaling-repeats must be at least 20")
     if any(thread < 1 for thread in args.threads):
         parser.error("thread counts must be positive")
 
@@ -72,6 +76,13 @@ def main() -> None:
     parameter_bytes = sum(parameter.numel() * parameter.element_size()
                           for parameter in model.parameters())
     by_thread = {}
+    graph = build_topology()
+    bfs_nodes = list(nx.bfs_tree(graph, source=CITIES[0]).nodes())
+    requested_sizes = sorted(set([8, 12, 16, 20, len(CITIES)]))
+    node_sizes = [size for size in requested_sizes if size <= len(bfs_nodes)]
+    scale_thread_count = min(4, max(args.threads))
+    torch.set_num_threads(scale_thread_count)
+    scaling = {}
     with torch.no_grad():
         for threads in args.threads:
             torch.set_num_threads(threads)
@@ -93,17 +104,42 @@ def main() -> None:
                 "max_ms": float(np.max(values)),
                 "std_ms": float(np.std(values, ddof=1)),
             }
+        for size in node_sizes:
+            subgraph = graph.subgraph(bfs_nodes[:size]).copy()
+            source, destination = bfs_nodes[0], bfs_nodes[size - 1]
+            env = QKDRoutingEnv(graph=subgraph, source=source, destination=destination,
+                season="monsoon", use_case="defence", node_feature_mode="relative",
+                time_of_day_hours=22.0, time_jitter_hours=0.0, dt_seconds=300,
+                max_steps=144, fiber_outage_prob=0.01, qber_hard=0.11)
+            obs = env.reset(seed=973000 + size)[0]
+            for _ in range(5):
+                model.act(obs, deterministic=True)
+            values = []
+            for _ in range(args.scaling_repeats):
+                start = time.perf_counter_ns()
+                model.act(obs, deterministic=True)
+                values.append((time.perf_counter_ns() - start) / 1e6)
+            scaling[str(size)] = {"nodes": size,
+                "undirected_edges": int(subgraph.number_of_edges()),
+                "degrees_of_freedom": int(subgraph.number_of_edges() * 2),
+                "source": source, "destination": destination,
+                "thread_count": scale_thread_count,
+                "decisions": args.scaling_repeats,
+                "p50_ms": float(np.percentile(values, 50)),
+                "p95_ms": float(np.percentile(values, 95)),
+                "p99_ms": float(np.percentile(values, 99))}
     report = {
         "status": "complete",
         "checkpoint": str(args.checkpoint),
         "protocol": {"ordered_city_pairs": len(observations),
             "repeats_per_pair": args.repeats_per_pair,
+            "scaling_repeats_per_graph_size": args.scaling_repeats,
             "thread_counts": args.threads, "season": "monsoon",
             "time_of_day_hours": 22.0, "feature_mode": "relative",
             "fiber_outage_prob": 0.01, "qber_hard": 0.11,
             "max_steps": 144, "encoder_cache": "disabled",
             "timed_operation": "one deterministic model.act decision",
-            "note": "One machine and one fixed simulator topology; no graph-size scaling claim."},
+            "note": "One machine. Graph-size scaling uses connected induced subgraphs from the simulator topology and measures inference cost, not route quality."},
         "host": {"platform": platform.platform(), "processor": platform.processor(),
             "logical_cpu_count": psutil.cpu_count(logical=True),
             "physical_cpu_count": psutil.cpu_count(logical=False),
@@ -114,11 +150,13 @@ def main() -> None:
         "measurement_context": {"other_python_processes_at_start": background_processes,
             "concurrent_load_note": "Other Python processes may affect latency; inspect this list before comparing runs."},
         "summary_by_threads": by_thread,
+        "graph_size_scaling": scaling,
         "pair_seeds": pair_seeds,
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
-    print(json.dumps({"summary_by_threads": by_thread, "memory": report["memory"]}, indent=2))
+    print(json.dumps({"summary_by_threads": by_thread, "graph_size_scaling": scaling,
+                      "memory": report["memory"]}, indent=2))
 
 
 if __name__ == "__main__":
