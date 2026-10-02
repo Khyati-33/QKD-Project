@@ -43,6 +43,7 @@ files = {
     "inference_source.py": "inference_engine.py",
     "training_seed_stability_source.py": "scripts/run_training_seed_stability.py",
     "training_seed_progress_source.py": "scripts/refresh_training_seed_progress.py",
+    "training_seed_stability_progress_20261002.json": "paper/supplementary/training_seed_stability_progress_20261002.json",
     "link_quality_choice_source.py": "link_quality_choice_test.py",
     "small_graph_oracle_source.py": "scripts/run_small_graph_oracle.py",
     "pair_season_matrix_20261002.json": "paper/supplementary/pair_season_matrix_20261002.json",
