@@ -44,6 +44,8 @@ def main() -> None:
                         "current_checkpoint_pair_metrics_20261002.json")
     parser.add_argument("--test-report", type=Path, default=ROOT / "paper" / "supplementary" /
                         "test_results_20261002.json")
+    parser.add_argument("--training-seeds", type=Path, default=ROOT / "paper" / "supplementary" /
+                        "training_seed_stability_20261002.json")
     parser.add_argument("--roadmap", type=Path, default=ROOT /
                         "QKD_Routing_Agent_Research_Roadmap_QSMS_Style.pdf")
     parser.add_argument("--output", type=Path)
@@ -58,6 +60,7 @@ def main() -> None:
     sensitivity = read_json(args.sensitivity) if args.sensitivity.exists() else None
     pair_metrics = read_json(args.pair_metrics) if args.pair_metrics.exists() else None
     test_report = read_json(args.test_report) if args.test_report.exists() else None
+    training_report = read_json(args.training_seeds) if args.training_seeds.exists() else None
     dated = date.today().isoformat()
     out_pdf = args.output or ROOT / "paper" / "roadmap_status_addendum.pdf"
     out_pdf.parent.mkdir(parents=True, exist_ok=True)
@@ -129,6 +132,21 @@ def main() -> None:
          (sensitivity_result if sensitivity else "Controlled rate/QBER/outage sensitivity output is not yet present."),
          "A policy-input diagnostic does not establish link-measurement validity or route-level performance."],
     ]
+    if training_report and training_report.get("status") == "complete" and \
+            training_report.get("training_seed_count") == 5:
+        gnn = training_report["aggregate_across_independent_training_seeds"]["GNN-PPO"]
+        success = gnn["success_rate"]
+        hops = gnn["avg_hops_success"]
+        work_rows.append(["Independent training-seed stability",
+            f"{training_report['training_seed_count']} independent policies trained for "
+            f"{training_report['fixed_training_budget']['ppo_epochs']} PPO epochs each. "
+            f"Mean paired-set success rate {success['mean_across_training_seeds']:.1%} "
+            f"(training-seed SD {success['sample_sd_across_training_seeds']:.1%}); "
+            f"successful-route mean hops "
+            f"{hops['mean_across_training_seeds']:.2f} "
+            f"(SD {hops['sample_sd_across_training_seeds']:.2f}).",
+            "Interval summarizes variability across fitted policies on one fixed simulator protocol; "
+            "it is not an episode-level confidence interval or external validation."])
     work_table = Table([[paragraph(str(cell), styles["RoadCellHead"] if i == 0 else styles["RoadCell"])
                          for cell in row] for i, row in enumerate(work_rows)],
                        colWidths=[1.05 * inch, 3.25 * inch, 2.88 * inch], repeatRows=1)
@@ -187,8 +205,15 @@ def main() -> None:
          "Fiber formula consistency, configured FSO anchor sampling, and temporal correlation. No matched device/channel calibration or measured traces."],
         ["P0-3 link sensitivity", "DONE - diagnostic" if sensitivity else "IN PROGRESS",
          "Rate-ratio, QBER-margin, and hard outage-mask tests vary simulator policy inputs only."],
-        ["P0-4 five training seeds", "TODO",
-         "Five independent full-budget training runs are not present. Evaluation episodes for one checkpoint do not substitute for training-seed replication."],
+        ["P0-4 five training seeds", "DONE - fixed protocol" if training_report and
+         training_report.get("status") == "complete" and training_report.get("training_seed_count") == 5
+         else "IN PROGRESS",
+         (f"Five independent policies, each trained for "
+          f"{training_report['fixed_training_budget']['ppo_epochs']} PPO epochs and evaluated on "
+          "the same held-out simulator seeds. Results vary across fitted policies; this does not "
+          "establish endpoint/weather generalization." if training_report and
+          training_report.get("status") == "complete" and training_report.get("training_seed_count") == 5 else
+          "Five independent full-budget training runs are not present. Evaluation episodes for one checkpoint do not substitute for training-seed replication.")],
         ["P1 endpoint / weather holdouts", "PARTIAL",
          "The current checkpoint was run on 42 ordered pairs (31/42 success), plus earlier adverse-condition episodes. These are coverage diagnostics, not held-out endpoint/weather tests."],
         ["P1 architecture / feature ablations", "TODO",
@@ -216,8 +241,7 @@ def main() -> None:
           "Report success, successful-route hops, revisits, action-mask violations, and route outcomes; "
           "do not infer network capacity or superiority from reward alone. Preserve baseline failures as "
           "observed outcomes and state each baseline definition.", styles["RoadBody"]),
-        paragraph("Next priorities are five independent policies under a fixed training budget, followed "
-          "by held-out endpoint/weather experiments and matched-budget ablations. The Johann-style "
+        paragraph("Next priorities are held-out endpoint/weather experiments and matched-budget ablations. The Johann-style "
           "demand/QKP study is a separate extension and depends on absolute key-resource units and a "
           "time-indexed demand model. Do not present Johann's BB84 equations as implemented until that "
           "model is adopted and validated.", styles["RoadBody"]),

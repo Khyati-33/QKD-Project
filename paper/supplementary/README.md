@@ -19,7 +19,8 @@ Reproduce with `python scripts/run_corrected_route_comparison.py --seeds-per-sea
 - `fso_model_validation.json`: 2,000 availability samples at each of 16 season/distance conditions, with errors and approximate binomial uncertainty. Targets are model configuration values, not observed weather.
 - `link_quality_sensitivity_20261002.json`: current-checkpoint twin-link comparison plus controlled proxy-rate ratio, feasible QBER margin, and outage-mask sweeps. The inputs are synthetic policy counterfactuals.
 - `current_checkpoint_pair_metrics_20261002.json`: one route sample for each of 42 ordered city pairs under the monsoon-night scenario, plus local-inference latency. This is not a held-out endpoint test and has no matched baseline.
-- `test_results_20261002.json`: full repository regression suite result after these implementation changes (40 passed, 0 failed).
+- `test_results_20261002.json`: full repository regression suite result after these implementation changes (41 passed, 0 failed).
+- `training_seed_stability_20261002.json` will contain the aggregate five-seed report when the active full-budget campaign finishes. The fixed protocol and per-seed configs are defined by `configs/seed_stability_50ep.yaml` and `scripts/run_training_seed_stability.py`; until the aggregate report exists, P0-4 remains in progress.
 
 Reproduce physics checks with `python scripts/validate_physics_analytical.py` and `python scripts/validate_fso_model.py`. Reproduce controlled link sensitivity with `python link_quality_choice_test.py --checkpoint paper/supplementary/checkpoint_gnn_latest_50ep_idq_20260928.pt --samples-per-condition 32 --output <path>`. Reproduce the ordered-pair run with `python scripts/paper_metrics.py --checkpoint paper/supplementary/checkpoint_gnn_latest_50ep_idq_20260928.pt --output <path>`.
 
