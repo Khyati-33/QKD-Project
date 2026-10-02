@@ -1,0 +1,93 @@
+{
+  "status": "internal_analytical_consistency_only",
+  "external_measurement_validation": "not_performed_no_matched_trace_or_device_dataset",
+  "seed": 20261002,
+  "fiber_distance_sweep_km": [
+    0,
+    200,
+    1
+  ],
+  "fiber_sweep_points": 201,
+  "independent_formula_max_abs_error": {
+    "qber": 0.0,
+    "normalized_rate_proxy": 0.0
+  },
+  "monotonic_checks": {
+    "transmission_nonincreasing": true,
+    "qber_nondecreasing": true,
+    "rate_proxy_nonincreasing": true
+  },
+  "fso_availability_anchor_max_abs_error": 3.469446951953614e-18,
+  "fso_log_cn2_ar1": {
+    "configured": 0.85,
+    "sampled": 0.8521661650473431,
+    "samples": 20000,
+    "five_se_tolerance": 0.00981110658896335
+  },
+  "scope_note": "Checks code against an independent transcription of its own assumptions; does not establish physical accuracy or QKD security.",
+  "fiber_samples": [
+    {
+      "distance_km": 0.0,
+      "loss_db": 0.46,
+      "transmission": 0.8365327508229328,
+      "qber": 0.010500836787321619,
+      "rate_proxy": 0.6958356727066765,
+      "code_qber": 0.010500836787321619,
+      "code_rate_proxy": 0.6958356727066765
+    },
+    {
+      "distance_km": 10.0,
+      "loss_db": 2.46,
+      "transmission": 0.5278164830299489,
+      "qber": 0.010501326218529564,
+      "rate_proxy": 0.4390392399455398,
+      "code_qber": 0.010501326218529564,
+      "code_rate_proxy": 0.4390392399455398
+    },
+    {
+      "distance_km": 40.0,
+      "loss_db": 8.46,
+      "transmission": 0.13258150620500347,
+      "qber": 0.010505279771063346,
+      "rate_proxy": 0.11027479621584847,
+      "code_qber": 0.010505279771063346,
+      "code_rate_proxy": 0.11027479621584847
+    },
+    {
+      "distance_km": 80.0,
+      "loss_db": 16.46,
+      "transmission": 0.021012752663055086,
+      "qber": 0.010533313103294535,
+      "rate_proxy": 0.017469654176779183,
+      "code_qber": 0.010533313103294535,
+      "code_rate_proxy": 0.017469654176779183
+    },
+    {
+      "distance_km": 120.0,
+      "loss_db": 24.46,
+      "transmission": 0.0033302968650545136,
+      "qber": 0.010710191471857984,
+      "rate_proxy": 0.002761047023594587,
+      "code_qber": 0.010710191471857984,
+      "code_rate_proxy": 0.002761047023594587
+    },
+    {
+      "distance_km": 160.0,
+      "loss_db": 32.46,
+      "transmission": 0.0005278164830299488,
+      "qber": 0.0118262185270445,
+      "rate_proxy": 0.00042999074199548675,
+      "code_qber": 0.0118262185270445,
+      "code_rate_proxy": 0.00042999074199548675
+    },
+    {
+      "distance_km": 200.0,
+      "loss_db": 40.46,
+      "transmission": 8.365327508229323e-05,
+      "qber": 0.018867873116067583,
+      "rate_proxy": 6.106088287708358e-05,
+      "code_qber": 0.018867873116067583,
+      "code_rate_proxy": 6.106088287708358e-05
+    }
+  ]
+}

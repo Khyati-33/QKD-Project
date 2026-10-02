@@ -7,3 +7,5 @@ nbclient
 nbformat
 pyyaml
 pytest
+reportlab>=4.0
+pypdf>=5.0

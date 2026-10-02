@@ -28,6 +28,7 @@ def run_test(checkpoint: Path, samples_per_condition: int = 32) -> dict:
     model = GNNActorCritic(hidden_dim=64, dropedge_probability=0.05)
     load_checkpoint(checkpoint, model, map_location="cpu")
     model.eval()
+    model.enable_encoder_cache(True)
     env = QKDRoutingEnv(season="monsoon", use_case="defence",
         node_feature_mode="relative", time_of_day_hours=22.0,
         time_jitter_hours=0.0, fiber_outage_prob=0.0)
@@ -73,6 +74,45 @@ def run_test(checkpoint: Path, samples_per_condition: int = 32) -> dict:
             probabilities = torch.softmax(pair_logits, dim=0).cpu().tolist()
         return {"fiber_probability": probabilities[0], "fso_probability": probabilities[1],
                 "selected": "fiber" if probabilities[0] >= probabilities[1] else "fso"}
+
+    def counterfactual(fiber_rate: float, fso_rate: float,
+                       fiber_qber: float, fso_qber: float,
+                       fso_available: bool = True) -> dict:
+        """Hold route context fixed while varying one policy input at a time."""
+        obs = {key: np.array(value, copy=True) for key, value in observation.items()}
+        obs["neighbor_indices"][:] = -1
+        obs["neighbor_indices"][fiber_slot] = same_neighbor
+        obs["neighbor_indices"][fso_slot] = same_neighbor
+        obs["edge_valid_mask"][:] = 0
+        obs["edge_features"][:] = 0.0
+        for slot, is_fso, rate, qber in (
+                (fiber_slot, 0.0, fiber_rate, fiber_qber),
+                (fso_slot, 1.0, fso_rate, fso_qber)):
+            feature = [qber, rate, is_fso, 0.125, qber, 1.0, 0.0, 0.0, 0.5]
+            obs["edge_features"][slot] = feature
+            available = (not is_fso or fso_available)
+            obs["edge_valid_mask"][slot] = int(
+                available and qber < env.qber_hard and rate > 0.0)
+        with torch.no_grad():
+            logits, _ = model(obs)
+            pair_logits = logits[0, [fiber_slot, fso_slot]]
+            probabilities = torch.softmax(pair_logits, dim=0).cpu().tolist()
+        return {"fiber_probability": probabilities[0],
+                "fso_probability": probabilities[1],
+                "fiber_valid": bool(obs["edge_valid_mask"][fiber_slot]),
+                "fso_valid": bool(obs["edge_valid_mask"][fso_slot])}
+
+    rate_sensitivity = []
+    base_fiber_rate = 0.05
+    for ratio in (0.25, 0.5, 1.0, 2.0, 4.0):
+        rate_sensitivity.append({"fso_to_fiber_rate_ratio": ratio,
+            **counterfactual(base_fiber_rate, base_fiber_rate * ratio, 0.02, 0.02)})
+    qber_sensitivity = []
+    for q in (0.01, 0.03, 0.05, 0.07, 0.09, 0.10, 0.109, 0.111):
+        qber_sensitivity.append({"fso_qber": q,
+            **counterfactual(0.05, 0.05, 0.02, q)})
+    outage_sensitivity = counterfactual(0.05, 0.05, 0.02, 0.02,
+                                        fso_available=False)
 
     condition_results = {}
     seed = 70100
@@ -132,6 +172,13 @@ def run_test(checkpoint: Path, samples_per_condition: int = 32) -> dict:
                          "fiber_detector_profile": "IDQ ID281 1550 nm characterized channel",
                          "fso_detector": "785 nm scenario assumption, not ID281 profile"},
         "conditions": condition_results,
+        "controlled_input_sensitivity": {
+            "shared_context": "same current/destination/neighbor embedding, progress, distance, pool, and link-switch features; one input varied at a time",
+            "rate_ratio_sweep": rate_sensitivity,
+            "qber_sweep": qber_sensitivity,
+            "fso_outage_mask": outage_sensitivity,
+            "interpretation_note": "Synthetic policy-input counterfactuals isolate response of the current checkpoint. They do not represent measured links or end-to-end route success.",
+        },
     }
 
 

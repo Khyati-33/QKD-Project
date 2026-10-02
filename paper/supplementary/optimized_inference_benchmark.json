@@ -1,0 +1,912 @@
+{
+  "checkpoint": "C:\\Users\\OJ\\QKD-project\\experiments\\defence_monsoon_night_200ep_mumbai_kolkata\\checkpoints\\GNN\\latest.pt",
+  "conditions": {
+    "season": "monsoon",
+    "use_case": "defence",
+    "node_feature_mode": "relative",
+    "time_of_day_hours": 22.0,
+    "time_jitter_hours": 1.0,
+    "dt_seconds": 300.0,
+    "max_steps": 400,
+    "fiber_outage_prob": 0.01,
+    "qber_hard": 0.11,
+    "reward_protection_overrides": {
+      "step_cost": -0.05,
+      "revisit": -0.6,
+      "switch": -0.2,
+      "security_penalty": -30.0,
+      "depletion_penalty": -60.0,
+      "backtrack": -0.5
+    }
+  },
+  "optimizations": [
+    "torch.inference_mode",
+    "dynamic INT8 Linear quantization",
+    "bounded CPU threads",
+    "batched independent decisions"
+  ],
+  "summary": {
+    "FP32": {
+      "pairs": 42,
+      "success_rate": 1.0,
+      "decision_median_seconds": 0.008174075002898462,
+      "decision_mean_seconds": 0.008683351191610286,
+      "route_median_seconds": 1.1364786999984062
+    },
+    "INT8": {
+      "pairs": 42,
+      "success_rate": 1.0,
+      "decision_median_seconds": 0.010416475000965875,
+      "decision_mean_seconds": 0.011209676190836555,
+      "route_median_seconds": 1.2248538499989081
+    }
+  },
+  "batch_throughput": {
+    "1": {
+      "batch_seconds_median": 0.005701999994926155,
+      "per_decision_seconds": 0.005701999994926155
+    },
+    "4": {
+      "batch_seconds_median": 0.04833259999577422,
+      "per_decision_seconds": 0.012083149998943554
+    },
+    "8": {
+      "batch_seconds_median": 0.17939340000157245,
+      "per_decision_seconds": 0.022424175000196556
+    },
+    "16": {
+      "batch_seconds_median": 0.42323399998713285,
+      "per_decision_seconds": 0.026452124999195803
+    },
+    "32": {
+      "batch_seconds_median": 0.8993518000061158,
+      "per_decision_seconds": 0.02810474375019112
+    },
+    "42": {
+      "batch_seconds_median": 1.1199038000049768,
+      "per_decision_seconds": 0.026664376190594686
+    }
+  },
+  "pairs": [
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Delhi",
+      "destination": "Mumbai",
+      "success": true,
+      "hops": 19,
+      "decision_median_seconds": 0.009553900003083982,
+      "decision_mean_seconds": 0.011955273684610515,
+      "route_seconds": 1.2071749000024283
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Delhi",
+      "destination": "Chennai",
+      "success": true,
+      "hops": 28,
+      "decision_median_seconds": 0.0075779000035254285,
+      "decision_mean_seconds": 0.009053117856508055,
+      "route_seconds": 1.6388681000098586
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Delhi",
+      "destination": "Kolkata",
+      "success": true,
+      "hops": 19,
+      "decision_median_seconds": 0.007727200005319901,
+      "decision_mean_seconds": 0.008329868422343248,
+      "route_seconds": 1.0998743000091054
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Delhi",
+      "destination": "Bangalore",
+      "success": true,
+      "hops": 28,
+      "decision_median_seconds": 0.008862150003551506,
+      "decision_mean_seconds": 0.009240614286162392,
+      "route_seconds": 1.6644405000115512
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Delhi",
+      "destination": "Jaipur",
+      "success": true,
+      "hops": 4,
+      "decision_median_seconds": 0.006582350004464388,
+      "decision_mean_seconds": 0.0065561000010347925,
+      "route_seconds": 0.15426100000331644
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Delhi",
+      "destination": "Hyderabad",
+      "success": true,
+      "hops": 20,
+      "decision_median_seconds": 0.009231400006683543,
+      "decision_mean_seconds": 0.012198080001689959,
+      "route_seconds": 1.4858310999989044
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Mumbai",
+      "destination": "Delhi",
+      "success": true,
+      "hops": 19,
+      "decision_median_seconds": 0.008135500000207685,
+      "decision_mean_seconds": 0.00902539999974818,
+      "route_seconds": 1.1134034999995492
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Mumbai",
+      "destination": "Chennai",
+      "success": true,
+      "hops": 18,
+      "decision_median_seconds": 0.008005000003322493,
+      "decision_mean_seconds": 0.008295716666099098,
+      "route_seconds": 1.0582954999990761
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Mumbai",
+      "destination": "Kolkata",
+      "success": true,
+      "hops": 24,
+      "decision_median_seconds": 0.0097633500045049,
+      "decision_mean_seconds": 0.009701662501053457,
+      "route_seconds": 1.412039000002551
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Mumbai",
+      "destination": "Bangalore",
+      "success": true,
+      "hops": 13,
+      "decision_median_seconds": 0.01124010000785347,
+      "decision_mean_seconds": 0.014469392308875775,
+      "route_seconds": 1.2158840999909444
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Mumbai",
+      "destination": "Jaipur",
+      "success": true,
+      "hops": 15,
+      "decision_median_seconds": 0.00839260000793729,
+      "decision_mean_seconds": 0.010789466667726325,
+      "route_seconds": 0.969431400008034
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Mumbai",
+      "destination": "Hyderabad",
+      "success": true,
+      "hops": 9,
+      "decision_median_seconds": 0.007335199989029206,
+      "decision_mean_seconds": 0.008184500001435582,
+      "route_seconds": 0.5099420000042301
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Chennai",
+      "destination": "Delhi",
+      "success": true,
+      "hops": 28,
+      "decision_median_seconds": 0.00975664999714354,
+      "decision_mean_seconds": 0.01113640357289114,
+      "route_seconds": 1.964902700012317
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Chennai",
+      "destination": "Mumbai",
+      "success": true,
+      "hops": 18,
+      "decision_median_seconds": 0.008179850003216416,
+      "decision_mean_seconds": 0.008519205556593887,
+      "route_seconds": 1.0782661999983247
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Chennai",
+      "destination": "Kolkata",
+      "success": true,
+      "hops": 21,
+      "decision_median_seconds": 0.00828449999971781,
+      "decision_mean_seconds": 0.013625957143154838,
+      "route_seconds": 1.4341666999971494
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Chennai",
+      "destination": "Bangalore",
+      "success": true,
+      "hops": 5,
+      "decision_median_seconds": 0.00790739999501966,
+      "decision_mean_seconds": 0.008495920000132173,
+      "route_seconds": 0.2193007000023499
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Chennai",
+      "destination": "Jaipur",
+      "success": true,
+      "hops": 25,
+      "decision_median_seconds": 0.007740300003206357,
+      "decision_mean_seconds": 0.00799497599771712,
+      "route_seconds": 1.4080715000018245
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Chennai",
+      "destination": "Hyderabad",
+      "success": true,
+      "hops": 8,
+      "decision_median_seconds": 0.007421149995934684,
+      "decision_mean_seconds": 0.008112124998660875,
+      "route_seconds": 0.4771496000030311
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Kolkata",
+      "destination": "Delhi",
+      "success": true,
+      "hops": 19,
+      "decision_median_seconds": 0.008019999993848614,
+      "decision_mean_seconds": 0.008870836841340764,
+      "route_seconds": 1.162583099998301
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Kolkata",
+      "destination": "Mumbai",
+      "success": true,
+      "hops": 24,
+      "decision_median_seconds": 0.009649200001149438,
+      "decision_mean_seconds": 0.009825862499686385,
+      "route_seconds": 1.4912059999915073
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Kolkata",
+      "destination": "Chennai",
+      "success": true,
+      "hops": 21,
+      "decision_median_seconds": 0.00821630000427831,
+      "decision_mean_seconds": 0.008628423808009498,
+      "route_seconds": 1.2322317999933148
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Kolkata",
+      "destination": "Bangalore",
+      "success": true,
+      "hops": 23,
+      "decision_median_seconds": 0.008525199998985045,
+      "decision_mean_seconds": 0.010526569566497094,
+      "route_seconds": 1.507548499997938
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Kolkata",
+      "destination": "Jaipur",
+      "success": true,
+      "hops": 19,
+      "decision_median_seconds": 0.009023100006743334,
+      "decision_mean_seconds": 0.009810215792018235,
+      "route_seconds": 1.052620400005253
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Kolkata",
+      "destination": "Hyderabad",
+      "success": true,
+      "hops": 18,
+      "decision_median_seconds": 0.010045650000392925,
+      "decision_mean_seconds": 0.01221061111007455,
+      "route_seconds": 1.1219307999999728
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Bangalore",
+      "destination": "Delhi",
+      "success": true,
+      "hops": 28,
+      "decision_median_seconds": 0.00755360000039218,
+      "decision_mean_seconds": 0.008672053570730245,
+      "route_seconds": 1.706302599995979
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Bangalore",
+      "destination": "Mumbai",
+      "success": true,
+      "hops": 13,
+      "decision_median_seconds": 0.007363099997746758,
+      "decision_mean_seconds": 0.007562976924908491,
+      "route_seconds": 0.7192311999970116
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Bangalore",
+      "destination": "Chennai",
+      "success": true,
+      "hops": 5,
+      "decision_median_seconds": 0.006922900007339194,
+      "decision_mean_seconds": 0.007280100003117696,
+      "route_seconds": 0.20121929999731947
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Bangalore",
+      "destination": "Kolkata",
+      "success": true,
+      "hops": 23,
+      "decision_median_seconds": 0.009503199995378964,
+      "decision_mean_seconds": 0.009478243478477689,
+      "route_seconds": 1.6499585999990813
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Bangalore",
+      "destination": "Jaipur",
+      "success": true,
+      "hops": 40,
+      "decision_median_seconds": 0.00992219999898225,
+      "decision_mean_seconds": 0.010173042499809526,
+      "route_seconds": 2.6382011999958195
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Bangalore",
+      "destination": "Hyderabad",
+      "success": true,
+      "hops": 8,
+      "decision_median_seconds": 0.0074169500003336,
+      "decision_mean_seconds": 0.008119162501316168,
+      "route_seconds": 0.34409620000224095
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Jaipur",
+      "destination": "Delhi",
+      "success": true,
+      "hops": 4,
+      "decision_median_seconds": 0.021998899996106047,
+      "decision_mean_seconds": 0.021175149999180576,
+      "route_seconds": 0.3134472999954596
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Jaipur",
+      "destination": "Mumbai",
+      "success": true,
+      "hops": 15,
+      "decision_median_seconds": 0.009579899997333996,
+      "decision_mean_seconds": 0.01216020666664311,
+      "route_seconds": 1.0002520000125514
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Jaipur",
+      "destination": "Chennai",
+      "success": true,
+      "hops": 27,
+      "decision_median_seconds": 0.007550900001660921,
+      "decision_mean_seconds": 0.008079118517882846,
+      "route_seconds": 1.5116564000054495
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Jaipur",
+      "destination": "Kolkata",
+      "success": true,
+      "hops": 19,
+      "decision_median_seconds": 0.007713700004387647,
+      "decision_mean_seconds": 0.007869905263712434,
+      "route_seconds": 1.1058304000034695
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Jaipur",
+      "destination": "Bangalore",
+      "success": true,
+      "hops": 24,
+      "decision_median_seconds": 0.008503949997248128,
+      "decision_mean_seconds": 0.008316479165538718,
+      "route_seconds": 1.3250140000018291
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Jaipur",
+      "destination": "Hyderabad",
+      "success": true,
+      "hops": 17,
+      "decision_median_seconds": 0.007974399995873682,
+      "decision_mean_seconds": 0.00847124117460814,
+      "route_seconds": 0.9078958000027342
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Hyderabad",
+      "destination": "Delhi",
+      "success": true,
+      "hops": 28,
+      "decision_median_seconds": 0.008260599999630358,
+      "decision_mean_seconds": 0.00964182857153771,
+      "route_seconds": 1.9042831999977352
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Hyderabad",
+      "destination": "Mumbai",
+      "success": true,
+      "hops": 9,
+      "decision_median_seconds": 0.00797630001034122,
+      "decision_mean_seconds": 0.008178800000071837,
+      "route_seconds": 0.5178175999899395
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Hyderabad",
+      "destination": "Chennai",
+      "success": true,
+      "hops": 16,
+      "decision_median_seconds": 0.008391799994569737,
+      "decision_mean_seconds": 0.008594656247623789,
+      "route_seconds": 0.8237287999945693
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Hyderabad",
+      "destination": "Kolkata",
+      "success": true,
+      "hops": 26,
+      "decision_median_seconds": 0.0074445500067668036,
+      "decision_mean_seconds": 0.008426753847743385,
+      "route_seconds": 1.4398424999963026
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Hyderabad",
+      "destination": "Bangalore",
+      "success": true,
+      "hops": 8,
+      "decision_median_seconds": 0.007279550001840107,
+      "decision_mean_seconds": 0.007100662500306498,
+      "route_seconds": 0.4698638999980176
+    },
+    {
+      "method": "GNN-FP32-inference-mode",
+      "source": "Hyderabad",
+      "destination": "Jaipur",
+      "success": true,
+      "hops": 17,
+      "decision_median_seconds": 0.008168300002580509,
+      "decision_mean_seconds": 0.009460929412264651,
+      "route_seconds": 1.1510265999968396
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Delhi",
+      "destination": "Mumbai",
+      "success": true,
+      "hops": 19,
+      "decision_median_seconds": 0.010846500008483417,
+      "decision_mean_seconds": 0.013424563156532761,
+      "route_seconds": 1.4546158999874024
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Delhi",
+      "destination": "Chennai",
+      "success": true,
+      "hops": 28,
+      "decision_median_seconds": 0.009281750004447531,
+      "decision_mean_seconds": 0.010251196428725962,
+      "route_seconds": 1.6083535999932792
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Delhi",
+      "destination": "Kolkata",
+      "success": true,
+      "hops": 19,
+      "decision_median_seconds": 0.010536099987803027,
+      "decision_mean_seconds": 0.010575994735087366,
+      "route_seconds": 1.213651599988225
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Delhi",
+      "destination": "Bangalore",
+      "success": true,
+      "hops": 28,
+      "decision_median_seconds": 0.009805749999941327,
+      "decision_mean_seconds": 0.011085671429360186,
+      "route_seconds": 1.7692395000049146
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Delhi",
+      "destination": "Jaipur",
+      "success": true,
+      "hops": 4,
+      "decision_median_seconds": 0.011610299996391404,
+      "decision_mean_seconds": 0.013198324999393662,
+      "route_seconds": 0.17834949999814853
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Delhi",
+      "destination": "Hyderabad",
+      "success": true,
+      "hops": 20,
+      "decision_median_seconds": 0.010767700005089864,
+      "decision_mean_seconds": 0.01509540500046569,
+      "route_seconds": 1.4754472999920836
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Mumbai",
+      "destination": "Delhi",
+      "success": true,
+      "hops": 19,
+      "decision_median_seconds": 0.008924900001147762,
+      "decision_mean_seconds": 0.009678300000623016,
+      "route_seconds": 1.030201199988369
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Mumbai",
+      "destination": "Chennai",
+      "success": true,
+      "hops": 18,
+      "decision_median_seconds": 0.010021399997640401,
+      "decision_mean_seconds": 0.009993983334020918,
+      "route_seconds": 0.9556102000060491
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Mumbai",
+      "destination": "Kolkata",
+      "success": true,
+      "hops": 24,
+      "decision_median_seconds": 0.011655299997073598,
+      "decision_mean_seconds": 0.014186162499754573,
+      "route_seconds": 1.859145800000988
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Mumbai",
+      "destination": "Bangalore",
+      "success": true,
+      "hops": 13,
+      "decision_median_seconds": 0.010385800007497892,
+      "decision_mean_seconds": 0.010689884615623249,
+      "route_seconds": 0.7664759000035701
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Mumbai",
+      "destination": "Jaipur",
+      "success": true,
+      "hops": 15,
+      "decision_median_seconds": 0.008905700000468642,
+      "decision_mean_seconds": 0.009568659997118327,
+      "route_seconds": 0.944427700000233
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Mumbai",
+      "destination": "Hyderabad",
+      "success": true,
+      "hops": 9,
+      "decision_median_seconds": 0.02331910000066273,
+      "decision_mean_seconds": 0.021092511115259387,
+      "route_seconds": 0.6996725000062725
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Chennai",
+      "destination": "Delhi",
+      "success": true,
+      "hops": 28,
+      "decision_median_seconds": 0.010447149994433858,
+      "decision_mean_seconds": 0.0114357964282265,
+      "route_seconds": 1.690278499998385
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Chennai",
+      "destination": "Mumbai",
+      "success": true,
+      "hops": 18,
+      "decision_median_seconds": 0.00973830000293674,
+      "decision_mean_seconds": 0.010096244445271118,
+      "route_seconds": 1.124702699991758
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Chennai",
+      "destination": "Kolkata",
+      "success": true,
+      "hops": 21,
+      "decision_median_seconds": 0.01290329999756068,
+      "decision_mean_seconds": 0.016757700000501547,
+      "route_seconds": 1.6121043000021018
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Chennai",
+      "destination": "Bangalore",
+      "success": true,
+      "hops": 5,
+      "decision_median_seconds": 0.013366200000746176,
+      "decision_mean_seconds": 0.012139200003002771,
+      "route_seconds": 0.3618338000087533
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Chennai",
+      "destination": "Jaipur",
+      "success": true,
+      "hops": 25,
+      "decision_median_seconds": 0.010141900012968108,
+      "decision_mean_seconds": 0.010549344000755809,
+      "route_seconds": 1.501113299993449
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Chennai",
+      "destination": "Hyderabad",
+      "success": true,
+      "hops": 8,
+      "decision_median_seconds": 0.011745750001864508,
+      "decision_mean_seconds": 0.011427012501371792,
+      "route_seconds": 0.5176473000028636
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Kolkata",
+      "destination": "Delhi",
+      "success": true,
+      "hops": 19,
+      "decision_median_seconds": 0.010687000001780689,
+      "decision_mean_seconds": 0.014883926315202476,
+      "route_seconds": 1.4782840999978362
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Kolkata",
+      "destination": "Mumbai",
+      "success": true,
+      "hops": 24,
+      "decision_median_seconds": 0.010142199993424583,
+      "decision_mean_seconds": 0.011564133331072904,
+      "route_seconds": 1.4089620000013383
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Kolkata",
+      "destination": "Chennai",
+      "success": true,
+      "hops": 21,
+      "decision_median_seconds": 0.009582200000295416,
+      "decision_mean_seconds": 0.009851957142624693,
+      "route_seconds": 1.2177618999994593
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Kolkata",
+      "destination": "Bangalore",
+      "success": true,
+      "hops": 23,
+      "decision_median_seconds": 0.009160600005998276,
+      "decision_mean_seconds": 0.010253165219657367,
+      "route_seconds": 1.3171711000031792
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Kolkata",
+      "destination": "Jaipur",
+      "success": true,
+      "hops": 19,
+      "decision_median_seconds": 0.015375700008007698,
+      "decision_mean_seconds": 0.015752757894867835,
+      "route_seconds": 1.557845700008329
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Kolkata",
+      "destination": "Hyderabad",
+      "success": true,
+      "hops": 18,
+      "decision_median_seconds": 0.014545300000463612,
+      "decision_mean_seconds": 0.014935311111912597,
+      "route_seconds": 1.4534372000052826
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Bangalore",
+      "destination": "Delhi",
+      "success": true,
+      "hops": 28,
+      "decision_median_seconds": 0.01092860000062501,
+      "decision_mean_seconds": 0.012184667857322242,
+      "route_seconds": 1.7880441999877803
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Bangalore",
+      "destination": "Mumbai",
+      "success": true,
+      "hops": 13,
+      "decision_median_seconds": 0.016574900000705384,
+      "decision_mean_seconds": 0.014876423075642938,
+      "route_seconds": 0.9293335999973351
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Bangalore",
+      "destination": "Chennai",
+      "success": true,
+      "hops": 5,
+      "decision_median_seconds": 0.010904800001299009,
+      "decision_mean_seconds": 0.011784640001133084,
+      "route_seconds": 0.2312889000022551
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Bangalore",
+      "destination": "Kolkata",
+      "success": true,
+      "hops": 23,
+      "decision_median_seconds": 0.013930499990237877,
+      "decision_mean_seconds": 0.023004108694452872,
+      "route_seconds": 2.0693560000072466
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Bangalore",
+      "destination": "Jaipur",
+      "success": true,
+      "hops": 40,
+      "decision_median_seconds": 0.01022345000092173,
+      "decision_mean_seconds": 0.011204772498604142,
+      "route_seconds": 2.6178647999913665
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Bangalore",
+      "destination": "Hyderabad",
+      "success": true,
+      "hops": 8,
+      "decision_median_seconds": 0.015865649991610553,
+      "decision_mean_seconds": 0.016375787499782746,
+      "route_seconds": 0.6399001999961911
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Jaipur",
+      "destination": "Delhi",
+      "success": true,
+      "hops": 4,
+      "decision_median_seconds": 0.010375600002589636,
+      "decision_mean_seconds": 0.010406200002762489,
+      "route_seconds": 0.16906810000364203
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Jaipur",
+      "destination": "Mumbai",
+      "success": true,
+      "hops": 15,
+      "decision_median_seconds": 0.009465900002396666,
+      "decision_mean_seconds": 0.010965319999377244,
+      "route_seconds": 0.9806166000053054
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Jaipur",
+      "destination": "Chennai",
+      "success": true,
+      "hops": 27,
+      "decision_median_seconds": 0.01002149999840185,
+      "decision_mean_seconds": 0.010342281480983796,
+      "route_seconds": 1.5612757000053534
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Jaipur",
+      "destination": "Kolkata",
+      "success": true,
+      "hops": 19,
+      "decision_median_seconds": 0.011748900011298247,
+      "decision_mean_seconds": 0.011868415788692226,
+      "route_seconds": 1.231945799998357
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Jaipur",
+      "destination": "Bangalore",
+      "success": true,
+      "hops": 24,
+      "decision_median_seconds": 0.010527999998885207,
+      "decision_mean_seconds": 0.012527479166237754,
+      "route_seconds": 1.604378000003635
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Jaipur",
+      "destination": "Hyderabad",
+      "success": true,
+      "hops": 17,
+      "decision_median_seconds": 0.009377399997902103,
+      "decision_mean_seconds": 0.009757905882639428,
+      "route_seconds": 1.0343118000018876
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Hyderabad",
+      "destination": "Delhi",
+      "success": true,
+      "hops": 28,
+      "decision_median_seconds": 0.009542249994410668,
+      "decision_mean_seconds": 0.011127789289665608,
+      "route_seconds": 1.800773199996911
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Hyderabad",
+      "destination": "Mumbai",
+      "success": true,
+      "hops": 9,
+      "decision_median_seconds": 0.009599299999536015,
+      "decision_mean_seconds": 0.010352200000650354,
+      "route_seconds": 0.5750095999974292
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Hyderabad",
+      "destination": "Chennai",
+      "success": true,
+      "hops": 16,
+      "decision_median_seconds": 0.01110655000229599,
+      "decision_mean_seconds": 0.01558125000246946,
+      "route_seconds": 1.2165903999994043
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Hyderabad",
+      "destination": "Kolkata",
+      "success": true,
+      "hops": 26,
+      "decision_median_seconds": 0.009641249998821877,
+      "decision_mean_seconds": 0.009956511538453365,
+      "route_seconds": 1.6148785999976099
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Hyderabad",
+      "destination": "Bangalore",
+      "success": true,
+      "hops": 8,
+      "decision_median_seconds": 0.007874850001826417,
+      "decision_mean_seconds": 0.00894606250221841,
+      "route_seconds": 0.479164899996249
+    },
+    {
+      "method": "GNN-INT8-dynamic",
+      "source": "Hyderabad",
+      "destination": "Jaipur",
+      "success": true,
+      "hops": 17,
+      "decision_median_seconds": 0.009201099994243123,
+      "decision_mean_seconds": 0.010218523527488714,
+      "route_seconds": 0.9369658000068739
+    }
+  ]
+}

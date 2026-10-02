@@ -1,0 +1,11 @@
+{
+  "date": "2026-10-02",
+  "command": "python -m pytest -q",
+  "passed": 40,
+  "failed": 0,
+  "duration_seconds": 73.13,
+  "warnings": [
+    "PyTorch FutureWarning: torch.jit.script is deprecated; no test failures were associated with this warning."
+  ],
+  "scope": "Repository regression suite after evaluator, baseline, diagnostics, and report tooling changes."
+}

@@ -1,0 +1,125 @@
+{
+  "status": "paired_route_level_simulation",
+  "created_utc": "2026-10-02T08:47:22.146099+00:00",
+  "git_commit": "8545226374457e5ad68425c3f4f1154628c79227",
+  "git_worktree_status": [
+    " M baselines.py",
+    " M evaluation.py",
+    " M link_quality_choice_test.py",
+    " M scripts/validate_fso_model.py",
+    "?? QKD_IEEE_Overleaf_Project.zip",
+    "?? QKD_IEEE_Paper.pdf",
+    "?? QKD_Routing_Agent_Research_Roadmap_QSMS_Style.pdf",
+    "?? paper/",
+    "?? scripts/run_corrected_route_comparison.py",
+    "?? scripts/validate_physics_analytical.py"
+  ],
+  "config": "configs\\defence_monsoon_night_50ep_idq.yaml",
+  "config_sha256": "ba9b369473a1824ba09fbecee5eae8df2e16020db86e125c44ae7b298f30cbae",
+  "checkpoint": "experiments\\runs\\defence_monsoon_night_50ep_idq_20260928T044715Z_c84be8c5\\checkpoints\\GNN\\latest.pt",
+  "checkpoint_sha256": "154c8a81e4335b2bd609999155d785b5f1eaeedf8f5cd90e62023d795a368b27",
+  "conditions": {
+    "source": "Delhi",
+    "destination": "Chennai",
+    "seasons": [
+      "normal",
+      "summer",
+      "winter",
+      "monsoon"
+    ],
+    "seeds_per_season": 4,
+    "seed_base": 60000,
+    "shared_environment_seeds": true,
+    "shared_valid_action_mask": true,
+    "max_steps": 400
+  },
+  "scope_note": "Single-route simulator comparison; not demand blocking, QKP load balancing, or service throughput.",
+  "summary": {
+    "GNN-PPO": {
+      "episodes": 16,
+      "successes": 16,
+      "success_rate": 1.0,
+      "successful_mean_hops": 28.25,
+      "successful_median_hops": 28.0,
+      "checked_edges": 452,
+      "invalid_actions": 0,
+      "no_valid_action_states": 0,
+      "fallbacks": 0,
+      "revisits": 2,
+      "fso_edges": 4,
+      "success_rate_wilson_95pct": [
+        0.8063923194655637,
+        1
+      ]
+    },
+    "Random": {
+      "episodes": 16,
+      "successes": 0,
+      "success_rate": 0.0,
+      "successful_mean_hops": null,
+      "successful_median_hops": null,
+      "checked_edges": 3037,
+      "invalid_actions": 0,
+      "no_valid_action_states": 8,
+      "fallbacks": 0,
+      "revisits": 2459,
+      "fso_edges": 2771,
+      "success_rate_wilson_95pct": [
+        0,
+        0.1936076805344365
+      ]
+    },
+    "Dijkstra-km": {
+      "episodes": 16,
+      "successes": 4,
+      "success_rate": 0.25,
+      "successful_mean_hops": 233.0,
+      "successful_median_hops": 235.0,
+      "checked_edges": 2377,
+      "invalid_actions": 0,
+      "no_valid_action_states": 0,
+      "fallbacks": 0,
+      "revisits": 172,
+      "fso_edges": 2368,
+      "success_rate_wilson_95pct": [
+        0.10182067491213048,
+        0.49498316535508774
+      ]
+    },
+    "BFS-hop": {
+      "episodes": 16,
+      "successes": 16,
+      "success_rate": 1.0,
+      "successful_mean_hops": 28.25,
+      "successful_median_hops": 28.0,
+      "checked_edges": 452,
+      "invalid_actions": 0,
+      "no_valid_action_states": 0,
+      "fallbacks": 0,
+      "revisits": 3,
+      "fso_edges": 2,
+      "success_rate_wilson_95pct": [
+        0.8063923194655637,
+        1
+      ]
+    },
+    "Max-SKR": {
+      "episodes": 16,
+      "successes": 0,
+      "success_rate": 0.0,
+      "successful_mean_hops": null,
+      "successful_median_hops": null,
+      "checked_edges": 1192,
+      "invalid_actions": 0,
+      "no_valid_action_states": 5,
+      "fallbacks": 0,
+      "revisits": 984,
+      "fso_edges": 1192,
+      "success_rate_wilson_95pct": [
+        0,
+        0.1936076805344365
+      ]
+    }
+  },
+  "summary_calculation": "Recomputed from raw episode_metrics.csv using arithmetic mean and conventional median; success intervals use Wilson 95% score interval."
+}

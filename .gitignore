@@ -8,3 +8,10 @@ experiments/smoke-training/
 experiments/section6-smoke/
 *.pt
 *.pth
+paper/*.aux
+paper/*.bbl
+paper/*.blg
+paper/*.log
+paper/*.out
+paper/*.fls
+paper/*.fdb_latexmk

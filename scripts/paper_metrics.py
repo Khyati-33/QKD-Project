@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import argparse
 import sys
 import time
 from pathlib import Path
@@ -18,14 +19,19 @@ from ppo import load_checkpoint
 from qkd_env import QKDRoutingEnv
 from topology import CITIES, build_topology
 
-CKPT = ROOT / "experiments" / "defence_monsoon_night_200ep_mumbai_kolkata" / "checkpoints" / "GNN" / "latest.pt"
-OUT = ROOT / "experiments" / "paper_metrics.json"
+DEFAULT_CKPT = ROOT / "experiments" / "defence_monsoon_night_200ep_mumbai_kolkata" / "checkpoints" / "GNN" / "latest.pt"
+DEFAULT_OUT = ROOT / "experiments" / "paper_metrics.json"
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--checkpoint", type=Path, default=DEFAULT_CKPT)
+    parser.add_argument("--output", type=Path, default=DEFAULT_OUT)
+    args = parser.parse_args()
+    checkpoint, output = args.checkpoint, args.output
     configure_cpu(threads=4, interop_threads=2)
     model = GNNActorCritic(hidden_dim=64, dropedge_probability=0.05)
-    load_checkpoint(CKPT, model, map_location="cpu"); model.eval()
+    load_checkpoint(checkpoint, model, map_location="cpu"); model.eval()
     graph = build_topology()
     rows = []
     for i, source in enumerate(CITIES):
@@ -63,10 +69,10 @@ def main() -> None:
                 "entropy_normalized_mean": float(np.mean(normalized)),
                 "qber_skr_valid_rate": float(np.mean(qber_ok)) if qber_ok else None})
     decisions = np.asarray([r["decision_p50_ms"] for r in rows])
-    report = {"checkpoint": str(CKPT), "inference_mode": "local_2_hop_fp32",
+    report = {"checkpoint": str(checkpoint), "inference_mode": "local_2_hop_fp32",
         "conditions": {"season": "monsoon", "time": "22:00", "fiber_outage_prob": 0.01},
         "model": {"parameters": sum(p.numel() for p in model.parameters()),
-                  "checkpoint_bytes": CKPT.stat().st_size},
+                  "checkpoint_bytes": checkpoint.stat().st_size},
         "aggregate": {"pairs": len(rows), "success_rate": float(np.mean([r["success"] for r in rows])),
             "decision_p50_ms": float(np.percentile(decisions, 50)),
             "decision_p95_ms": float(np.percentile(decisions, 95)),
@@ -79,7 +85,8 @@ def main() -> None:
             "median_distance_km": float(np.median([r["distance_km"] for r in rows]))},
         "established_method_entropy": {"BFS-hop": 0.0, "Dijkstra-km": 0.0, "Max-SKR": 0.0},
         "pairs": rows}
-    OUT.write_text(json.dumps(report, indent=2), encoding="utf8")
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps(report, indent=2), encoding="utf8")
     print(json.dumps(report["aggregate"], indent=2))
 
 
