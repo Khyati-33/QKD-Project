@@ -39,6 +39,7 @@ Per-condition results (18 episodes per policy):
 | Monsoon / 22:00 | 18/18 (100%) | 18.11 | 18/18 (100%) | 15.50 |
 - `inference_profile_20261002.json`: 840 deterministic single-decision calls per CPU thread setting over 42 ordered pairs, with encoder memoization disabled. At 8 threads, p50/p95/p99 were 12.76/16.89/22.58 ms; process RSS after the run was 348.3 MiB and model parameter storage was 0.53 MiB. The measurement shared the host with the 8-thread seed-stability training job, so treat latency as a concurrent-load result. It is one host/topology and does not measure graph-size scaling.
 - `matched_budget_ablations_20261002.json` will be written by the five-condition matched-budget ablation campaign when its runs finish. It compares baseline, geographic node features, no SKR reward term, no DropEdge, and 32-wide GNN using the same 50 PPO epochs, evaluation protocol, and training seed. Results are single-seed sensitivity evidence, not between-seed estimates.
+- `matched_budget_ablations_progress_20261002.json` is a checkpoint-derived progress record, not a result report. Refresh it with `python scripts/refresh_ablation_progress.py` while the training campaign runs.
 
 Reproduce physics checks with `python scripts/validate_physics_analytical.py` and `python scripts/validate_fso_model.py`. Reproduce controlled link sensitivity with `python link_quality_choice_test.py --checkpoint paper/supplementary/checkpoint_gnn_latest_50ep_idq_20260928.pt --samples-per-condition 32 --output <path>`. Reproduce the ordered-pair run with `python scripts/paper_metrics.py --checkpoint paper/supplementary/checkpoint_gnn_latest_50ep_idq_20260928.pt --output <path>`.
 
@@ -51,6 +52,8 @@ Recompute the paired success and hop analysis from a completed matrix with `pyth
 Reproduce the CPU inference profile with `python scripts/benchmark_inference_profile.py --checkpoint <completed-GNN-checkpoint> --repeats-per-pair 20`. The script reports per-decision p50/p95/p99 latency and process/model memory for the selected CPU thread counts. Record concurrent CPU jobs when interpreting the result.
 
 Run the matched-budget architecture, feature, and reward sensitivity study with `python scripts/run_matched_budget_ablations.py`. It sequentially trains five configurations at the 50-epoch budget and writes progress after each variant.
+
+Refresh the active matched-ablation checkpoint state with `python scripts/refresh_ablation_progress.py`.
 
 In the controlled rate-ratio sweep, the checkpoint's FSO action probability rose from about 0.311 at a 0.25x FSO/fiber proxy-rate ratio to 0.638 at 4x. At QBER 0.111 the FSO candidate was masked and assigned zero probability. Under feasible QBER values, probability shifted only slightly (about 0.473 to 0.472), so the primary observed sensitivity was to the proxy rate and hard feasibility mask.
 

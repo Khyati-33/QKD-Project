@@ -242,9 +242,14 @@ def main() -> None:
             "One host/topology; graph-size scaling and deployment profiling remain open."])
     if ablation_progress:
         completed_variants = ablation_progress.get("completed_variants", [])
+        ablation_state = ablation_progress.get("training_state") or {}
+        running_detail = (f" Current condition: {ablation_progress.get('running_variant')}, "
+            f"{ablation_state.get('phase', 'initializing')} phase, PPO "
+            f"{ablation_state.get('ppo_epoch', 0)}/{ablation_state.get('target_ppo_epochs', 50)}."
+            if ablation_progress.get("running_variant") else "")
         work_rows.append(["Matched-budget ablation campaign",
             f"{len(completed_variants)}/{len(ablation_progress.get('planned_variants', []))} "
-            "conditions complete at the shared 50-epoch budget.",
+            "conditions complete at the shared 50-epoch budget." + running_detail,
             "Single training seed; progress is not a completed comparative result."])
     work_table = Table([[paragraph(str(cell), styles["RoadCellHead"] if i == 0 else styles["RoadCell"])
                          for cell in row] for i, row in enumerate(work_rows)],

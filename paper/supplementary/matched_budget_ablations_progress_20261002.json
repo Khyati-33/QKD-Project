@@ -1,0 +1,20 @@
+{
+  "status": "in_progress",
+  "running_variant": "baseline",
+  "completed_variants": [],
+  "planned_variants": [
+    "baseline",
+    "geographic_features",
+    "no_skr_reward",
+    "no_dropedge",
+    "hidden_dim_32"
+  ],
+  "campaign_dir": "experiments\\runs\\matched_ablations_20261002T123245Z",
+  "running_run_dir": "experiments\\runs\\matched_ablation_baseline_20261020_20261002T123251Z_3bc99c4d",
+  "training_state": {
+    "phase": "ppo",
+    "bc_epoch": 15,
+    "ppo_epoch": 11,
+    "target_ppo_epochs": 50
+  }
+}
