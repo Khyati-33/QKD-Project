@@ -206,6 +206,13 @@ def main() -> None:
         paired_transfer = transfer_report.get("paired_analysis", {}).get("GNN-PPO_vs_BFS-hop")
         transfer_hops = ("n/a" if gnn_transfer["successful_mean_hops"] is None else
                          f"{gnn_transfer['successful_mean_hops']:.2f}")
+        paired_text = (f" Paired exact McNemar p={paired_transfer['exact_mcnemar_two_sided_p']:.4f}; "
+            f"among jointly successful episodes, GNN-minus-BFS hop difference was "
+            f"{paired_transfer['mean_paired_hop_difference']:.2f} "
+            f"(95% pair-cluster bootstrap CI "
+            f"{paired_transfer['hop_difference_95pct_pair_cluster_bootstrap_ci'][0]:.2f} to "
+            f"{paired_transfer['hop_difference_95pct_pair_cluster_bootstrap_ci'][1]:.2f}). "
+            if paired_transfer else " GNN did not outperform BFS.")
         work_rows.append(["Paired endpoint / season / time transfer",
             f"Across {gnn_transfer['episodes']} GNN episodes, success was "
             f"{gnn_transfer['successes']}/{gnn_transfer['episodes']} "
@@ -215,13 +222,7 @@ def main() -> None:
             f"{bfs_transfer['successes']}/{bfs_transfer['episodes']} "
             f"({bfs_transfer['success_rate']:.1%}), with "
             f"{bfs_transfer['successful_mean_hops']:.2f} successful mean hops. "
-            (f"Paired exact McNemar p={paired_transfer['exact_mcnemar_two_sided_p']:.4f}; "
-             f"among jointly successful episodes, GNN-minus-BFS hop difference was "
-             f"{paired_transfer['mean_paired_hop_difference']:.2f} "
-             f"(95% pair-cluster bootstrap CI "
-             f"{paired_transfer['hop_difference_95pct_pair_cluster_bootstrap_ci'][0]:.2f} to "
-             f"{paired_transfer['hop_difference_95pct_pair_cluster_bootstrap_ci'][1]:.2f}). "
-             "GNN did not outperform BFS." if paired_transfer else "GNN did not outperform BFS."),
+            + paired_text + "GNN did not outperform BFS.",
             "Six ordered pairs, four seasons and selected day/night times, paired seeds. "
             "BC endpoint randomization means these are not strict end-to-end endpoint holdouts. "
             "Hop interval resamples only six endpoint-pair clusters."])
