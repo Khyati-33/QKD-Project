@@ -129,6 +129,7 @@ def resolve_config(raw: dict[str, Any]) -> dict[str, Any]:
         "training": {
             "bc_epochs": int(training.get("bc_epochs", 15)),
             "bc_episodes_per_epoch": int(training.get("bc_episodes_per_epoch", 8)),
+            "bc_randomize_endpoints": bool(training.get("bc_randomize_endpoints", False)),
             "bc_learning_rate": float(training.get("bc_learning_rate", 1e-3)),
             "bc_entropy_coef": float(training.get("bc_entropy_coef", 0.02)),
             "ppo_epochs": int(training.get("ppo_epochs", 100)),
@@ -181,7 +182,7 @@ def _snapshot_sources(run_dir: Path, *, stage: str = "pre_training") -> None:
     snapshot = run_dir / "source_snapshot"
     snapshot.mkdir(parents=True, exist_ok=True)
     candidates = list(ROOT.glob("*.py"))
-    for folder_name in ("configs", "hardware_profiles", "tests"):
+    for folder_name in ("configs", "hardware_profiles", "tests", "scripts"):
         folder = ROOT / folder_name
         if folder.exists():
             candidates.extend(path for path in folder.rglob("*") if path.is_file())
@@ -340,7 +341,7 @@ def run_experiment(config_path: Path | None, *, resume: str | None = None,
                 seed_base=70_000 + model_index * 500_000 + epoch * 1_000)
             baseline_result = evaluate_all_baselines(seasons=seasons,
                 eval_seeds_per_season=eval_seeds, env_kwargs=env_kwargs,
-                seed_base=80_000 + model_index * 500_000 + epoch * 1_000,
+                seed_base=70_000 + model_index * 500_000 + epoch * 1_000,
                 baseline_names=tuple(cfg["protected_conditions"]["evaluation_baselines"]["value"]))
             record = {"model": model_name, "ppo_epoch": epoch,
                       "policy": policy_result, "baselines": baseline_result}

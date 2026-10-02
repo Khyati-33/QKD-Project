@@ -39,7 +39,11 @@ files = {
     "evaluation_source.py": "evaluation.py",
     "baseline_source.py": "baselines.py",
     "training_source.py": "train.py",
+    "runner_source.py": "run_experiment.py",
     "inference_source.py": "inference_engine.py",
+    "training_seed_stability_source.py": "scripts/run_training_seed_stability.py",
+    "seed_stability_50ep.yaml": "configs/seed_stability_50ep.yaml",
+    "configuration_test.py": "tests/test_config.py",
 }
 for dest, src in files.items():
     source, target = root / src, sup / dest
