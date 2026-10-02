@@ -7,12 +7,14 @@ import hashlib
 import json
 import statistics
 import subprocess
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
 SEEDS = (20261002, 20261003, 20261004, 20261005, 20261006)
 BASELINES = ("Random", "Dijkstra-km", "BFS-hop", "Max-SKR")
 
