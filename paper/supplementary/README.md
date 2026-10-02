@@ -25,6 +25,17 @@ Reproduce with `python scripts/run_corrected_route_comparison.py --seeds-per-sea
 - Once the five-seed campaign completes, archive and validate its reports, resolved configs, and checkpoints with `python scripts/archive_training_seed_evidence.py --campaign-dir experiments/runs/<completed-campaign>`; the archiver refuses partial or non-50-epoch campaigns.
 - `small_graph_oracle_20261002.json`: exhaustive simple-path reward oracle on five generated seven-node graphs, four channel seeds each, with static episode link states and 5% per-edge fiber outages. All 20 cases had a feasible oracle; the seed-20261002 policy succeeded in 18/20 and exactly matched oracle reward in 11/20 overall (11/18 successful policy episodes). Mean reward regret was 0.663 among successful policy episodes and 2.209 including failures. This is a toy static-channel result, not a full-network optimality claim.
 - `pair_season_matrix_20261002.json` and `.csv`: completed paired transfer diagnostic across six ordered endpoint pairs, six season/time conditions, and three shared environment seeds (108 episodes per method). GNN-PPO succeeded in 99/108 (91.7%, Wilson 95% CI 84.9%-95.6%); BFS-hop succeeded in 108/108 (100%, 96.6%-100%). Successful routes averaged 31.94 hops for GNN-PPO and 15.40 for BFS-hop. The tested GNN therefore did not outperform BFS on success or hop count. These simulator-derived pairs were excluded from PPO's fixed-endpoint rollouts, but the BC stage randomized endpoints, so this is not a strict end-to-end endpoint holdout.
+
+Per-condition results (18 episodes per policy):
+
+| Season / hour | GNN-PPO success | GNN successful mean hops | BFS-hop success | BFS successful mean hops |
+|---|---:|---:|---:|---:|
+| Normal / 02:00 | 14/18 (77.8%) | 48.79 | 18/18 (100%) | 15.50 |
+| Normal / 22:00 | 15/18 (83.3%) | 52.53 | 18/18 (100%) | 15.44 |
+| Summer / 22:00 | 16/18 (88.9%) | 40.75 | 18/18 (100%) | 15.28 |
+| Winter / 22:00 | 18/18 (100%) | 21.83 | 18/18 (100%) | 15.39 |
+| Monsoon / 02:00 | 18/18 (100%) | 17.78 | 18/18 (100%) | 15.28 |
+| Monsoon / 22:00 | 18/18 (100%) | 18.11 | 18/18 (100%) | 15.50 |
 - `inference_profile_20261002.json`: 840 deterministic single-decision calls per CPU thread setting over 42 ordered pairs, with encoder memoization disabled. At 8 threads, p50/p95/p99 were 12.76/16.89/22.58 ms; process RSS after the run was 348.3 MiB and model parameter storage was 0.53 MiB. The measurement shared the host with the 8-thread seed-stability training job, so treat latency as a concurrent-load result. It is one host/topology and does not measure graph-size scaling.
 - `matched_budget_ablations_20261002.json` will be written by the five-condition matched-budget ablation campaign when its runs finish. It compares baseline, geographic node features, no SKR reward term, no DropEdge, and 32-wide GNN using the same 50 PPO epochs, evaluation protocol, and training seed. Results are single-seed sensitivity evidence, not between-seed estimates.
 
