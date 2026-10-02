@@ -43,7 +43,7 @@
 \maketitle
 
 \begin{abstract}
-Hybrid quantum key distribution (QKD) networks require routing decisions to account for changing link quality and trusted-node constraints. This work presents a simulation framework combining a hybrid fiber and free-space optical (FSO) topology, scenario-based channel models, constrained next-hop selection, and a graph neural network policy trained with proximal policy optimization. The current implementation represents secret-key generation with a normalized rate proxy and evaluates single source-destination route episodes. In one archived Mumbai-to-Kolkata monsoon-night condition, the GNN policy completed 10 of 10 episodes, with a mean of 25.6 hops. This is a preliminary simulator observation and does not establish superiority over conventional routing. A controlled link-choice diagnostic found that the trained policy did not select the higher-rate candidate link, motivating policy and feature ablations. We describe the simulator, its security-model boundaries, and its evaluation protocol, and identify the demand-level and absolute-rate components required for a full network-routing comparison.
+Hybrid quantum key distribution (QKD) routing must account for link feasibility and changing channel conditions. We present a simulator and graph neural network (GNN) policy trained with proximal policy optimization (PPO) for next-hop routing over a modeled hybrid fiber and free-space optical network. In a paired matrix of 108 episodes spanning six ordered endpoint pairs and six season/time conditions, one trained GNN checkpoint completed 99 episodes (91.7\%; Wilson 95\% confidence interval, 84.9--95.6\%). It substantially exceeded distance-weighted Dijkstra (33/108), random routing (1/108), and greedy maximum-secret-key-rate routing (0/108), with no invalid action proposals or environment fallbacks. However, breadth-first search (BFS) completed all 108 episodes and used fewer hops; paired analysis favored BFS in success and route length. On 20 generated seven-node static-channel cases, the GNN matched the exhaustive reward optimum in 11/18 successful policy episodes. These results show that the agent can exploit the simulator's feasibility mask and state-dependent reward more effectively than several link-cost heuristics, while not demonstrating an advantage over BFS. All rates are normalized proxies, and all results are simulator-derived rather than field or security validation.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -59,7 +59,7 @@ This paper describes an extensible simulator and a graph-based routing agent for
 
 The current contribution is methodological and software oriented. It includes: 1) a road-corridor proxy topology for seven Indian city hubs, with candidate FSO bypasses; 2) a layered fiber and FSO link simulator with time-varying, temporally correlated FSO turbulence; 3) a configurable asymptotic secret-key-rate proxy and an opt-in vacuum-plus-weak-decoy finite-key engineering estimator; 4) a masked graph-policy training and evaluation workflow; and 5) an evidence ledger and validation protocol that separate derived simulation outputs from measurements. The present results are limited to archived simulator experiments. They do not establish deployed-network performance, composable finite-key security, or field availability.
 
-The paper is organized as follows. Section II formulates the routing setting and summarizes the QKD model. Section III describes the simulator and evaluation setup. Section IV presents the learned routing policy and comparator formulations. Section V reports preliminary route-level results. Section VI discusses the limits of the current evidence and the requirements for a network-level study. Section VII concludes the paper.
+The paper is organized as follows. Section II formulates the routing setting and summarizes the QKD model. Section III describes the simulator and evaluation setup. Section IV presents the learned routing policy and comparator formulations. Section V reports paired route-level results and a small-graph oracle analysis. Section VI discusses the limits of the evidence and the requirements for a network-level study. Section VII concludes the paper.
 
 \section{Problem Formulation and QKD Model}
 \subsection{Basic Principles of QKD}
@@ -191,7 +191,7 @@ Action mask & Edge is adjacent, passes the edge QBER threshold, has positive mod
 The GNN policy uses three message-passing layers, a shared actor-critic trunk, and a masked action head. The implementation uses a monotone log-rate prior and an explicit distance-progress prior. Behavior cloning can initialize the policy from shortest-path demonstrations before PPO fine-tuning. PPO uses clipped policy updates, generalized advantage estimation, reward normalization, gradient clipping, and checkpointed normalization state. The optional attention model is implemented in \texttt{qkd\_attention.py}; the GNN-PPO runs summarized below use the graph policy configuration specified in their saved YAML files.
 
 \begin{table}[t]
-\caption{Archived GNN-PPO evaluation scenario}
+\caption{GNN-PPO checkpoint and paired transfer-evaluation protocol}
 \label{tab:scenario}
 \centering
 \scriptsize
@@ -199,13 +199,16 @@ The GNN policy uses three message-passing layers, a shared actor-critic trunk, a
 \toprule
 Setting & Value\\
 \midrule
-Source and destination & Mumbai to Kolkata\\
-Season and start time & Monsoon, 22:00 $\pm$ 1 h\\
-Training budget & 200 PPO epochs, resumed checkpoint\\
+PPO training endpoints & Delhi to Chennai\\
+Training budget & 15 behavior-cloning and 50 PPO epochs\\
+Behavior-cloning endpoints & Randomized\\
 Hidden dimension & 64\\
-Evaluation seeds & 10\\
+Transfer pairs & Six ordered pairs excluding Delhi--Chennai\\
+Weather/time conditions & Six selected season and hour settings\\
+Paired seeds & Three per pair-condition (108 episodes per policy)\\
 QBER hard threshold & 0.11\\
 Fiber outage probability & 0.01\\
+Episode limit & 144 steps\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -261,7 +264,7 @@ The policy is updated by maximizing the clipped surrogate objective
  L^{\mathrm{clip}}(\theta)=\mathbb{E}_t\left[\min\left(\rho_t(\theta)\hat A_t,
  \operatorname{clip}(\rho_t(\theta),1-\epsilon,1+\epsilon)\hat A_t\right)\right],
 \end{equation}
-where $\rho_t(\theta)$ is the new-to-old action probability ratio and $\hat A_t$ is the estimated advantage. PPO is combined with a value loss and entropy regularization. Hyperparameters are resolved from a versioned YAML file and included with the experiment artifact. The specific settings for the preliminary run are in the supplementary package.
+where $\rho_t(\theta)$ is the new-to-old action probability ratio and $\hat A_t$ is the estimated advantage. PPO is combined with a value loss and entropy regularization. Hyperparameters are resolved from a versioned YAML file and included with the experiment artifact. The settings for the transfer-evaluation checkpoint and paired episode seeds are archived in the supplementary package.
 
 \subsection{Centralized Comparator Formulations}
 A centralized link-weight comparator can assign edge costs from link state and key-pool information, while an integer linear program can optimize simultaneous demands subject to link capacities. The current single-route simulator does not provide the demand matrix or calibrated key generation and consumption units needed to evaluate either method on a shared objective. These comparator families are outside the measured experiment reported here.
@@ -279,28 +282,38 @@ For completeness, a demand-level oracle can be written using binary variable $x_
 \end{align}
 The current environment processes one route episode and lacks a time-indexed request matrix and calibrated key-store refill process. This ILP is therefore a mathematical comparator definition, not a measured result.
 
-\section{Preliminary Results}
-\subsection{Route Completion and Baseline Behavior}
-The archived comparison used the road-corridor graph, Mumbai as source, Kolkata as destination, monsoon conditions, a nominal 22:00 start with one-hour jitter, and ten evaluation seeds. The GNN model had 200 PPO epochs and was resumed from the archived 100-epoch checkpoint. An independent NetworkX search of the current topology confirms a 24-edge unweighted shortest path between these hubs. The previously stored 23-edge reference was incorrect. The GNN mean of 25.6 hops comes from that archived run and is not evidence of optimality.
+\section{Results}
+\subsection{Paired Endpoint and Season/Time Evaluation}
+We evaluated one fixed GNN-PPO checkpoint on six ordered endpoint pairs, six season/time conditions, and three shared environment seeds per pair-condition combination. The pairs were Delhi--Mumbai, Mumbai--Chennai, Kolkata--Delhi, Bangalore--Hyderabad, Jaipur--Kolkata, and Hyderabad--Mumbai; the PPO fixed training pair, Delhi--Chennai, was excluded. Conditions covered normal, summer, winter, and monsoon scenarios at selected day and night hours. Five policies received the same episode seeds, yielding 108 paired episodes per policy. The GNN checkpoint was trained with PPO on Delhi--Chennai, but behavior cloning randomized endpoints; the evaluation is therefore a cross-pair transfer diagnostic, not a strict end-to-end endpoint holdout. Success-rate intervals in Table~\ref{tab:transfer} are Wilson score intervals across episodes for this one checkpoint, not intervals across independently trained models.
 
-The archived GNN completed all ten recorded episodes. The baseline rows in the old comparison were produced by a selector that did not consistently honor the environment's feasibility mask and are excluded as comparative evidence. The corrected baseline selector now uses the observation's action ordering and valid-action mask. Its episode-level results have not been regenerated because the available Python environments do not include Gymnasium. Thus, only the archived GNN completion count is reported here, and it should be read as a single-condition simulator observation.
-
-\begin{table}[t]
-\caption{Archived GNN route outcome for Mumbai-to-Kolkata in the monsoon-night condition. The former baseline outputs are omitted because their selector did not honor the current feasibility mask.}
-\label{tab:prelim}
+\begin{table*}[t]
+\caption{Paired cross-pair and season/time route outcomes for one trained checkpoint. Hop means are conditional on successful episodes.}
+\label{tab:transfer}
 \centering
 \footnotesize
-\begin{tabular}{@{}p{0.23\columnwidth}p{0.12\columnwidth}p{0.14\columnwidth}p{0.35\columnwidth}@{}}
+\begin{tabular}{@{}lrrrccc@{}}
 \toprule
-Policy & Success & Mean hops & Result scope\\
+Policy & Successes / episodes & Success rate & Wilson 95\% CI & Mean successful hops & Invalid / fallback actions & No-valid-action states\\
 \midrule
-GNN-PPO, 200 epochs & 10/10 & 25.6 & resumed run\\
+GNN-PPO & 99/108 & 91.7\% & 84.9--95.6\% & 31.94 & 0 / 0 & 0\\
+BFS-hop & 108/108 & 100.0\% & 96.6--100.0\% & 15.40 & 0 / 0 & 0\\
+Dijkstra-km & 33/108 & 30.6\% & 22.7--39.8\% & 96.36 & 0 / 0 & 0\\
+Random & 1/108 & 0.9\% & 0.2--5.1\% & 111.00 & 0 / 0 & 42\\
+Max-SKR & 0/108 & 0.0\% & 0.0--3.4\% & -- & 0 / 0 & 10\\
 \bottomrule
-\multicolumn{4}{p{0.88\columnwidth}}{\scriptsize This is a single-condition result from an archived GNN run. It does not establish comparative performance or generalization.}
 \end{tabular}
-\end{table}
+\end{table*}
 
-The former baseline results are not included because the selector could choose an action that the environment subsequently replaced through its fallback rule. The revised selector chooses only from currently valid actions. Independent topology checks confirm the 24-edge hop minimum; evaluation on stochastic channel snapshots requires Gymnasium, which is absent from the available runtime.
+The strongest result for the learned agent is its performance against the distance-weighted and greedy link-quality comparators: it completed 99 episodes, compared with 33 for Dijkstra-km, one for Random, and none for Max-SKR. It proposed no invalid actions and triggered no environment fallbacks. This indicates that the GNN policy can combine route context and the hard feasibility mask more effectively than these fixed local cost rules in the tested simulator conditions. It is not a general routing advantage: BFS-hop succeeded in every paired episode and produced substantially shorter successful routes.
+
+The GNN's completion rate varied by tested condition. It succeeded in all 18 episodes for each of winter at 22:00 and monsoon at both 02:00 and 22:00. Success was 16/18 in summer at 22:00, 15/18 in normal conditions at 22:00, and 14/18 in normal conditions at 02:00. These small condition-specific samples suggest the strongest observed performance occurred in the tested winter and monsoon cases; they do not establish general weather robustness. BFS remained 18/18 in every condition.
+
+The no-valid-action column counts terminal states in which a policy had no feasible next hop; these are not invalid proposals. The GNN, BFS, and Dijkstra policies reached no such states in this matrix, whereas random and Max-SKR did so 42 and 10 times, respectively.
+
+The paired outcomes sharpen this comparison. BFS had nine successes on episodes where GNN-PPO failed; there were no episodes with the opposite outcome. An exact two-sided McNemar test gives $p=0.0039$. Among the 99 episodes where both policies succeeded, the GNN used 16.00 more hops on average (median difference, six hops). A bootstrap that resampled the six ordered endpoint-pair clusters gave a 95\% interval of 6.48--25.97 additional GNN hops. Because that interval uses only six clusters, it is coarse; it nevertheless agrees with the descriptive comparison and rules out a claim that the GNN is the best route-completion or hop-minimization policy in this matrix. Episode-level Wilson intervals do not represent training-seed uncertainty.
+
+\subsection{Exact Reward Oracle on Small Graphs}
+To test policy behavior against a tractable optimum, we generated five connected seven-node graphs and evaluated four channel seeds per graph. Link states were frozen within each episode, with a 5\% per-edge fiber outage probability. An exhaustive enumeration of feasible simple paths produced a reward oracle for all 20 cases. The GNN succeeded in 18/20 cases (90\%) and exactly matched the oracle reward in 11/20 cases overall (55\%), or 11/18 successful policy episodes (61.1\%). Mean reward regret was 0.663 among successful policy episodes and 2.209 when failures were included. This result shows that the policy often finds an optimal-reward route in these small, static instances; it does not establish optimality on the full dynamic network, and reward optimality is distinct from minimizing hops or maximizing delivered key bits.
 
 \section{Discussion and Limitations}
 \subsection{Key-Store Utilization}
@@ -320,24 +333,24 @@ The stored physics report estimates, at 80 km and 1550 nm, 16.46 dB fiber loss i
 \end{figure}
 
 \subsubsection{Controlled Link-Choice Diagnostic}
-An archived paired-edge diagnostic compared a modeled 80-km fiber candidate with a clear 10-km FSO candidate while controlling route progress. Across 384 comparisons, the FSO candidate had a higher normalized rate proxy in all sampled pairs. However, the evaluated agent selected the FSO candidate in zero cases, and its assigned action probability remained near one-half. This finding is evidence that the current policy did not demonstrate a useful preference for the higher-proxy candidate under that diagnostic. It also shows that the policy's inclusion of physics-derived features does not establish that those features are used effectively.
+An earlier paired-edge diagnostic compared an 80-km fiber candidate with a clear 10-km FSO candidate while controlling route progress. In that archived experiment the policy failed to select the higher-proxy FSO candidate, motivating controlled feature-response tests. A later counterfactual analysis used a fixed shared route context and varied one link input at a time. The FSO action probability increased from 0.311 to 0.638 as the FSO-to-fiber proxy-rate ratio increased from 0.25 to 4.0. Within feasible QBER values, the probability changed only slightly (approximately 0.473 to 0.472); at QBER 0.111 the FSO candidate was correctly masked. Under a separate turbulence-input sweep, a 100-fold $C_n^2$ multiplier reduced the median FSO rate proxy from 0.202 to 0.183, while mean FSO action probability shifted only from 0.749 to 0.740 and FSO was selected in all 32 trials. Thus the checkpoint responds to proxy-rate contrast and the hard feasibility mask, but shows weak sensitivity to this turbulence feature scaling. These are synthetic input counterfactuals, not evidence of calibrated weather response or end-to-end route benefit.
 
 \subsection{Scope of the Current Evaluation}
-The evaluation covers one trained GNN model and one endpoint pair in one weather condition. It does not estimate variation across independent training runs, endpoint pairs, seasons, or calibrated channel traces. It also does not compare absolute delivered key volume, blocking under traffic, control-plane load, or target-hardware latency. Accordingly, the results characterize a software prototype and not network service performance.
+The completed route matrix covers one trained GNN checkpoint across six ordered pairs and six selected season/time conditions, with paired policy seeds. Because behavior cloning randomized endpoints and only one checkpoint is represented, these episodes do not establish strict endpoint generalization or variation across independent training runs. The simulator does not compare absolute delivered key volume, blocking under traffic, control-plane load, or performance on calibrated channel traces. The results therefore characterize a software prototype under selected simulated conditions, not network service performance.
 
-\paragraph{Validation levels.}
+\subsubsection*{Validation Levels}
 Validation is separated into implementation correctness, analytical checks, parameter calibration, synthetic stress testing, and hardware-in-the-loop or field evaluation. Implementation checks cover attenuation, detection, QBER, finite-key bounds, temporal correlation, outage behavior, and path constraints. Analytical validation compares code outputs with limiting cases and independently calculated reference values. Calibration requires traceable device and channel data with uncertainty records. Synthetic testing holds out entire weather traces and applies parameter shifts. Field validation requires timestamped measurements and separate reporting of model error and policy error.
 
-\paragraph{Research use cases.}
-The intended research campaigns include: (i) endpoint-pair generalization across the seven city hubs; (ii) seasonal and diurnal FSO robustness, including held-out weather distributions; (iii) demand-weighted routing with key-pool refill and blocking probability; (iv) controlled link choice when candidates trade off distance, rate, and outage risk; and (v) ablations of message passing, attention, behavior cloning, and reward terms. For each study, the unit of replication is a trained model and independent environment seed. Report success and blocking rates with confidence intervals, route length, delivered key bits where defined, QBER threshold violations, revisit rates, calibration error, and inference time. Hyperparameter selection and test seeds must be separated.
+\subsubsection*{Further Evaluation}
+The completed experiments provide an initial cross-pair/condition matrix, a paired comparison against four routing baselines, and an exact oracle on small static graphs. Further evaluation should use endpoint and weather traces withheld from both PPO and behavior cloning; multiple independently trained policies; matched-budget feature, architecture, and reward ablations; and absolute key generation, consumption, and refill under simultaneous demand. Report route success and blocking with uncertainty, successful route length, QBER feasibility, revisits, delivered key bits when calibrated, and inference cost. Hyperparameter selection and final test seeds must be separated.
 
-\paragraph{Limitations.}
+\subsubsection*{Limitations}
 Current road routes are proxies and may not correspond to deployable fiber. FSO visibility and optical geometry are not validated. Weather distributions and effective turbulence scaling are assumptions. The fiber and FSO hardware settings do not represent one fully characterized terminal pair. The default rate expression is a normalized utility, and the finite-key implementation is not independently verified as a composable proof. The simulator supports algorithm development, but this evidence does not establish field performance or certified security.
 
 \section{Conclusion}
-This paper has presented a graph-based reinforcement-learning simulator for routing in a modeled hybrid fiber and FSO trusted-node QKD network. The implementation combines constrained next-hop selection, GNN embeddings, PPO training, scenario-based channel variability, and reproducible experiment configurations. In one archived monsoon-night endpoint scenario, the GNN route completed ten of ten episodes. A controlled link-choice diagnostic found that the trained policy did not prefer a higher proxy-rate FSO option. Together, these results define the present prototype's operating scope and expose a link-selection weakness.
+This paper has presented a graph-based reinforcement-learning simulator for routing in a modeled hybrid fiber and FSO trusted-node QKD network. In a paired 108-episode cross-pair and season/time matrix, one GNN checkpoint completed 91.7\% of routes and substantially outperformed distance-weighted Dijkstra and greedy Max-SKR in completion rate, while making no invalid action proposals or triggering fallbacks. The exact small-graph study also found the GNN at the reward optimum in 61.1\% of successful policy episodes. These results illustrate where the agent is useful in this simulator: it can use state-dependent feasibility and route context where fixed link-cost rules perform poorly.
 
-Further study requires matched baseline experiments, a demand and absolute key-rate model, independent channel validation, and evaluation across held-out seasons and endpoint pairs. Measured device and channel traces are required before interpreting simulator outputs as network performance. Formal security claims require protocol-specific finite-key analysis and independently checked count data.
+The same evidence sets a clear limit. BFS completed all matrix episodes and used fewer hops than the GNN. We therefore make no claim that learned routing dominates the simplest shortest-hop baseline, generalizes to unseen endpoint-training distributions, maximizes delivered key bits, or improves network service. Such claims require strict holdouts, independent training replications, matched-budget ablations, absolute key-rate and demand models, and validated channel traces. Formal QKD security claims require protocol-specific finite-key analysis and independently checked count data.
 
 \section*{Acknowledgment}
 Funding and institutional acknowledgments are to be supplied by the authors.
