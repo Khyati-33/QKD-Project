@@ -50342,5 +50342,28 @@
         "fso": 2
       }
     }
-  ]
+  ],
+  "paired_analysis": {
+    "GNN-PPO_vs_BFS-hop": {
+      "paired_episodes": 108,
+      "gnn_only_successes": 0,
+      "bfs_only_successes": 9,
+      "exact_mcnemar_two_sided_p": 0.00390625,
+      "both_successful_episodes": 99,
+      "hop_difference_definition": "GNN-PPO hops minus BFS-hop hops; positive favors fewer BFS hops",
+      "mean_paired_hop_difference": 16.0,
+      "median_paired_hop_difference": 6.0,
+      "hop_difference_95pct_pair_cluster_bootstrap_ci": [
+        6.478260869565218,
+        25.97196261682243
+      ],
+      "bootstrap": {
+        "clusters": "ordered endpoint pair",
+        "cluster_count": 6,
+        "replicates": 20000,
+        "seed": 1313
+      },
+      "interpretation": "BFS succeeded in every paired episode; among shared successes, the GNN used more hops on average. The bootstrap resamples endpoint-pair clusters, not individual episodes."
+    }
+  }
 }
