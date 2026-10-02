@@ -1,0 +1,50 @@
+{
+  "status": "in_progress",
+  "refreshed_utc": "2026-10-02T10:56:13.747481+00:00",
+  "campaign_dir": "experiments\\runs\\training_seed_stability_20261002T094438Z",
+  "planned_seeds": [
+    20261002,
+    20261003,
+    20261004,
+    20261005,
+    20261006
+  ],
+  "completed_seed_count": 1,
+  "completed": [
+    {
+      "training_seed": 20261002,
+      "run_dir": "experiments\\runs\\qkd_gnn_seed_stability_20261002_20261002T094441Z_c020fe10",
+      "final_ppo_epoch": 50,
+      "success_rate": 0.9375,
+      "avg_hops_success": 69.8
+    }
+  ],
+  "not_yet_complete": [
+    {
+      "training_seed": 20261003,
+      "run_dir": "experiments\\runs\\qkd_gnn_seed_stability_20261003_20261002T103817Z_1dd8c844",
+      "checkpoint_updated_utc": "2026-10-02T10:56:11.357540+00:00",
+      "status": "no final summary yet"
+    },
+    {
+      "training_seed": 20261004,
+      "run_dir": null,
+      "checkpoint_updated_utc": null,
+      "status": "no final summary yet"
+    },
+    {
+      "training_seed": 20261005,
+      "run_dir": null,
+      "checkpoint_updated_utc": null,
+      "status": "no final summary yet"
+    },
+    {
+      "training_seed": 20261006,
+      "run_dir": null,
+      "checkpoint_updated_utc": null,
+      "status": "no final summary yet"
+    }
+  ],
+  "interpretation": "Progress inventory only. Aggregate training-seed statistics are valid only after every planned seed has a final evaluation.",
+  "source": "per-run summary.json, evaluation.json, and run-directory checkpoint timestamps"
+}

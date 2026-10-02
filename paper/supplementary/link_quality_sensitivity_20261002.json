@@ -1,5 +1,5 @@
 {
-  "checkpoint": "experiments\\runs\\defence_monsoon_night_50ep_idq_20260928T044715Z_c84be8c5\\checkpoints\\GNN\\latest.pt",
+  "checkpoint": "paper\\supplementary\\checkpoint_gnn_latest_50ep_idq_20260928.pt",
   "test": "matched-progress twin candidate counterfactual, 10 km FSO detour vs 80 km fiber",
   "shared_state": {
     "seasonal_outages_conditioned_clear": true,
@@ -5717,6 +5717,63 @@
       "fiber_valid": true,
       "fso_valid": false
     },
+    "fso_turbulence_cn2_multiplier_sweep": [
+      {
+        "cn2_multiplier": 0.01,
+        "samples": 32,
+        "mean_fso_probability": 0.7489039991050959,
+        "fso_selected_rate": 1.0,
+        "valid_fso_candidate_rate": 1.0,
+        "median_qber": 0.010004156649382503,
+        "median_skr_proxy": 0.20169099259269702,
+        "median_rytov_variance": 1.608868903180386e-05
+      },
+      {
+        "cn2_multiplier": 0.1,
+        "samples": 32,
+        "mean_fso_probability": 0.7488962989300489,
+        "fso_selected_rate": 1.0,
+        "valid_fso_candidate_rate": 1.0,
+        "median_qber": 0.0100041568184201,
+        "median_skr_proxy": 0.20168278856587635,
+        "median_rytov_variance": 0.00016088689031803862
+      },
+      {
+        "cn2_multiplier": 1.0,
+        "samples": 32,
+        "mean_fso_probability": 0.7488193046301603,
+        "fso_selected_rate": 1.0,
+        "valid_fso_candidate_rate": 1.0,
+        "median_qber": 0.010004158509203057,
+        "median_skr_proxy": 0.20160076804774302,
+        "median_rytov_variance": 0.001608868903180386
+      },
+      {
+        "cn2_multiplier": 10.0,
+        "samples": 32,
+        "mean_fso_probability": 0.7480478975921869,
+        "fso_selected_rate": 1.0,
+        "valid_fso_candidate_rate": 1.0,
+        "median_qber": 0.01000418165203438,
+        "median_skr_proxy": 0.20048502313707056,
+        "median_rytov_variance": 0.01608868903180386
+      },
+      {
+        "cn2_multiplier": 100.0,
+        "samples": 32,
+        "mean_fso_probability": 0.7401984445750713,
+        "fso_selected_rate": 1.0,
+        "valid_fso_candidate_rate": 1.0,
+        "median_qber": 0.010004578483164894,
+        "median_skr_proxy": 0.1831085272684723,
+        "median_rytov_variance": 0.1608868903180386
+      }
+    ],
+    "unsupported_perturbations": [
+      "pointing jitter parameter is fixed by the current physics model",
+      "background scaling is fixed by the current physics model",
+      "persistent outage bursts are not modeled independently of link-state availability"
+    ],
     "interpretation_note": "Synthetic policy-input counterfactuals isolate response of the current checkpoint. They do not represent measured links or end-to-end route success."
   }
 }

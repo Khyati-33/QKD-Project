@@ -46,6 +46,8 @@ def main() -> None:
                         "test_results_20261002.json")
     parser.add_argument("--training-seeds", type=Path, default=ROOT / "paper" / "supplementary" /
                         "training_seed_stability_20261002.json")
+    parser.add_argument("--training-progress", type=Path, default=ROOT / "paper" / "supplementary" /
+                        "training_seed_stability_progress_20261002.json")
     parser.add_argument("--roadmap", type=Path, default=ROOT /
                         "QKD_Routing_Agent_Research_Roadmap_QSMS_Style.pdf")
     parser.add_argument("--output", type=Path)
@@ -61,6 +63,7 @@ def main() -> None:
     pair_metrics = read_json(args.pair_metrics) if args.pair_metrics.exists() else None
     test_report = read_json(args.test_report) if args.test_report.exists() else None
     training_report = read_json(args.training_seeds) if args.training_seeds.exists() else None
+    training_progress = read_json(args.training_progress) if args.training_progress.exists() else None
     dated = date.today().isoformat()
     out_pdf = args.output or ROOT / "paper" / "roadmap_status_addendum.pdf"
     out_pdf.parent.mkdir(parents=True, exist_ok=True)
@@ -110,6 +113,8 @@ def main() -> None:
         "rate_ratio_sweep", [])
     qber_sensitivity = (sensitivity or {}).get("controlled_input_sensitivity", {}).get(
         "qber_sweep", [])
+    cn2_sensitivity = (sensitivity or {}).get("controlled_input_sensitivity", {}).get(
+        "fso_turbulence_cn2_multiplier_sweep", [])
     sensitivity_result = "The controlled diagnostic includes a proxy-rate ratio sweep, a feasible QBER-margin sweep, and an outage-mask counterfactual with route context held fixed."
     if rate_sensitivity and qber_sensitivity:
         sensitivity_result += (f" The FSO action probability rose from "
@@ -117,6 +122,13 @@ def main() -> None:
             f"{rate_sensitivity[-1]['fso_probability']:.3f} as its proxy-rate ratio rose "
             f"from {rate_sensitivity[0]['fso_to_fiber_rate_ratio']:.2g}x to "
             f"{rate_sensitivity[-1]['fso_to_fiber_rate_ratio']:.2g}x; at QBER 0.111 it was masked.")
+    if cn2_sensitivity:
+        sensitivity_result += (f" In a separate 32-sample FSO turbulence counterfactual, a 100x Cn2 "
+            f"multiplier lowered median proxy from {cn2_sensitivity[2]['median_skr_proxy']:.3f} "
+            f"to {cn2_sensitivity[-1]['median_skr_proxy']:.3f} and mean FSO action probability "
+            f"from {cn2_sensitivity[2]['mean_fso_probability']:.3f} to "
+            f"{cn2_sensitivity[-1]['mean_fso_probability']:.3f}; FSO remained selected in "
+            f"{cn2_sensitivity[-1]['fso_selected_rate']:.0%} of samples.")
     work_rows = [
         ["Workstream", "Change / result", "Remarks and evidence"],
         ["Corrected route comparison",
@@ -147,6 +159,21 @@ def main() -> None:
             f"(SD {hops['sample_sd_across_training_seeds']:.2f}).",
             "Interval summarizes variability across fitted policies on one fixed simulator protocol; "
             "it is not an episode-level confidence interval or external validation."])
+    elif training_progress:
+        completed = training_progress.get("completed", [])
+        pending = training_progress.get("not_yet_complete", [])
+        active = pending[0]["training_seed"] if pending else "none"
+        progress_text = (f"{len(completed)}/{len(training_progress['planned_seeds'])} independent "
+                         f"policies have final evaluations. Seed {active} is the latest run without "
+                         "a final summary.")
+        if completed:
+            observed = completed[0]
+            progress_text += (f" Completed seed {observed['training_seed']}: "
+                f"{observed['success_rate']:.1%} success, "
+                f"{observed['avg_hops_success']:.2f} mean hops among successful episodes.")
+        work_rows.append(["Five-seed stability campaign", progress_text,
+            "Inter-seed spread and confidence summaries are withheld until all planned seeds finish. "
+            "A training-seed interval is distinct from an episode-level interval."])
     work_table = Table([[paragraph(str(cell), styles["RoadCellHead"] if i == 0 else styles["RoadCell"])
                          for cell in row] for i, row in enumerate(work_rows)],
                        colWidths=[1.05 * inch, 3.25 * inch, 2.88 * inch], repeatRows=1)
@@ -205,9 +232,14 @@ def main() -> None:
          "Fiber formula consistency, configured FSO anchor sampling, and temporal correlation. No matched device/channel calibration or measured traces."],
         ["P0-3 link sensitivity", "DONE - diagnostic" if sensitivity else "IN PROGRESS",
          "Rate-ratio, QBER-margin, and hard outage-mask tests vary simulator policy inputs only."],
-        ["P0-4 five training seeds", "DONE - fixed protocol" if training_report and
+        ["P0-4 QBER stress", "PARTIAL",
+         "Controlled action-probability sweep covers QBER 0.01, 0.03, 0.05, 0.07, 0.09, 0.10, 0.109 and 0.111. The out-of-threshold candidate is masked. Route success, entropy, and preference curves across endpoint/weather conditions remain."],
+        ["P0-5 FSO stress", "PARTIAL",
+         "A 0.01x-100x Cn2 input sweep, season/hour quality samples, configured marginal availability, and an outage-mask counterfactual exist. Action-level response only: no route outcomes; pointing/background parameters are fixed and outage-persistence bursts are unsupported."],
+        ["P0-6 five training seeds", "DONE - fixed protocol" if training_report and
          training_report.get("status") == "complete" and training_report.get("training_seed_count") == 5
-         else "IN PROGRESS",
+         else (f"IN PROGRESS - {training_progress.get('completed_seed_count', 0)}/"
+               f"{len(training_progress.get('planned_seeds', []))} complete" if training_progress else "IN PROGRESS"),
          (f"Five independent policies, each trained for "
           f"{training_report['fixed_training_budget']['ppo_epochs']} PPO epochs and evaluated on "
           "the same held-out simulator seeds. Results vary across fitted policies; this does not "
@@ -241,7 +273,7 @@ def main() -> None:
           "Report success, successful-route hops, revisits, action-mask violations, and route outcomes; "
           "do not infer network capacity or superiority from reward alone. Preserve baseline failures as "
           "observed outcomes and state each baseline definition.", styles["RoadBody"]),
-        paragraph("Next priorities are held-out endpoint/weather experiments and matched-budget ablations. The Johann-style "
+        paragraph("Finish the remaining QBER/FSO stress outcomes and the five-seed campaign, then run held-out endpoint/weather experiments and matched-budget ablations. The Johann-style "
           "demand/QKP study is a separate extension and depends on absolute key-resource units and a "
           "time-indexed demand model. Do not present Johann's BB84 equations as implemented until that "
           "model is adopted and validated.", styles["RoadBody"]),
