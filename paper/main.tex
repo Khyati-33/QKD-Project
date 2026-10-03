@@ -10,7 +10,7 @@
 \usepackage{siunitx}
 \usepackage{xcolor}
 \usepackage{hyperref}
-\hypersetup{hidelinks}
+\hypersetup{colorlinks=true,linkcolor=black,urlcolor=black,citecolor=blue}
 \graphicspath{{figures/}}
 
 % Match the base journal's hierarchy while retaining the IEEE two-column layout.
@@ -65,12 +65,30 @@ The paper is organized as follows. Section II formulates the routing setting and
 \subsection{Basic Principles of QKD}
 QKD protocols combine a quantum channel with authenticated classical communication. BB84 uses nonorthogonal signal states to allow the communicating parties to estimate disturbance and distill key material \cite{bennett1984}. Practical transmitters commonly use weak coherent pulses rather than ideal single-photon sources. Decoy-state methods use pulses with different intensities to estimate single-photon contributions and counter photon-number-splitting attacks \cite{hwang2003,lo2005}.
 
+Fig.~\ref{fig:basic-qkd} gives a generic two-party QKD channel diagram for orientation. It is a conceptual illustration and does not depict the simulator's network or protocol implementation.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{basic_qkd_channels.png}
+\caption{Conceptual two-party QKD arrangement with quantum, public-interaction, and traditional data channels. This project-provided illustration is not a simulator output; its original source is not recorded in the repository.}
+\label{fig:basic-qkd}
+\end{figure}
+
 Finite-key operation must include statistical fluctuations, error-correction leakage, and security parameters. Asymptotic rate formulas are useful for link-level screening, but they do not by themselves certify a finite block. Entropic uncertainty and composable security analyses provide established foundations for finite-size bounds \cite{gllp2004,tomamichel2012,lim2014}. For STN chains, the parties and parity announcements couple information across links. A finite-key bound for such a chain is therefore protocol-specific and cannot be replaced by summing independent per-link asymptotic rates \cite{krawec2024}.
 
 \subsection{Generation and Relaying of Secret Keys}
 In a conventional trusted-node chain, neighboring QKD modules establish link keys. The network forwards end-to-end key material through trusted relays, commonly using one-time-pad operations. For a path with link key rates $R_i$, the instantaneous end-to-end service rate is limited by the slowest required resource, and practical delivery also depends on stored key inventory and demand. Key pools therefore couple routing decisions over time \cite{ituY3803,johann2024}.
 
-The simulator's default link utility is a normalized rate proxy, not a throughput in bits per second. A fiber channel is attenuated as a function of distance, and a detector model contributes efficiency and dark counts. The code computes a QBER proxy and a rate proxy from these quantities. The optional finite-key BB84 mode adds decoy-state and uncertainty terms, but has not been independently verified as a composable proof against measured detection counts. Fig. 1 illustrates the configured distance-dependent proxy under selected channel scenarios.
+The conceptual network and resource diagram in Fig.~\ref{fig:hybrid-resources} illustrates these ideas. Its node names, link layout, resource-slot depiction, and feasibility conditions are illustrative and differ from the seven-city topology and implemented resource model evaluated in this paper.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.98\textwidth,height=0.72\textheight,keepaspectratio]{hybrid_qkd_resources.png}
+\caption{Illustrative hybrid QKD network and link key-resource depiction. The topology, node labels, time slots, and resource rules are conceptual; they are not the evaluated simulator graph or a measurement of its key pools. Original source provenance is not recorded in the repository.}
+\label{fig:hybrid-resources}
+\end{figure*}
+
+The simulator's default link utility is a normalized rate proxy, not a throughput in bits per second. A fiber channel is attenuated as a function of distance, and a detector model contributes efficiency and dark counts. The code computes a QBER proxy and a rate proxy from these quantities. The optional finite-key BB84 mode adds decoy-state and uncertainty terms, but has not been independently verified as a composable proof against measured detection counts. Fig.~\ref{fig:ratedistance} illustrates the configured distance-dependent proxy under selected channel scenarios.
 
 \begin{figure}[t]
 \centering
@@ -99,6 +117,15 @@ GNNs represent relationships among nodes and edges through message passing. Grap
 \section{Simulator Architecture and Experimental Setup}
 \subsection{Architecture}
 The simulator has four logical components: topology and link profiles, a time-stepped environment, a routing policy, and an evaluation layer. The topology represents QKD-capable sites and candidate communication links. The environment samples channel conditions, enforces link security and reachability constraints, tracks route history and key-pool state, and returns an observation and reward. The policy selects a next-hop action. Evaluation replays fixed seeds and compares learned policies with conventional baselines. The present software does not implement a production key-management plane or a QKD device control interface.
+
+Fig.~\ref{fig:routing-framework-illustration} presents a project-provided overview of a graph-learning routing workflow. It is a conceptual companion to the implementation description; labels in the diagram should not be read as an exact inventory of current observation features or as a measured system architecture.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.98\textwidth,height=0.72\textheight,keepaspectratio]{hybrid_routing_framework.png}
+\caption{Illustrative graph reinforcement-learning workflow for hybrid fiber/FSO QKD routing. The diagram is conceptual and is not an exact specification of the evaluated code path; its original source provenance is not recorded in the repository.}
+\label{fig:routing-framework-illustration}
+\end{figure*}
 
 \begin{figure}[t]
 \centering
@@ -147,7 +174,7 @@ FSO temporal correlation & 0.85 & uncalibrated assumption\\
 
 FSO turbulence is represented with a correlated latent log-$C_n^2$ process. The environment samples availability and channel conditions by time step; FSO corridor outages are held fixed for the episode to avoid a bypass disappearing between its relay segments. These choices create repeatable stress scenarios. They are not observations of weather on the modeled routes. A detailed parameter ledger and provenance categories are supplied in \texttt{PHYSICS\_EVIDENCE.md}.
 
-The implemented FSO model uses a correlated log-normal turbulence process with atmospheric, diffraction, pointing, and background terms. It does not implement a Gamma-Gamma irradiance model or a generalized amplitude-damping channel. Detector and channel noise enter through the project's QBER and rate calculations. Fig. 5 summarizes this implemented coupling; the optional finite-key estimator remains a simplified engineering model.
+The implemented FSO model uses a correlated log-normal turbulence process with atmospheric, diffraction, pointing, and background terms. It does not implement a Gamma-Gamma irradiance model or a generalized amplitude-damping channel. Detector and channel noise enter through the project's QBER and rate calculations. Fig.~\ref{fig:physcoupling} summarizes this implemented coupling; the optional finite-key estimator remains a simplified engineering model.
 
 \begin{figure}[t]
 \centering
@@ -189,6 +216,15 @@ Action mask & Edge is adjacent, passes the edge QBER threshold, has positive mod
 
 \subsubsection{Training and Evaluation Setup}
 The GNN policy uses three message-passing layers, a shared actor-critic trunk, and a masked action head. The implementation uses a monotone log-rate prior and an explicit distance-progress prior. Behavior cloning can initialize the policy from shortest-path demonstrations before PPO fine-tuning. PPO uses clipped policy updates, generalized advantage estimation, reward normalization, gradient clipping, and checkpointed normalization state. The optional attention model is implemented in \texttt{qkd\_attention.py}; the GNN-PPO runs summarized below use the graph policy configuration specified in their saved YAML files.
+
+The project figure in Fig.~\ref{fig:training-curves-illustration} contains training-curve traces for several named policies. Their underlying data and generation procedure are not present in the repository, and the plotted 50{,}000-epoch scale does not match the 50-epoch PPO checkpoint evaluated here. We therefore retain it only as an illustration and do not use it as evidence for any result in this paper.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=0.98\textwidth,height=0.72\textheight,keepaspectratio]{training_curves_illustration.png}
+\caption{Project-provided illustrative training-curve comparison. The traces are not the archived experiment data, and the 50{,}000-epoch axis is inconsistent with the 50-epoch checkpoint reported in this paper. No quantitative claim in this work is based on this figure; its original source provenance is not recorded in the repository.}
+\label{fig:training-curves-illustration}
+\end{figure*}
 
 \begin{table}[t]
 \caption{GNN-PPO checkpoint and paired transfer-evaluation protocol}
