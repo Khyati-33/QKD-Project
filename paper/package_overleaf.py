@@ -50,6 +50,7 @@ files = {
     "pair_season_matrix_20261002.json": "paper/supplementary/pair_season_matrix_20261002.json",
     "pair_season_matrix_20261002.csv": "paper/supplementary/pair_season_matrix_20261002.csv",
     "pair_season_matrix_source.py": "scripts/run_pair_season_matrix.py",
+    "reward_component_audit_source.py": "scripts/run_reward_component_audit.py",
     "pair_season_analysis_source.py": "scripts/analyze_pair_season_matrix.py",
     "archive_training_seed_source.py": "scripts/archive_training_seed_evidence.py",
     "inference_profile_source.py": "scripts/benchmark_inference_profile.py",

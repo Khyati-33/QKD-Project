@@ -1,0 +1,197 @@
+{
+  "status": "paired_reward_component_audit",
+  "created_utc": "2026-10-03T09:12:58.506864+00:00",
+  "config": "configs\\defence_monsoon_night_50ep_idq.yaml",
+  "checkpoint": "experiments\\runs\\defence_monsoon_night_50ep_idq_20260928T044715Z_c84be8c5\\checkpoints\\GNN\\latest.pt",
+  "checkpoint_sha256": "154c8a81e4335b2bd609999155d785b5f1eaeedf8f5cd90e62023d795a368b27",
+  "scenario_count_per_policy": 108,
+  "episodes_per_policy": 108,
+  "policies": [
+    "GNN-PPO",
+    "Random",
+    "Dijkstra-km",
+    "BFS-hop",
+    "Max-SKR"
+  ],
+  "implemented_baselines_only": true,
+  "weighted_shortest_path_note": "Not included; no Weighted-SP implementation exists in this repository.",
+  "scenarios": {
+    "endpoint_pairs": [
+      [
+        "Delhi",
+        "Mumbai"
+      ],
+      [
+        "Mumbai",
+        "Chennai"
+      ],
+      [
+        "Kolkata",
+        "Delhi"
+      ],
+      [
+        "Bangalore",
+        "Hyderabad"
+      ],
+      [
+        "Jaipur",
+        "Kolkata"
+      ],
+      [
+        "Hyderabad",
+        "Mumbai"
+      ]
+    ],
+    "conditions": {
+      "normal_0200": [
+        "normal",
+        2.0
+      ],
+      "normal_2200": [
+        "normal",
+        22.0
+      ],
+      "summer": [
+        "summer",
+        22.0
+      ],
+      "winter": [
+        "winter",
+        22.0
+      ],
+      "monsoon_0200": [
+        "monsoon",
+        2.0
+      ],
+      "monsoon_2200": [
+        "monsoon",
+        22.0
+      ]
+    },
+    "seeds": [
+      0,
+      1,
+      2
+    ]
+  },
+  "condition_hour_note": "summer and winter are evaluated at 22:00 because the supplied condition labels specify no hour; time jitter is disabled so condition hours remain matched.",
+  "interpretation_note": "Environment seeds and starting conditions are paired; later channel states can diverge because each policy visits a different route. Results are simulated, route-level measurements.",
+  "scope_note": "No network-wide demand blocking, key-pool load balancing, deployed service tests, or field validation are measured.",
+  "summary": [
+    {
+      "policy": "GNN-PPO",
+      "episodes": 108,
+      "success_rate": 0.9444444444444444,
+      "mean_hops_successful": 15.784313725490197,
+      "mean_total_reward": -5.2600532408228275,
+      "mean_progress": 2.57346004055606,
+      "mean_margin": 11.33198654633176,
+      "mean_skr": 0.33683695880522246,
+      "mean_pool_level": 5.107226321659332,
+      "mean_pool_delta": -0.5671834787890471,
+      "mean_latency": -0.21702314802640738,
+      "mean_energy": -0.21702314802640738,
+      "mean_congestion": -22.037037037037038,
+      "mean_step_cost": -0.7898148148148152,
+      "mean_revisit": -0.7444444444444442,
+      "mean_switch": -0.07407407407407407,
+      "mean_backtrack": -0.4074074074074074,
+      "mean_arrival": 3.7777777777777777,
+      "mean_security_penalty": 0.0,
+      "mean_depletion_penalty": -3.3333333333333335,
+      "mean_failure_penalty": 0.0
+    },
+    {
+      "policy": "Random",
+      "episodes": 108,
+      "success_rate": 0.0,
+      "mean_hops_successful": "",
+      "mean_total_reward": -210.1932058302057,
+      "mean_progress": -0.43723913066111697,
+      "mean_margin": -5.184777752146601,
+      "mean_skr": -0.2814736351763666,
+      "mean_pool_level": -2.608466121398266,
+      "mean_pool_delta": 0.3085092429472169,
+      "mean_latency": -0.4726569946630671,
+      "mean_energy": -0.4726569946630671,
+      "mean_congestion": -47.51851851851852,
+      "mean_step_cost": -6.914814814814819,
+      "mean_revisit": -62.56666666666661,
+      "mean_switch": -3.3777777777777773,
+      "mean_backtrack": -36.4537037037037,
+      "mean_arrival": 0.0,
+      "mean_security_penalty": 0.0,
+      "mean_depletion_penalty": -42.77777777777778,
+      "mean_failure_penalty": -1.4351851851851851
+    },
+    {
+      "policy": "Dijkstra-km",
+      "episodes": 108,
+      "success_rate": 0.4444444444444444,
+      "mean_hops_successful": 114.25,
+      "mean_total_reward": 36.605022218271195,
+      "mean_progress": 2.0509481682890116,
+      "mean_margin": 64.52157209665319,
+      "mean_skr": 3.7997621306612035,
+      "mean_pool_level": 32.82208147587265,
+      "mean_pool_delta": -3.646577788995372,
+      "mean_latency": -0.16328008025293037,
+      "mean_energy": -0.16328008025293037,
+      "mean_congestion": -19.12037037037037,
+      "mean_step_cost": -4.967129629629621,
+      "mean_revisit": -4.744444444444444,
+      "mean_switch": -0.2518518518518518,
+      "mean_backtrack": -1.9768518518518519,
+      "mean_arrival": 1.7777777777777777,
+      "mean_security_penalty": 0.0,
+      "mean_depletion_penalty": -33.333333333333336,
+      "mean_failure_penalty": 0.0
+    },
+    {
+      "policy": "BFS-hop",
+      "episodes": 108,
+      "success_rate": 1.0,
+      "mean_hops_successful": 15.833333333333334,
+      "mean_total_reward": 1.9106207066197072,
+      "mean_progress": 2.7681849257890176,
+      "mean_margin": 12.133333333333338,
+      "mean_skr": 0.35815853558388033,
+      "mean_pool_level": 5.455229340890805,
+      "mean_pool_delta": -0.6048288912897858,
+      "mean_latency": -0.23167271328821537,
+      "mean_energy": -0.23167271328821537,
+      "mean_congestion": -20.47222222222222,
+      "mean_step_cost": -0.7916666666666671,
+      "mean_revisit": -0.24999999999999997,
+      "mean_switch": -0.05555555555555555,
+      "mean_backtrack": -0.16666666666666666,
+      "mean_arrival": 4.0,
+      "mean_security_penalty": 0.0,
+      "mean_depletion_penalty": 0.0,
+      "mean_failure_penalty": 0.0
+    },
+    {
+      "policy": "Max-SKR",
+      "episodes": 108,
+      "success_rate": 0.0,
+      "mean_hops_successful": "",
+      "mean_total_reward": -140.04968767886874,
+      "mean_progress": -0.06450127243330453,
+      "mean_margin": -2.074498102209549,
+      "mean_skr": -0.14452792220099356,
+      "mean_pool_level": -1.1745144424273457,
+      "mean_pool_delta": 0.1642610814635718,
+      "mean_latency": -0.08327758460463339,
+      "mean_energy": -0.08327758460463339,
+      "mean_congestion": -42.157407407407405,
+      "mean_step_cost": -2.6726851851851823,
+      "mean_revisit": -26.75555555555556,
+      "mean_switch": -0.022222222222222227,
+      "mean_backtrack": -14.148148148148149,
+      "mean_arrival": 0.0,
+      "mean_security_penalty": 0.0,
+      "mean_depletion_penalty": -50.0,
+      "mean_failure_penalty": -0.8333333333333334
+    }
+  ]
+}
