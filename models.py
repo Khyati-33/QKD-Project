@@ -1,4 +1,4 @@
-"""Graph-aware GNN and deliberately graph-blind LSTM actor-critic models."""
+"""Graph-aware and graph-blind actor-critic models for QKD next-hop routing."""
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
@@ -46,6 +46,20 @@ class LSTMNodeProcessor(nn.Module):
             node_features = node_features.unsqueeze(0)
         outputs, _ = self.lstm(node_features)
         return outputs
+
+
+class MLPNodeProcessor(nn.Module):
+    """Pointwise node encoder; it never aggregates neighboring node state."""
+    def __init__(self, node_feature_dim: int, hidden_dim: int):
+        super().__init__()
+        self.network = nn.Sequential(
+            nn.Linear(node_feature_dim, hidden_dim), nn.ReLU(),
+            nn.Linear(hidden_dim, hidden_dim), nn.ReLU(),
+            nn.Linear(hidden_dim, hidden_dim), nn.ReLU(),
+        )
+
+    def forward(self, node_features: torch.Tensor) -> torch.Tensor:
+        return self.network(node_features)
 
 
 class _LearnedMessageLayer(MessagePassing):
@@ -159,6 +173,20 @@ class LSTMActorCritic(ActorCriticBase):
                  hidden_dim: int = 64):
         super().__init__(node_feature_dim, edge_feature_dim, hidden_dim)
         self.encoder = LSTMNodeProcessor(node_feature_dim, hidden_dim)
+
+    def forward(self, observation: Mapping[str, Any]) -> tuple[torch.Tensor, torch.Tensor]:
+        device = next(self.parameters()).device
+        node_features = _tensor(observation["node_features"], device, torch.float32)
+        embeddings = self.encoder(node_features)
+        return self._forward_encoded(embeddings, observation)
+
+
+class MLPActorCritic(ActorCriticBase):
+    """Graph-blind control sharing GNN candidate scorer, critic, and action mask."""
+    def __init__(self, node_feature_dim: int = 5, edge_feature_dim: int = 9,
+                 hidden_dim: int = 64):
+        super().__init__(node_feature_dim, edge_feature_dim, hidden_dim)
+        self.encoder = MLPNodeProcessor(node_feature_dim, hidden_dim)
 
     def forward(self, observation: Mapping[str, Any]) -> tuple[torch.Tensor, torch.Tensor]:
         device = next(self.parameters()).device

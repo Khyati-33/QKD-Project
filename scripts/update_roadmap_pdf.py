@@ -56,6 +56,10 @@ def main() -> None:
                         "inference_profile_20261002.json")
     parser.add_argument("--ablation-report", type=Path, default=ROOT / "paper" / "supplementary" /
                         "matched_budget_ablations_20261002.json")
+    parser.add_argument("--strict-report", type=Path, default=ROOT / "experiments" /
+                        "final_holdout_20261007.json")
+    parser.add_argument("--reward-audit", type=Path, default=ROOT / "experiments" /
+                        "final_reward_audit_20261007" / "audit_summary.json")
     parser.add_argument("--roadmap", type=Path, default=ROOT /
                         "QKD_Routing_Agent_Research_Roadmap_QSMS_Style.pdf")
     parser.add_argument("--output", type=Path)
@@ -76,6 +80,11 @@ def main() -> None:
     transfer_report = read_json(args.transfer_report) if args.transfer_report.exists() else None
     inference_profile = read_json(args.inference_profile) if args.inference_profile.exists() else None
     ablation_report = read_json(args.ablation_report) if args.ablation_report.exists() else None
+    strict_report = read_json(args.strict_report) if args.strict_report.exists() else None
+    reward_audit = read_json(args.reward_audit) if args.reward_audit.exists() else None
+    strict_complete = bool(strict_report and strict_report.get("status") == "complete")
+    final_training_complete = strict_complete and len(
+        strict_report.get("trained_checkpoint_manifest", [])) == 10
     ablation_progress_files = sorted((ROOT / "experiments" / "runs").glob(
         "matched_ablations_*/progress.json"), key=lambda path: path.stat().st_mtime)
     ablation_progress = read_json(ablation_progress_files[-1]) if ablation_progress_files else None
@@ -159,7 +168,20 @@ def main() -> None:
          (sensitivity_result if sensitivity else "Controlled rate/QBER/outage sensitivity output is not yet present."),
          "A policy-input diagnostic does not establish link-measurement validity or route-level performance."],
     ]
-    if training_report and training_report.get("status") == "complete" and \
+    if final_training_complete:
+        seed_rates = strict_report["training_seed_uncertainty_success_rate"]
+        nested = strict_report["nested_training_and_scenario_bootstrap_success_rate_ci95"]
+        gnn_ci = nested["GNN-PPO"]["ci95"]
+        mlp_ci = nested["MLP-PPO"]["ci95"]
+        work_rows.append(["Independent training-seed stability",
+            f"Five independent checkpoints per architecture were completed. GNN mean success "
+            f"{seed_rates['GNN-PPO']['mean']:.1%} (SD {seed_rates['GNN-PPO']['std_sample']:.1%}; "
+            f"nested 95% interval {gnn_ci[0]:.1%}-{gnn_ci[1]:.1%}); MLP mean success "
+            f"{seed_rates['MLP-PPO']['mean']:.1%} (SD {seed_rates['MLP-PPO']['std_sample']:.1%}; "
+            f"nested interval {mlp_ci[0]:.1%}-{mlp_ci[1]:.1%}).",
+            "Variability is across fitted policies and scenario clusters in this simulator protocol; "
+            "it is not external validation."])
+    elif training_report and training_report.get("status") == "complete" and \
             training_report.get("training_seed_count") == 5:
         gnn = training_report["aggregate_across_independent_training_seeds"]["GNN-PPO"]
         success = gnn["success_rate"]
@@ -251,6 +273,48 @@ def main() -> None:
             f"{len(completed_variants)}/{len(ablation_progress.get('planned_variants', []))} "
             "conditions complete at the shared 50-epoch budget." + running_detail,
             "Single training seed; progress is not a completed comparative result."])
+    if strict_report and strict_report.get("status") == "complete":
+        seed_rates = strict_report["training_seed_uncertainty_success_rate"]
+        nested = strict_report["nested_training_and_scenario_bootstrap_success_rate_ci95"]
+        bfs_rate = strict_report["baseline_summary"]["BFS-hop"]["success_rate"]
+        gnn = seed_rates["GNN-PPO"]
+        mlp = seed_rates["MLP-PPO"]
+        gnn_ci = nested["GNN-PPO"]["ci95"]
+        mlp_ci = nested["MLP-PPO"]["ci95"]
+        def mean_hops(method):
+            values = [value["successful_mean_hops"] for key, value in
+                strict_report["summary_by_method_training_seed"].items()
+                if key.startswith(method + "|") and value["successful_mean_hops"] is not None]
+            return (sum(values) / len(values)) if values else None
+        gnn_hops, mlp_hops = mean_hops("GNN-PPO"), mean_hops("MLP-PPO")
+        outage_level = max(strict_report["fiber_outage_stress_levels"])
+        outage_rates = {}
+        for method in ("GNN-PPO", "MLP-PPO"):
+            values = [value["success_rate"] for key, value in
+                strict_report["fiber_outage_stress_summary_by_training_seed"].items()
+                if key.startswith(f"{method}|outage={outage_level:.2f}|")]
+            outage_rates[method] = sum(values) / len(values) if values else None
+        work_rows.append(["Strict matched held-out evaluation",
+            f"Five GNN and five MLP policies were evaluated on the same 108 held-out scenarios. "
+            f"Training-seed mean success: GNN {gnn['mean']:.1%} (SD {gnn['std_sample']:.1%}; "
+            f"nested 95% interval {gnn_ci[0]:.1%}-{gnn_ci[1]:.1%}), MLP "
+            f"{mlp['mean']:.1%} (SD {mlp['std_sample']:.1%}; nested interval "
+            f"{mlp_ci[0]:.1%}-{mlp_ci[1]:.1%}), BFS {bfs_rate:.1%}. "
+            f"Mean successful hops across seeds: GNN {gnn_hops:.2f}, MLP {mlp_hops:.2f}. "
+            f"At {outage_level:.0%} fiber outage, GNN/MLP mean success was "
+            f"{outage_rates['GNN-PPO']:.1%}/{outage_rates['MLP-PPO']:.1%}.",
+            "Paired scenario IDs; five fitted policies per learned architecture; intervals resample "
+            "training seeds outside scenario clusters. Simulator results, not field validation."])
+    if reward_audit and reward_audit.get("status") == "complete":
+        audit_summary = reward_audit["reward_term_summary"]
+        work_rows.append(["Final-checkpoint reward decomposition",
+            f"One final GNN seed and its matched MLP seed were decomposed over "
+            f"{reward_audit['scenario_count_per_policy']} scenarios against BFS-hop. "
+            f"Route success: GNN {audit_summary['GNN-PPO']['success_rate']:.1%}, "
+            f"MLP {audit_summary['MLP-PPO']['success_rate']:.1%}, "
+            f"BFS {audit_summary['BFS-hop']['success_rate']:.1%}.",
+            "Reward components are descriptive shaped-return contributions; route metrics remain "
+            "the primary comparison and this one-seed audit does not estimate seed uncertainty."])
     work_table = Table([[paragraph(str(cell), styles["RoadCellHead"] if i == 0 else styles["RoadCell"])
                          for cell in row] for i, row in enumerate(work_rows)],
                        colWidths=[1.05 * inch, 3.25 * inch, 2.88 * inch], repeatRows=1)
@@ -311,32 +375,42 @@ def main() -> None:
          "Rate-ratio, QBER-margin, and hard outage-mask tests vary simulator policy inputs only."],
         ["P0-4 QBER stress", "PARTIAL",
          "Controlled action-probability sweep covers QBER 0.01, 0.03, 0.05, 0.07, 0.09, 0.10, 0.109 and 0.111. The out-of-threshold candidate is masked. Route success, entropy, and preference curves across endpoint/weather conditions remain."],
-        ["P0-5 FSO stress", "PARTIAL",
-         "A 0.01x-100x Cn2 input sweep, season/hour quality samples, configured marginal availability, and an outage-mask counterfactual exist. Action-level response only: no route outcomes; pointing/background parameters are fixed and outage-persistence bursts are unsupported."],
-        ["P0-6 five training seeds", "DONE - fixed protocol" if training_report and
-         training_report.get("status") == "complete" and training_report.get("training_seed_count") == 5
-         else (f"IN PROGRESS - {training_progress.get('completed_seed_count', 0)}/"
-               f"{len(training_progress.get('planned_seeds', []))} complete" if training_progress else "IN PROGRESS"),
-         (f"Five independent policies, each trained for "
-          f"{training_report['fixed_training_budget']['ppo_epochs']} PPO epochs and evaluated on "
-          "the same held-out simulator seeds. Results vary across fitted policies; this does not "
-          "establish endpoint/weather generalization." if training_report and
-          training_report.get("status") == "complete" and training_report.get("training_seed_count") == 5 else
-          "Five independent full-budget training runs are not present. Evaluation episodes for one checkpoint do not substitute for training-seed replication.")],
-        ["P1 endpoint / weather holdouts", "PARTIAL - transfer matrix" if transfer_report else "PARTIAL",
-         (f"Paired across-pair and season/time matrix is archived ({transfer_report['summary_by_method']['GNN-PPO']['episodes']} episodes per policy) with Wilson intervals. GNN success was {transfer_report['summary_by_method']['GNN-PPO']['success_rate']:.1%} versus BFS {transfer_report['summary_by_method']['BFS-hop']['success_rate']:.1%}; successful mean hops were {transfer_report['summary_by_method']['GNN-PPO']['successful_mean_hops']:.2f} versus {transfer_report['summary_by_method']['BFS-hop']['successful_mean_hops']:.2f}. BC endpoint randomization prevents a strict endpoint-holdout claim." if transfer_report else
-          "The current checkpoint was run on 42 ordered pairs (31/42 success), plus earlier adverse-condition episodes. These are coverage diagnostics, not held-out endpoint/weather tests.")],
+        ["P0-5 FSO / outage stress", "DONE - paired route stress" if strict_complete else "PARTIAL",
+          (f"Paired route outcomes are archived at outage probabilities "
+           f"{', '.join(f'{p:.0%}' for p in strict_report['fiber_outage_stress_levels'])}. "
+           "These are simulator stress scenarios; pointing/background parameters remain fixed and "
+           "outage-persistence bursts are not separately calibrated." if strict_complete else
+           "A 0.01x-100x Cn2 input sweep, season/hour quality samples, configured marginal availability, and an outage-mask counterfactual exist. Route-level outage outcomes are pending; pointing/background parameters are fixed and outage-persistence bursts are unsupported.")],
+        ["P0-6 five training seeds", "DONE - five GNN + five MLP" if final_training_complete else ("DONE - fixed protocol" if training_report and
+          training_report.get("status") == "complete" and training_report.get("training_seed_count") == 5
+          else (f"IN PROGRESS - {training_progress.get('completed_seed_count', 0)}/"
+                f"{len(training_progress.get('planned_seeds', []))} complete" if training_progress else "IN PROGRESS")),
+          (f"Five independent policies, each trained for "
+           f"{training_report['fixed_training_budget']['ppo_epochs']} PPO epochs and evaluated on "
+           "the same held-out simulator seeds. Results vary across fitted policies; this does not "
+           "establish endpoint/weather generalization." if training_report and
+           training_report.get("status") == "complete" and training_report.get("training_seed_count") == 5 else
+           ("Five GNN and five matched MLP full-budget runs are complete and their checkpoint hashes are recorded in the strict evaluation report." if final_training_complete else
+            "Five independent full-budget training runs are not present. Evaluation episodes for one checkpoint do not substitute for training-seed replication."))],
+         ["P1 endpoint / weather holdouts", "DONE - strict paired test" if strict_complete else ("PARTIAL - transfer matrix" if transfer_report else "PARTIAL"),
+           (f"Final report covers {strict_report['unique_scenario_count']} paired held-out endpoint/condition/scenario IDs, "
+              "five trained seeds each for GNN and MLP, four fiber-outage levels, and per-checkpoint CPU latency. "
+              "See the final report and manuscript for estimates and uncertainty." if strict_complete else
+              (f"Paired across-pair and season/time matrix is archived ({transfer_report['summary_by_method']['GNN-PPO']['episodes']} episodes per policy) with Wilson intervals. GNN success was {transfer_report['summary_by_method']['GNN-PPO']['success_rate']:.1%} versus BFS {transfer_report['summary_by_method']['BFS-hop']['success_rate']:.1%}; successful mean hops were {transfer_report['summary_by_method']['GNN-PPO']['successful_mean_hops']:.2f} versus {transfer_report['summary_by_method']['BFS-hop']['successful_mean_hops']:.2f}. BC endpoint randomization prevents a strict endpoint-holdout claim." if transfer_report else
+               "The current checkpoint was run on 42 ordered pairs (31/42 success), plus earlier adverse-condition episodes. These are coverage diagnostics, not held-out endpoint/weather tests."))],
         ["P1 architecture / feature ablations",
-         "DONE - single-seed scope" if ablation_report else
-         (f"IN PROGRESS ({len(ablation_progress.get('completed_variants', []))}/"
-          f"{len(ablation_progress.get('planned_variants', []))})" if ablation_progress else "TODO"),
-         ("Matched-budget results archive width, node-feature, DropEdge, and SKR reward sensitivities. "
-          "Single-seed results do not quantify training-seed variability." if ablation_report else
-          ("Matched 50-epoch baseline, geographic-feature, no-SKR-reward, no-DropEdge, and width-32 runs are underway." if ablation_progress else
-           "No matched-budget GNN feature, architecture, or reward ablation set is archived."))],
-        ["P1 inference cost", "PARTIAL - profiled" if inference_profile else "PARTIAL",
-         ("Repeated per-decision CPU latency, p50/p95/p99, thread counts, host details, and process/model memory are archived across 42 ordered pairs. This remains a one-host, one-topology simulator profile; no graph-size scaling or deployment claim." if inference_profile else
-          "Current checkpoint: 42-pair local inference had 3.83 ms median and 4.34 ms p95 decision latency. It is one host/scenario; report tail latency, memory, and scaling before deployment claims.")],
+          "DONE - single-seed scope" if ablation_report else "DEFERRED - outside current scope",
+          ("Matched-budget results archive width, node-feature, DropEdge, and SKR reward sensitivities. "
+           "Single-seed results do not quantify training-seed variability." if ablation_report else
+           (f"An earlier campaign stopped during the baseline at PPO epoch "
+            f"{(ablation_progress.get('training_state') or {}).get('ppo_epoch', 0)}/"
+            f"{(ablation_progress.get('training_state') or {}).get('target_ppo_epochs', 50)}; "
+            "no ablation comparison is used in the manuscript and the campaign is deferred." if ablation_progress else
+            "No matched-budget GNN feature, architecture, or reward ablation set is used in the manuscript."))],
+         ["P1 inference cost", "DONE - one-host protocol" if strict_complete else ("PARTIAL - profiled" if inference_profile else "PARTIAL"),
+          ("Per-decision latency was measured for all ten final checkpoints with warm-up, four CPU threads, and caching disabled. Results characterize one host/topology only; graph-size scaling and deployment profiling remain open." if strict_complete else
+           ("Repeated per-decision CPU latency, p50/p95/p99, thread counts, host details, and process/model memory are archived across 42 ordered pairs. This remains a one-host, one-topology simulator profile; no graph-size scaling or deployment claim." if inference_profile else
+            "Current checkpoint: 42-pair local inference had 3.83 ms median and 4.34 ms p95 decision latency. It is one host/scenario; report tail latency, memory, and scaling before deployment claims."))],
         ["P1 exact small-graph oracle", "DONE - toy scope" if oracle_report else "TODO",
          ("Exhaustive simple-path reward oracle and policy regret archived for generated 7-node graphs with frozen episode channels. "
           "Does not establish optimality on the full dynamic network." if oracle_report else
@@ -355,15 +429,21 @@ def main() -> None:
         ("VALIGN", (0, 0), (-1, -1), "TOP"), ("LEFTPADDING", (0, 0), (-1, -1), 5),
         ("RIGHTPADDING", (0, 0), (-1, -1), 5), ("TOPPADDING", (0, 0), (-1, -1), 4),
         ("BOTTOMPADDING", (0, 0), (-1, -1), 4)]))
+    next_work = ("The strict five-seed endpoint/weather and paired outage evaluation, selected-checkpoint "
+        "reward decomposition, final figures, and revised manuscript are complete. Before submission, "
+        "the authors should fill the author/funding block and verify the final package in their target "
+        "venue template. The demand/QKP service-capacity study and external device/weather validation "
+        "remain deferred extensions outside this completion." if strict_complete else
+        "Complete the five-seed training and strict held-out endpoint/weather evaluation before making "
+        "final comparative claims. Then update the manuscript and evidence package. The demand/QKP "
+        "service-capacity study and external device/weather validation remain separate extensions.")
     story += [status_table, Spacer(1, 8), paragraph("4. Interpretation and next work", styles["RoadSection"]),
         paragraph("The corrected comparison supports a route-level simulator statement only. "
           "Report success, successful-route hops, revisits, action-mask violations, and route outcomes; "
           "do not infer network capacity or superiority from reward alone. Preserve baseline failures as "
           "observed outcomes and state each baseline definition.", styles["RoadBody"]),
-        paragraph("Finish the remaining QBER/FSO stress outcomes and the five-seed campaign, then run held-out endpoint/weather experiments and matched-budget ablations. The Johann-style "
-          "demand/QKP study is a separate extension and depends on absolute key-resource units and a "
-          "time-indexed demand model. Do not present Johann's BB84 equations as implemented until that "
-          "model is adopted and validated.", styles["RoadBody"]),
+        paragraph(next_work + " Do not present the demand-level BB84/QKP formulation as implemented "
+          "until an absolute key-resource and demand model is adopted and validated.", styles["RoadBody"]),
         *([paragraph(f"Regression check: {test_report['passed']} tests passed, "
           f"{test_report['failed']} failed in {test_report['duration_seconds']:.1f} s; "
           f"{len(test_report.get('warnings', []))} warning(s) recorded. Details: "

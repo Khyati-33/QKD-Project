@@ -36,8 +36,19 @@ def _run_episode(policy, env: QKDRoutingEnv, seed: int, max_steps: int | None = 
     invalid_action_count = 0
     no_valid_action_states = 0
     link_type_counts = {"fiber": 0, "fso": 0}
+    policy_entropies = []
     for _ in range(max_steps or env.max_steps):
-        action = _policy_action(policy, obs, env)
+        if not isinstance(policy, BaselinePolicy) and np.any(obs["edge_valid_mask"]):
+            import torch
+            from torch.distributions import Categorical
+            with torch.no_grad():
+                logits, _ = policy(obs)
+                policy_entropies.append(float(Categorical(logits=logits).entropy().mean()))
+                # The deterministic actor uses the same masked-logit argmax.
+                # Reuse this forward pass instead of evaluating the encoder twice.
+                action = int(logits[0].argmax().item())
+        else:
+            action = _policy_action(policy, obs, env)
         neighbor_count = int(obs.get("neighbor_count", 0))
         valid_mask = obs["edge_valid_mask"][:neighbor_count]
         if not bool(np.any(valid_mask)):
@@ -61,6 +72,8 @@ def _run_episode(policy, env: QKDRoutingEnv, seed: int, max_steps: int | None = 
             "source": env.source, "destination": env.destination,
             "hops": len(route) - 1 if success else None,
             "route": route, "revisits": len(route) - len(set(route)),
+            "mean_policy_entropy": (float(np.mean(policy_entropies))
+                                    if policy_entropies else None),
             "qber_skr_validity": {"checked_edges": len(physical_checks),
                 "valid_edges": sum(physical_checks), "invalid_edges": len(physical_checks) - sum(physical_checks),
                 "valid_rate": float(np.mean(physical_checks)) if physical_checks else None},
@@ -114,6 +127,9 @@ def evaluate_policy(policy, *, seasons: tuple[str, ...] = SEASONS,
                               "success": r["success"], "hops": r["hops"]} for r in runs],
             "success_rate": len(successes) / len(runs),
             "avg_hops_success": float(np.mean([r["hops"] for r in successes])) if successes else None,
+            "mean_policy_entropy": (float(np.mean([r["mean_policy_entropy"] for r in runs
+                    if r.get("mean_policy_entropy") is not None])) if any(
+                    r.get("mean_policy_entropy") is not None for r in runs) else None),
             "hop_ratio_to_optimal": (float(np.mean([r["hops"] for r in successes])) / 23.0
                                      if successes else None),
             "episodes": len(runs),
@@ -128,6 +144,9 @@ def evaluate_policy(policy, *, seasons: tuple[str, ...] = SEASONS,
         "per_season": summaries,
         "success_rate": len(successes) / len(all_results),
         "avg_hops_success": float(np.mean([r["hops"] for r in successes])) if successes else None,
+        "mean_policy_entropy": (float(np.mean([r["mean_policy_entropy"] for r in all_results
+                if r.get("mean_policy_entropy") is not None])) if any(
+                r.get("mean_policy_entropy") is not None for r in all_results) else None),
         "successful_hop_counts": [r["hops"] for r in successes],
         "optimal_hops": 23,
         "avg_hop_ratio_to_optimal": (float(np.mean([r["hops"] for r in successes])) / 23.0

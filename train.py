@@ -11,14 +11,14 @@ import numpy as np
 import torch
 from torch.distributions import Categorical
 
-from models import GNNActorCritic, LSTMActorCritic, stack_observations
+from models import GNNActorCritic, LSTMActorCritic, MLPActorCritic, stack_observations
 from ppo import (BC_ENTROPY_COEF, CLIP_EPSILON, CRITIC_WARMUP_EPOCHS,
                  INITIAL_ENTROPY_COEF, LEARNING_RATE, RolloutBuffer, RunningRewardNormalizer,
                  compute_gae, load_checkpoint, ppo_update, save_checkpoint)
 from topology import CITIES
 
 
-MODEL_TYPES = {"GNN": GNNActorCritic, "LSTM": LSTMActorCritic}
+MODEL_TYPES = {"GNN": GNNActorCritic, "MLP": MLPActorCritic, "LSTM": LSTMActorCritic}
 
 
 def _teacher_slot(env, observation) -> int:
@@ -76,7 +76,9 @@ def behavior_clone(model, env, *, epochs: int = 15, episodes_per_epoch: int = 8,
                    entropy_coef: float = BC_ENTROPY_COEF, learning_rate: float = 1e-3,
                    checkpoint_dir: str | Path | None = None,
                    start_epoch: int = 0, optimizer=None,
-                   randomize_endpoints: bool = False) -> tuple[Any, list[dict[str, float]]]:
+                   randomize_endpoints: bool = False,
+                   excluded_endpoint_pairs: list[tuple[str, str]] | None = None
+                   ) -> tuple[Any, list[dict[str, float]]]:
     optimizer = optimizer or torch.optim.Adam(model.parameters(), lr=learning_rate)
     # BC is a supervised warm start and needs a useful step size. The main
     # training optimizer is deliberately initialized with PPO's much smaller
@@ -88,6 +90,13 @@ def behavior_clone(model, env, *, epochs: int = 15, episodes_per_epoch: int = 8,
     original_pair = (env.source, env.destination)
     original_randomize = env.randomize_endpoints
     env.randomize_endpoints = False
+    excluded = {tuple(pair) for pair in (excluded_endpoint_pairs or ())}
+    eligible_pairs = [(source, destination) for source in CITIES for destination in CITIES
+                      if source != destination
+                      and (source, destination) not in excluded
+                      and (destination, source) not in excluded]
+    if randomize_endpoints and excluded and not eligible_pairs:
+        raise ValueError("endpoint holdout excludes every behavior-cloning pair")
     for epoch in range(start_epoch, epochs):
         states, labels = [], []
         for episode in range(episodes_per_epoch):
@@ -95,9 +104,12 @@ def behavior_clone(model, env, *, epochs: int = 15, episodes_per_epoch: int = 8,
             options = None
             if randomize_endpoints:
                 pair_rng = random.Random(seed)
-                source = pair_rng.choice(CITIES)
-                destination = pair_rng.choice(tuple(
-                    city for city in CITIES if city != source))
+                if excluded:
+                    source, destination = pair_rng.choice(eligible_pairs)
+                else:
+                    source = pair_rng.choice(CITIES)
+                    destination = pair_rng.choice(tuple(
+                        city for city in CITIES if city != source))
                 options = {"source": source, "destination": destination}
             obs, _ = env.reset(seed=seed, options=options)
             for _ in range(env.max_steps):
@@ -237,7 +249,9 @@ def train_model(model_name: str, env, config: dict[str, Any], output_dir: str | 
             entropy_coef=config.get("bc_entropy_coef", BC_ENTROPY_COEF),
             learning_rate=config.get("bc_learning_rate", 1e-3),
             checkpoint_dir=checkpoint_dir, start_epoch=start_bc_epoch, optimizer=optimizer,
-            randomize_endpoints=bool(config.get("bc_randomize_endpoints", False)))
+            randomize_endpoints=bool(config.get("bc_randomize_endpoints", False)),
+            excluded_endpoint_pairs=[tuple(p) for p in config.get(
+                "bc_excluded_endpoint_pairs", [])])
         history.extend(bc_history)
         critic_parameters = {id(p) for p in model.critic.parameters()}
         for group in optimizer.param_groups:
