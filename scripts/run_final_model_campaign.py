@@ -37,7 +37,7 @@ def sha256_file(path: Path) -> str:
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--model", choices=("GNN", "MLP"), required=True)
+    parser.add_argument("--model", choices=("GNN", "MLP", "LSTM"), required=True)
     parser.add_argument("--config", type=Path,
         default=ROOT / "configs" / "final_holdout_50ep.yaml")
     parser.add_argument("--campaign-dir", type=Path, required=True)

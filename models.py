@@ -173,11 +173,33 @@ class LSTMActorCritic(ActorCriticBase):
                  hidden_dim: int = 64):
         super().__init__(node_feature_dim, edge_feature_dim, hidden_dim)
         self.encoder = LSTMNodeProcessor(node_feature_dim, hidden_dim)
+        self._encoder_cache_enabled = False
+        self._encoder_cache: dict[tuple, torch.Tensor] = {}
+
+    def enable_encoder_cache(self, enabled: bool = True) -> None:
+        """Cache deterministic node embeddings when sequence features repeat."""
+        self._encoder_cache_enabled = bool(enabled)
+        if not enabled:
+            self._encoder_cache.clear()
+
+    def _encode_cached(self, node_features: torch.Tensor) -> torch.Tensor:
+        if (not self._encoder_cache_enabled or torch.is_grad_enabled() or
+                node_features.ndim != 2):
+            return self.encoder(node_features)
+        key = (tuple(parameter._version for parameter in self.encoder.parameters()),
+               node_features.detach().cpu().numpy().tobytes())
+        cached = self._encoder_cache.get(key)
+        if cached is None:
+            cached = self.encoder(node_features).detach()
+            if len(self._encoder_cache) >= 32:
+                self._encoder_cache.pop(next(iter(self._encoder_cache)))
+            self._encoder_cache[key] = cached
+        return cached
 
     def forward(self, observation: Mapping[str, Any]) -> tuple[torch.Tensor, torch.Tensor]:
         device = next(self.parameters()).device
         node_features = _tensor(observation["node_features"], device, torch.float32)
-        embeddings = self.encoder(node_features)
+        embeddings = self._encode_cached(node_features)
         return self._forward_encoded(embeddings, observation)
 
 

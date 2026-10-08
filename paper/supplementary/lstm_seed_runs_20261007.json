@@ -1,0 +1,85 @@
+{
+  "status": "complete",
+  "model": "LSTM",
+  "seeds": [
+    20261002,
+    20261003,
+    20261004,
+    20261005,
+    20261006
+  ],
+  "source_config": "configs\\final_holdout_50ep.yaml",
+  "updated_utc": "2026-10-07T17:03:04.039808+00:00",
+  "runs": [
+    {
+      "training_seed": 20261002,
+      "run_dir": "experiments\\runs\\final_holdout_lstm_20261002_20261007T134429Z_f031bb85",
+      "status": "complete",
+      "checkpoint_selection": "best_by_success_rate on fixed monsoon validation seeds",
+      "checkpoint": "experiments\\runs\\final_holdout_lstm_20261002_20261007T134429Z_f031bb85\\checkpoints\\LSTM\\best_by_success_rate.pt",
+      "checkpoint_sha256": "80e673c1a26e44128305edc6022f4f4c9dc4ac08fffdf63baa3645e2007ff0f7",
+      "resolved_config": "experiments\\runs\\final_holdout_lstm_20261002_20261007T134429Z_f031bb85\\configs\\resolved.yaml",
+      "device": "cpu",
+      "cpu_threads": 4,
+      "wall_seconds_this_campaign_process": 1483.1469163000002,
+      "started_utc": "2026-10-07T13:44:29.516373+00:00",
+      "completed_utc": "2026-10-07T14:09:07.900666+00:00"
+    },
+    {
+      "training_seed": 20261003,
+      "run_dir": "experiments\\runs\\final_holdout_lstm_20261003_20261007T140907Z_40d53aa9",
+      "status": "complete",
+      "checkpoint_selection": "best_by_success_rate on fixed monsoon validation seeds",
+      "checkpoint": "experiments\\runs\\final_holdout_lstm_20261003_20261007T140907Z_40d53aa9\\checkpoints\\LSTM\\best_by_success_rate.pt",
+      "checkpoint_sha256": "c1c9a21cb9598d602355fbe80e1fa12046e9ef1d7d147de0989f7c361086e46e",
+      "resolved_config": "experiments\\runs\\final_holdout_lstm_20261003_20261007T140907Z_40d53aa9\\configs\\resolved.yaml",
+      "device": "cpu",
+      "cpu_threads": 4,
+      "wall_seconds_this_campaign_process": 1768.2065749000176,
+      "started_utc": "2026-10-07T14:09:07.908576+00:00",
+      "completed_utc": "2026-10-07T14:38:36.113669+00:00"
+    },
+    {
+      "training_seed": 20261004,
+      "run_dir": "experiments\\runs\\final_holdout_lstm_20261004_20261007T143836Z_dbbcdc1c",
+      "status": "complete",
+      "checkpoint_selection": "best_by_success_rate on fixed monsoon validation seeds",
+      "checkpoint": "experiments\\runs\\final_holdout_lstm_20261004_20261007T143836Z_dbbcdc1c\\checkpoints\\LSTM\\best_by_success_rate.pt",
+      "checkpoint_sha256": "70e1590178cfa63b9403f5cd1c915467fba2839cf67c1aa90ec96776445381f4",
+      "resolved_config": "experiments\\runs\\final_holdout_lstm_20261004_20261007T143836Z_dbbcdc1c\\configs\\resolved.yaml",
+      "device": "cpu",
+      "cpu_threads": 4,
+      "wall_seconds_this_campaign_process": 1539.0433459000196,
+      "started_utc": "2026-10-07T14:38:36.121677+00:00",
+      "completed_utc": "2026-10-07T15:04:15.164183+00:00"
+    },
+    {
+      "training_seed": 20261005,
+      "run_dir": "experiments\\runs\\final_holdout_lstm_20261005_20261007T150415Z_2dc7ae9e",
+      "status": "complete",
+      "checkpoint_selection": "best_by_success_rate on fixed monsoon validation seeds",
+      "checkpoint": "experiments\\runs\\final_holdout_lstm_20261005_20261007T150415Z_2dc7ae9e\\checkpoints\\LSTM\\best_by_success_rate.pt",
+      "checkpoint_sha256": "05134f74195f445ccb85a2377c8f36d739d4743b6d7022f5783223c559214e05",
+      "resolved_config": "experiments\\runs\\final_holdout_lstm_20261005_20261007T150415Z_2dc7ae9e\\configs\\resolved.yaml",
+      "device": "cpu",
+      "cpu_threads": 4,
+      "wall_seconds_this_campaign_process": 4858.377136000025,
+      "started_utc": "2026-10-07T15:04:15.171181+00:00",
+      "completed_utc": "2026-10-07T16:25:13.515175+00:00"
+    },
+    {
+      "training_seed": 20261006,
+      "run_dir": "experiments\\runs\\final_holdout_lstm_20261006_20261007T162513Z_1454bc73",
+      "status": "complete",
+      "checkpoint_selection": "best_by_success_rate on fixed monsoon validation seeds",
+      "checkpoint": "experiments\\runs\\final_holdout_lstm_20261006_20261007T162513Z_1454bc73\\checkpoints\\LSTM\\best_by_success_rate.pt",
+      "checkpoint_sha256": "574497ad1806d337242336255137efd257d37b166b21b26db24f05c2999ec893",
+      "resolved_config": "experiments\\runs\\final_holdout_lstm_20261006_20261007T162513Z_1454bc73\\configs\\resolved.yaml",
+      "device": "cpu",
+      "cpu_threads": 4,
+      "wall_seconds_this_campaign_process": 2270.509317500051,
+      "started_utc": "2026-10-07T16:25:13.528912+00:00",
+      "completed_utc": "2026-10-07T17:03:04.036806+00:00"
+    }
+  ]
+}

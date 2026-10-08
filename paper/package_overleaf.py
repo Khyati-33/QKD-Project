@@ -61,26 +61,99 @@ files = {
     "inference_profile_20261002.json": "paper/supplementary/inference_profile_20261002.json",
     "seed_stability_50ep.yaml": "configs/seed_stability_50ep.yaml",
     "configuration_test.py": "tests/test_config.py",
+    "final_gnn_lstm_holdout_20261007.json": "experiments/final_gnn_lstm_holdout_20261007.json",
+    "final_gnn_lstm_reward_audit_20261007.json": "experiments/final_gnn_lstm_reward_audit_20261007/audit_summary.json",
+    "final_gnn_lstm_reward_episode_ledger.csv": "experiments/final_gnn_lstm_reward_audit_20261007/episode_reward_components.csv",
+    "lstm_seed_runs_20261007.json": "experiments/final_holdout_lstm_20261007/seed_runs.json",
+    "lstm_seed_20261002.yaml": "experiments/final_holdout_lstm_20261007/configs/seed_20261002.yaml",
+    "lstm_seed_20261003.yaml": "experiments/final_holdout_lstm_20261007/configs/seed_20261003.yaml",
+    "lstm_seed_20261004.yaml": "experiments/final_holdout_lstm_20261007/configs/seed_20261004.yaml",
+    "lstm_seed_20261005.yaml": "experiments/final_holdout_lstm_20261007/configs/seed_20261005.yaml",
+    "lstm_seed_20261006.yaml": "experiments/final_holdout_lstm_20261007/configs/seed_20261006.yaml",
+    "matched_gnn_lstm_protocol_20261007.md": "paper/supplementary/final_gnn_lstm_protocol_20261007.md",
+    "matched_campaign_source.py": "scripts/run_final_model_campaign.py",
+    "lstm_heldout_evaluation_source.py": "scripts/run_lstm_heldout_evaluation.py",
+    "gnn_lstm_comparison_plot_source.py": "scripts/plot_gnn_lstm_comparison.py",
+    "gnn_lstm_reward_audit_source.py": "scripts/run_gnn_lstm_reward_audit.py",
+}
+active_supplementary_files = {
+    "final_gnn_lstm_holdout_20261007.json",
+    "final_gnn_lstm_reward_audit_20261007.json",
+    "final_gnn_lstm_reward_episode_ledger.csv",
+    "lstm_seed_runs_20261007.json",
+    "lstm_seed_20261002.yaml",
+    "lstm_seed_20261003.yaml",
+    "lstm_seed_20261004.yaml",
+    "lstm_seed_20261005.yaml",
+    "lstm_seed_20261006.yaml",
+    "matched_gnn_lstm_protocol_20261007.md",
+    "gnn_model_source.py",
+    "topology_source.py",
+    "physics_source.py",
+    "environment_source.py",
+    "ppo_source.py",
+    "evaluation_source.py",
+    "training_source.py",
+    "runner_source.py",
+    "inference_source.py",
+    "matched_campaign_source.py",
+    "lstm_heldout_evaluation_source.py",
+    "gnn_lstm_comparison_plot_source.py",
+    "gnn_lstm_reward_audit_source.py",
 }
 for dest, src in files.items():
+    if dest not in active_supplementary_files:
+        continue
     source, target = root / src, sup / dest
     if source.resolve() != target.resolve():
         shutil.copy2(source, target)
 shutil.copy2(root / "figures/india_road_corridor_map.html", sup / "interactive_corridor_map.html")
-if not (sup / "README.md").exists():
-    (sup / "README.md").write_text(
-        "# Supplementary files\n\n"
-        "These files preserve inputs and outputs for the research experiments. "
-        "The corrected route comparison and physics validations are simulator-derived; "
-        "they do not establish field performance or composable QKD security. "
-        "Road routes are OpenStreetMap corridor proxies, not surveyed fiber assets. "
-        "See this README and the evidence ledger for scope and limitations. "
-        "OpenStreetMap attribution and licensing terms apply.\n", encoding="utf-8")
 out = root / "QKD_IEEE_Overleaf_Project.zip"
+publication_files = {
+    "README.md", "main.tex", "references.bib", "main.pdf", "QKD_IEEE_Paper.pdf",
+    "supplementary/README.md",
+    "supplementary/final_gnn_lstm_protocol_20261007.md",
+    "supplementary/archive_figures.pdf",
+    "supplementary/archive_figures.tex",
+    "supplementary/final_gnn_lstm_holdout_20261007.json",
+    "supplementary/final_gnn_lstm_reward_audit_20261007.json",
+    "supplementary/final_gnn_lstm_reward_episode_ledger.csv",
+    "supplementary/lstm_seed_runs_20261007.json",
+    "supplementary/lstm_seed_20261002.yaml",
+    "supplementary/lstm_seed_20261003.yaml",
+    "supplementary/lstm_seed_20261004.yaml",
+    "supplementary/lstm_seed_20261005.yaml",
+    "supplementary/lstm_seed_20261006.yaml",
+    "supplementary/gnn_model_source.py",
+    "supplementary/topology_source.py",
+    "supplementary/physics_source.py",
+    "supplementary/environment_source.py",
+    "supplementary/ppo_source.py",
+    "supplementary/evaluation_source.py",
+    "supplementary/training_source.py",
+    "supplementary/runner_source.py",
+    "supplementary/inference_source.py",
+    "supplementary/matched_campaign_source.py",
+    "supplementary/lstm_heldout_evaluation_source.py",
+    "supplementary/gnn_lstm_comparison_plot_source.py",
+    "supplementary/gnn_lstm_reward_audit_source.py",
+    "figures/physical_state_pipeline.pdf",
+    "figures/corridor_map.png",
+    "figures/graph_policy_implementation.pdf",
+}
+publication_files.update(
+    f"figures/final_evaluation/{name}"
+    for name in (
+        "01_gnn_lstm_primary.pdf", "01_gnn_lstm_primary.png",
+        "02_gnn_lstm_by_condition.pdf", "02_gnn_lstm_by_condition.png",
+        "03_gnn_lstm_seed_variability.pdf", "03_gnn_lstm_seed_variability.png",
+        "04_gnn_lstm_latency.pdf", "04_gnn_lstm_latency.png",
+        "05_gnn_lstm_reward_components.pdf", "05_gnn_lstm_reward_components.png",
+    )
+)
 with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as archive:
     for path in paper.rglob("*"):
-        if (path.is_file()
-                and path.name not in {"package_overleaf.py", "build_artifacts.py"}
-                and path.suffix.lower() not in {".aux", ".log", ".out", ".blg", ".fls"}):
+        relative = path.relative_to(paper).as_posix()
+        if path.is_file() and relative in publication_files:
             archive.write(path, path.relative_to(paper))
 print(f"Created {out} ({out.stat().st_size} bytes)")

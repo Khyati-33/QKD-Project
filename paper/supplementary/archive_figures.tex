@@ -1,0 +1,34 @@
+\documentclass[11pt]{article}
+\usepackage{graphicx}
+\begin{document}
+\title{Supplementary Archive Figures for the QKD Routing Manuscript}
+\author{}
+\date{October 2026}
+\maketitle
+
+This file preserves the project's conceptual and simulator-illustration graphics outside the main manuscript's results flow. The revised main paper uses only figures directly cited in the methods and matched GNN-PPO versus LSTM-PPO analysis. These archive figures provide background context; they are not additional experimental outcomes.
+
+\newcommand{\archivefig}[3]{%
+  \begin{figure}[p]
+  \centering
+  \includegraphics[width=0.94\linewidth,height=0.72\textheight,keepaspectratio]{../figures/#1}
+  \caption{#2}
+  \label{#3}
+  \end{figure}
+  \clearpage
+}
+
+\archivefig{architecture.pdf}{High-level project workflow showing topology and link profiles, time-stepped environment, routing policy, and evaluation. This is an overview diagram rather than a specification of individual model layers.}{fig:archive-architecture}
+\archivefig{basic_qkd_channels.png}{Conceptual distinction between a quantum signal channel and a public classical interaction channel in a prepare-and-measure QKD link. The drawing is educational context, not a hardware diagram of the simulated network.}{fig:archive-basic-channels}
+\archivefig{gnn_ppo.pdf}{Earlier conceptual GNN-PPO architecture sketch. The implementation-backed actor--critic and feature flow are specified in the main manuscript.}{fig:archive-gnn-ppo}
+\archivefig{hybrid_qkd_resources.png}{Conceptual hybrid QKD topology and normalized key-pool visualization. Pool states in the simulator are abstractions, not measured link capacities or a calibrated network-wide key-management process.}{fig:archive-hybrid-resources}
+\archivefig{hybrid_routing_framework.png}{High-level hybrid-routing and reinforcement-learning workflow from an earlier project design. It is a conceptual overview; the final implementation is described in the main manuscript.}{fig:archive-routing-framework}
+\archivefig{link_model_summary.png}{Simulator-generated normalized rate proxy for representative fiber and FSO links and sampled FSO availability across configured seasons. These conditional model outputs are not field or device measurements.}{fig:archive-link-summary}
+\archivefig{meshed_key_relay_architecture.pdf}{Conceptual meshed trusted-node QKD architecture with direct and relayed paths. The figure illustrates the routing abstraction and does not assert deployed topology or key-throughput measurements.}{fig:archive-meshed-architecture}
+\archivefig{physics_to_policy.pdf}{Conceptual mapping from scenario inputs through channel and rate models to a routing decision. Model quantities and evidence limitations are detailed in the main manuscript.}{fig:archive-physics-policy}
+\archivefig{qkd_stack.pdf}{Conceptual QKD network stack placing routing control, key management, trusted-node relaying, and optical channels in context. It is a functional abstraction rather than a deployed protocol stack.}{fig:archive-qkd-stack}
+\archivefig{rate_distance.png}{Configured distance-dependent fiber rate proxy and conditional FSO rate proxy with sampled interval bands. These curves summarize simulator assumptions and do not represent calibrated link measurements or secret-key throughput.}{fig:archive-rate-distance}
+\archivefig{simulation_flow.pdf}{Episode simulation loop: load the graph and scenario, reset route/channel/pool state, select a next hop, apply feasibility and reward updates, and repeat until termination.}{fig:archive-simulation-flow}
+\archivefig{tn_stn_relay.pdf}{Conceptual comparison of conventional trusted-node and simplified trusted-relay chain abstractions. The diagram is explanatory and does not define an implemented composable security protocol.}{fig:archive-tn-stn}
+
+\end{document}

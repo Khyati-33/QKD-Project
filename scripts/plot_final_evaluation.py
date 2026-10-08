@@ -130,7 +130,7 @@ def plot_outage(report, output):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input", type=Path, default=ROOT / "experiments" / "final_holdout_20261007.json")
-    parser.add_argument("--output-dir", type=Path, default=ROOT / "paper" / "figures" / "final_evaluation")
+    parser.add_argument("--output-dir", type=Path, default=ROOT / "paper" / "figures" / "archived_baseline_comparisons")
     args = parser.parse_args()
     report = json.loads(args.input.read_text(encoding="utf-8"))
     if report.get("status") != "complete" or "fiber_outage_stress_summary" not in report:
