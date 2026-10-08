@@ -12,6 +12,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.patches import Patch
 import torch
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -152,21 +153,29 @@ def main():
         for method, values in groups.items()}
     deltas = {term: summaries["GNN-PPO"][f"mean_{term}"] - summaries["LSTM-PPO"][f"mean_{term}"]
               for term in TERMS}
-    fig, ax = plt.subplots(figsize=(3.48, 4.55))
+    fig, ax = plt.subplots(figsize=(7.16, 5.1))
     vals = [deltas[term] for term in TERMS]
     y = np.arange(len(TERMS))
-    ax.barh(y, vals,
-            color=["#2878B5" if value >= 0 else "#D9534F" for value in vals],
-            edgecolor="black", linewidth=.4)
-    ax.axvline(0, color="black", linewidth=.8)
-    ax.set_yticks(y, [LABELS[t] for t in TERMS], fontsize=6.5)
+    bar_colors = ["#2878B5" if value >= 0 else "#D95F02" for value in vals]
+    bars = ax.barh(y, vals, color=bar_colors, edgecolor="black", linewidth=.45)
+    for bar, value in zip(bars, vals):
+        bar.set_hatch("///" if value >= 0 else "xx")
+    ax.axvline(0, color="black", linewidth=1.0)
+    ax.set_yticks(y, [LABELS[t] for t in TERMS], fontsize=8.5)
     ax.invert_yaxis()
-    ax.set_xlabel("Mean cumulative difference per episode", fontsize=7)
-    ax.set_title("GNN-PPO minus LSTM-PPO reward", fontsize=9)
-    ax.tick_params(axis="x", labelsize=7)
+    ax.set_xlabel("Mean cumulative component difference per episode (GNN − LSTM)", fontsize=9)
+    fig.suptitle("Selected-seed reward decomposition", fontsize=10, y=.99)
+    ax.tick_params(axis="x", labelsize=8)
+    ax.legend(handles=[
+        Patch(facecolor="#2878B5", edgecolor="black", hatch="///",
+              label="Larger GNN-PPO contribution"),
+        Patch(facecolor="#D95F02", edgecolor="black", hatch="xx",
+              label="Larger LSTM-PPO contribution")],
+        loc="lower center", bbox_to_anchor=(0.5, 1.04), ncol=2,
+        frameon=False, fontsize=8.2)
     ax.grid(axis="x", linestyle="--", alpha=.3)
     ax.set_axisbelow(True)
-    fig.tight_layout()
+    fig.subplots_adjust(left=.16, right=.98, top=.83, bottom=.12)
     fig.savefig(output / "gnn_lstm_reward_components.pdf", bbox_inches="tight")
     fig.savefig(output / "gnn_lstm_reward_components.png", dpi=300, bbox_inches="tight")
     plt.close(fig)

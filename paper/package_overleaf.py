@@ -75,6 +75,7 @@ files = {
     "lstm_heldout_evaluation_source.py": "scripts/run_lstm_heldout_evaluation.py",
     "gnn_lstm_comparison_plot_source.py": "scripts/plot_gnn_lstm_comparison.py",
     "gnn_lstm_reward_audit_source.py": "scripts/run_gnn_lstm_reward_audit.py",
+    "figure_generation_source.py": "paper/generate_figures.py",
 }
 active_supplementary_files = {
     "final_gnn_lstm_holdout_20261007.json",
@@ -100,6 +101,7 @@ active_supplementary_files = {
     "lstm_heldout_evaluation_source.py",
     "gnn_lstm_comparison_plot_source.py",
     "gnn_lstm_reward_audit_source.py",
+    "figure_generation_source.py",
 }
 for dest, src in files.items():
     if dest not in active_supplementary_files:
@@ -137,9 +139,10 @@ publication_files = {
     "supplementary/lstm_heldout_evaluation_source.py",
     "supplementary/gnn_lstm_comparison_plot_source.py",
     "supplementary/gnn_lstm_reward_audit_source.py",
+    "supplementary/figure_generation_source.py",
     "figures/physical_state_pipeline.pdf",
     "figures/corridor_map.png",
-    "figures/graph_policy_implementation.pdf",
+    "figures/matched_architecture.pdf",
 }
 publication_files.update(
     f"figures/final_evaluation/{name}"

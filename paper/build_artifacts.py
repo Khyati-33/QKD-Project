@@ -244,17 +244,31 @@ def corridor_map():
         else:
             p1=graph.nodes[u]["pos"]; p2=graph.nodes[v]["pos"]
             fso.append([(p1[1],p1[0]),(p2[1],p2[0])])
-    ax.add_collection(LineCollection(fiber,colors="#465f78",linewidths=.72,alpha=.58,zorder=1,label="Fiber"))
-    ax.add_collection(LineCollection(fso,colors="#d45519",linewidths=.42,alpha=.48,zorder=2,label="Candidate FSO"))
+    ax.add_collection(LineCollection(fiber,colors="#2878B5",linewidths=.78,alpha=.72,
+                                     zorder=1,label="Fiber (solid)"))
+    ax.add_collection(LineCollection(fso,colors="#D95F02",linewidths=.34,alpha=.42,
+                                     linestyles=(0, (2.2, 1.6)),zorder=2,
+                                     label="Candidate FSO (dashed)"))
     hubs={name:(coord[1],coord[0]) for name,coord in CITY_COORDS.items()}
+    label_offsets={"Bangalore":(-40,25),"Chennai":(9,43),"Mumbai":(5,5),
+                   "Kolkata":(5,5),"Hyderabad":(5,5),"Delhi":(5,5),"Jaipur":(5,5)}
     for city,(lon,lat) in hubs.items():
-        ax.scatter(lon,lat,s=26,color="#a54632",edgecolor="white",linewidth=.55,zorder=3)
-        ax.annotate(city,(lon,lat),xytext=(3,3),textcoords="offset points",fontsize=7,zorder=4)
-    ax.scatter([],[],s=22,color="#a54632",edgecolor="white",label="City access node")
+        ax.scatter(lon,lat,s=28,marker="D",color="#F2C14E",edgecolor="#263746",
+                   linewidth=.7,zorder=3)
+        ax.annotate(city,(lon,lat),xytext=label_offsets[city],textcoords="offset points",
+                    fontsize=7,zorder=4)
+    ax.scatter([],[],s=28,marker="D",color="#F2C14E",edgecolor="#263746",
+               label="City access node")
+    # The example demand endpoints are overlaid with distinct markers so they
+    # remain legible when printed without color.
+    ax.scatter(*hubs["Mumbai"],s=64,marker="^",color="#2A7F62",edgecolor="white",
+               linewidth=.7,zorder=6,label="Source: Mumbai")
+    ax.scatter(*hubs["Kolkata"],s=64,marker="s",color="#B33A3A",edgecolor="white",
+               linewidth=.7,zorder=6,label="Destination: Kolkata")
     ax.add_patch(FancyArrowPatch(hubs["Mumbai"],hubs["Kolkata"],connectionstyle="arc3,rad=-.18",
-                                 arrowstyle="-|>",mutation_scale=9,color="#7b3f91",lw=1.2,
+                                 arrowstyle="-|>",mutation_scale=9,color="#6A4C93",lw=1.35,
                                  linestyle="--",zorder=5))
-    ax.plot([],[],color="#7b3f91",lw=1.2,ls="--",label="Example request: Mumbai to Kolkata")
+    ax.plot([],[],color="#6A4C93",lw=1.35,ls="--",label="Example request path")
     ax.text(.02,.02,f"{graph.number_of_nodes():,} nodes, {graph.number_of_edges():,} links\nRoad geometry is a corridor proxy",transform=ax.transAxes,fontsize=6.5,va="bottom",bbox={"fc":"white","ec":"none","alpha":.8})
     ax.set_xlabel("Longitude (degrees east)"); ax.set_ylabel("Latitude (degrees north)")
     ax.set_title("Modeled India corridor graph")

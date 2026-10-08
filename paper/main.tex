@@ -91,24 +91,24 @@ with graph convolution, neighborhood aggregation, and attention providing establ
 
 \section{Simulator Architecture and Experimental Setup}
 \subsection{Architecture}
-The simulator couples topology and link profiles to a time-stepped environment, routing policy, and evaluation layer. At each step, scenario variables update fiber/FSO link states; the environment forms graph and candidate-edge observations, applies a shared feasibility mask, and updates route and normalized key-pool state after the selected hop. Fig.~\ref{fig:physical-pipeline} summarizes this physical-to-decision coupling. The controller is a centralized simulator abstraction, not a deployed QKD management interface.
+The simulator couples topology and link profiles to a time-stepped environment, routing policy, and evaluation layer. At each step, scenario variables update fiber/FSO link states; the environment forms graph and candidate-edge observations, applies a shared feasibility mask, and updates route and normalized key-pool state after the selected hop. Fig.~\ref{fig:physical-pipeline} summarizes this physical-to-decision coupling; the nine candidate-edge features are defined in Table~\ref{tab:features}. The controller is a centralized simulator abstraction, not a deployed QKD management interface.
 
-\begin{figure*}[t]
+\begin{figure*}[!t]
 \centering
 \includegraphics[width=\textwidth]{physical_state_pipeline.pdf}
-\caption{Physical channel and normalized resource state flow into the constrained routing decision. Fiber and FSO model inputs produce link state; route state joins that information in candidate-edge features before the masked GNN-PPO action is selected.}
+\caption{Physical channel and normalized resource state flow into constrained next-hop selection. Fiber and FSO inputs determine link state; route state and nine candidate features inform the feasibility-masked policy. Channel and resource quantities are simulator inputs.}
 \label{fig:physical-pipeline}
 \end{figure*}
 
 
 \subsection{Simulation Setup}
 \subsubsection{Topology and Corridor Data}
-The topology contains seven city hubs (Delhi, Jaipur, Mumbai, Bangalore, Hyderabad, Kolkata, and Chennai), 2,370 modeled nodes, and 2,653 links: 273 fiber links and 2,380 candidate FSO links. OpenStreetMap driving routes provide corridor geometry for the modeled fiber paths; this is a planning proxy, not verified deployed fiber infrastructure. FSO line of sight and terrain clearance are not surveyed. The topology is archived with the research data and uses OpenStreetMap data under its applicable attribution and database terms \cite{osm2008}.
+The topology contains seven city hubs (Delhi, Jaipur, Mumbai, Bangalore, Hyderabad, Kolkata, and Chennai), 2,370 modeled nodes, and 2,653 links: 273 fiber links and 2,380 candidate FSO links. Fig.~\ref{fig:map} distinguishes the modeled link classes and marks the example request endpoints. OpenStreetMap driving routes provide corridor geometry for the modeled fiber paths; this is a planning proxy, not verified deployed fiber infrastructure. FSO line of sight and terrain clearance are not surveyed. The topology is archived with the research data and uses OpenStreetMap data under its applicable attribution and database terms \cite{osm2008}.
 
-\begin{figure}[!htbp]
+\begin{figure}[!tbp]
 \centering
 \includegraphics[width=\columnwidth]{corridor_map.png}
-\caption{Modeled corridor graph with fiber links and candidate FSO links. The dashed Mumbai-to-Kolkata line marks an example request, not a physical link. Road geometry is a corridor proxy; FSO line of sight is assumed.}
+\caption{Modeled corridor graph: solid blue lines denote fiber, dashed orange lines denote candidate FSO links, diamonds mark city access nodes, and distinct symbols mark the Mumbai source and Kolkata destination. The purple dashed route is an example request, not a physical link. Road geometry is a corridor proxy; FSO line of sight is assumed.}
 \label{fig:map}
 \end{figure}
 
@@ -241,7 +241,6 @@ QBER / outage / episode limit & 0.11 / 0.01 / 144 steps\\
 The LSTM-PPO comparator shares the GNN policy's actor-critic head, candidate-edge features, PPO objective, and physical-feasibility mask. It replaces message passing with a single-layer LSTM over node-feature rows in the topology's stable node order and receives no graph edges. The LSTM state is initialized afresh for each policy call, so this is a node-sequence encoder rather than persistent memory across route decisions. Matching the remaining components and training budgets makes encoder type the primary architectural difference under test.
 
 
-\clearpage
 \section{Routing Policy and Learning Objective}
 \subsection{Graph State and Constrained Routing}
 At time $t$, let $G_t=(V,E,X_t)$ denote the modeled graph and its scenario-dependent link state, where $X_t$ contains channel and normalized pool values. The environment state $s_t$ additionally contains current and destination nodes, route history, chain-error state, and time. The policy receives observation $o_t$ and selects an adjacent node $a_t\in\mathcal{A}_{\mathrm{feasible}}(s_t)$ as defined in (\ref{eq:feasible-actions}). Transitions update the route, key-pool level, and channel scenario; future turbulence and outage draws are not exposed as a forecast to the policy.
@@ -264,14 +263,6 @@ Invalid links contribute no message in either direction, and the candidate mask 
 
 In the optional attention variant, candidate embeddings are combined using learned compatibility scores, following neighborhood attention formulations \cite{velickovic2018}. Attention is treated as an architectural choice. Its value must be established by an ablation with the same training budget and seed distribution. The current results do not isolate a causal benefit from attention.
 
-\begin{figure*}[t]
-\centering
-\includegraphics[width=\textwidth]{graph_policy_implementation.pdf}
-\caption{GNN-PPO policy path with implemented graph inputs, candidate features, feasibility conditions, and actor-critic components. Full-graph edges are filtered by QBER and positive rate before node-only message aggregation; candidate scoring separately consumes the nine route-context features.}
-\label{fig:policy-implementation}
-\end{figure*}
-
-
 \subsubsection{PPO Training}
 The policy is updated by maximizing the clipped surrogate objective
 \begin{equation}
@@ -281,6 +272,15 @@ The policy is updated by maximizing the clipped surrogate objective
 where $\rho_t(\theta)$ is the new-to-old action probability ratio and $\hat A_t$ is the estimated advantage. PPO is combined with a value loss and entropy regularization. Hyperparameters are resolved from a versioned YAML file and included with the experiment artifact. The settings for the transfer-evaluation checkpoint and paired episode seeds are archived in the supplementary package.
 
 \subsection{Encoder-Level Comparison}
+Fig.~\ref{fig:matched-architecture} summarizes the shared and encoder-specific components.
+
+\begin{figure*}[!t]
+\centering
+\includegraphics[width=\textwidth]{matched_architecture.pdf}
+\caption{Matched policy architectures. Both receive the same observation and use the same candidate-scoring, feasibility, actor--critic, and PPO decision path. The GNN encoder aggregates over graph edges; the LSTM encoder processes node-feature rows in a fixed topology order without edge-index input.}
+\label{fig:matched-architecture}
+\end{figure*}
+
 Both encoders feed node representations to the same candidate scorer, critic, and masked action distribution. GNN-PPO aggregates information over the graph adjacency at each message-passing layer. LSTM-PPO instead processes the node-feature matrix as a sequence in the topology's stable node order, without edge-index input, using the standard recurrent LSTM encoder \cite{hochreiter1997}. For sequence position $i$, its encoder computes
 \begin{equation}
  (h_i,c_i)=\operatorname{LSTM}(x_i,h_{i-1},c_{i-1}),\qquad h_0=c_0=0,
@@ -289,47 +289,46 @@ Both encoders feed node representations to the same candidate scorer, critic, an
 and supplies $h_i$ to the shared candidate scorer. The hidden and cell states are initialized afresh for each policy call. Thus, the LSTM can mix node features according to their sequence positions, but it has no persistent state across route decisions and no explicit graph adjacency. This comparison tests the implemented message-passing encoder against the implemented ordered-node sequence encoder under a shared decision head. Sensitivity to the arbitrary node order is therefore a limitation of the comparator and of the interpretation.
 
 
-\clearpage
 \section{Results}
 \subsection{Matched GNN-PPO and LSTM-PPO Held-Out Comparison}
 The frozen protocol in \path{supplementary/final_gnn_lstm_protocol_20261007.md} evaluates five independently trained checkpoints per architecture on six ordered city pairs, six season/time conditions, and three shared environment replicates (108 matched scenarios per checkpoint; 540 episodes per architecture). Training seeds and environment seeds are paired across encoders. We summarize uncertainty by resampling training checkpoints and, within each selected checkpoint, the shared scenario IDs. The resulting evidence is specific to this simulator and scenario matrix.
 
 Across the five checkpoints, GNN-PPO completed 249/540 routes (46.1\%; nested 95\% interval 31.3--58.5\%), while LSTM-PPO completed 403/540 (74.6\%; 58.0--87.6\%). The paired LSTM-minus-GNN completion difference was 28.5 percentage points (nested 95\% interval 20.6--37.2). Of 540 matched outcomes, both policies succeeded on 242 scenarios, LSTM-PPO alone succeeded on 161, GNN-PPO alone on 7, and both failed on 130. Neither policy proposed an invalid action or used an environment fallback; GNN-PPO encountered 18 no-valid-action states, while LSTM-PPO encountered none. Thus the aggregate advantage is accompanied by substantial shared failure and should not be read as near-universal route feasibility. Figure~\ref{fig:gnn-lstm-primary} reports the completion estimate with its nested interval and successful-route hops. Averaging checkpoint-specific successful-hop means gives 87.8 for GNN-PPO and 71.4 for LSTM-PPO; among the 242 scenarios both completed, LSTM-PPO used 32.6 fewer hops on average. Hop count is conditional on success and does not measure route efficiency for failed episodes. Figure~\ref{fig:gnn-lstm-conditions} resolves completion by season and time; Fig.~\ref{fig:gnn-lstm-seeds} shows checkpoint variation. These differences describe this evaluation and do not establish generalization beyond its topology and configured channel model.
 
-\begin{figure}[!htbp]
+\begin{figure*}[!t]
 \centering
-\includegraphics[width=\columnwidth]{figures/final_evaluation/01_gnn_lstm_primary.pdf}
-\caption{Matched GNN-PPO and LSTM-PPO results on the strict held-out matrix. The upper panel reports route completion with nested 95\% bootstrap intervals; the lower panel reports successful-route hops averaged across checkpoint means, with between-checkpoint standard deviation.}
+\includegraphics[width=\textwidth]{figures/final_evaluation/01_gnn_lstm_primary.pdf}
+\caption{Matched GNN-PPO and LSTM-PPO results on the strict held-out matrix. (a) Route completion with nested 95\% intervals; (b) paired LSTM-minus-GNN completion difference with its nested 95\% interval (pp denotes percentage points); and (c) successful-route hops averaged across checkpoint means, with between-checkpoint standard deviation.}
 \label{fig:gnn-lstm-primary}
-\end{figure}
+\end{figure*}
 
 Condition-level completion is shown in Fig.~\ref{fig:gnn-lstm-conditions}. The bars summarize means across five checkpoint-specific rates; whiskers show checkpoint standard deviation. LSTM-PPO's mean completion exceeded GNN-PPO's in all six season/time cells, by 24.4--32.2 percentage points. The gaps were not confined to one condition, although the five independent checkpoints per policy remain a small sample for estimating training variability.
 
-\begin{figure}[!htbp]
+\begin{figure}[!tbp]
 \centering
 \includegraphics[width=\columnwidth]{figures/final_evaluation/02_gnn_lstm_by_condition.pdf}
-\caption{Held-out route completion by season and time for GNN-PPO and LSTM-PPO. Bars show means across the five trained checkpoints and whiskers show checkpoint standard deviation.}
+\caption{Held-out route completion by season and time for GNN-PPO and LSTM-PPO. Bars show means across five checkpoints and whiskers show checkpoint standard deviation; colors and hatches distinguish policies.}
 \label{fig:gnn-lstm-conditions}
 \end{figure}
 
 
 Figure~\ref{fig:gnn-lstm-seeds} presents the five paired checkpoint outcomes. GNN-PPO checkpoint completion ranged from 18.5\% to 63.9\%; LSTM-PPO ranged from 42.6\% to 89.8\%. Pairing makes this seed-level variation visible rather than hiding training instability in the aggregate over 540 episodes per architecture.
 
-\begin{figure}[!htbp]
+\begin{figure}[!tbp]
 \centering
 \includegraphics[width=\columnwidth]{figures/final_evaluation/03_gnn_lstm_seed_variability.pdf}
-\caption{Held-out route-completion rate for each matched training-seed pair. Seed suffixes identify the five independently trained checkpoints.}
+\caption{Held-out route-completion rate for each matched training-seed pair. Seed suffixes identify the five checkpoints; color, marker, and line style distinguish policies.}
 \label{fig:gnn-lstm-seeds}
 \end{figure}
 
 
 \subsection{Inference Cost}
-Actor-call latency was measured on the same CPU host after warm-up, using 1,000 deterministic calls per checkpoint, four CPU threads, and disabled encoder caching. Figure~\ref{fig:gnn-lstm-latency} compares the mean checkpoint-specific 95th-percentile latency and its across-checkpoint standard deviation: 9.61$\pm$1.65 ms for GNN-PPO and 6.24$\pm$0.22 ms for LSTM-PPO. These measurements exclude environment simulation and do not establish deployment latency.
+Actor-call latency was measured on the same CPU host after warm-up, using 1,000 deterministic calls per checkpoint, four CPU threads, and disabled encoder caching. Figure~\ref{fig:gnn-lstm-latency} compares the mean checkpoint-specific 95th-percentile latency and its across-checkpoint standard deviation: 9.61$\pm$1.65 ms for GNN-PPO and 6.24$\pm$0.22 ms for LSTM-PPO. The timing excludes environment simulation and is not end-to-end latency.
 
-\begin{figure}[!htbp]
+\begin{figure}[!tbp]
 \centering
 \includegraphics[width=0.92\columnwidth]{figures/final_evaluation/04_gnn_lstm_latency.pdf}
-\caption{CPU actor-call p95 latency, averaged across five checkpoints; whiskers show standard deviation across checkpoints.}
+\caption{CPU actor-call p95 latency in milliseconds, averaged across five checkpoints; whiskers show checkpoint standard deviation. Each checkpoint used 1,000 deterministic calls after warm-up, with four CPU threads and encoder caching disabled; environment simulation is excluded.}
 \label{fig:gnn-lstm-latency}
 \end{figure}
 
@@ -337,22 +336,26 @@ Actor-call latency was measured on the same CPU host after warm-up, using 1,000 
 \subsection{Reward-Component Audit}
 A matched reward-component audit evaluates the 20261002 GNN-PPO and LSTM-PPO checkpoints on the same 108 scenario IDs. GNN-PPO completed 50/108 routes (46.3\%) with 92.56 mean successful-route hops; LSTM-PPO completed 91/108 (84.3\%) with 62.22 hops. This selected-seed result is descriptive and is not a second independent estimate of the five-seed comparison. Because component totals accumulate over trajectories of different lengths, they describe the shaped training signal and are not independent measures of delivered key service. Figure~\ref{fig:gnn-lstm-reward} plots the component-wise mean difference; it is a diagnostic, not an additional performance objective.
 
-\begin{figure}[!htbp]
+\begin{figure*}[!t]
 \centering
-\includegraphics[width=\columnwidth]{figures/final_evaluation/05_gnn_lstm_reward_components.pdf}
-\caption{Mean cumulative reward-component difference for the selected matched checkpoints (GNN-PPO minus LSTM-PPO) on shared scenarios. Positive and negative values identify larger accumulated contributions; unequal route lengths make this a descriptive shaped-reward audit, not a service-capacity measure.}
+\includegraphics[width=\textwidth]{figures/final_evaluation/05_gnn_lstm_reward_components.pdf}
+\caption{Mean cumulative reward-component difference for the selected matched checkpoints (GNN-PPO minus LSTM-PPO) on shared scenarios. Blue positive bars indicate a larger GNN-PPO contribution and orange negative bars a larger LSTM-PPO contribution. Because episode lengths differ, this is a descriptive shaped-reward audit, not a service-capacity measure.}
 \label{fig:gnn-lstm-reward}
-\end{figure}
+\end{figure*}
 
 
-\subsection{Exact Reward Oracle on Small Graphs}
-An archived small-graph reward-oracle check is reported in the supplementary research package. It evaluates a different, static toy-graph setting and is not used to rank GNN-PPO against LSTM-PPO in the main held-out study.
-
-
-\clearpage
 \section{Discussion and Limitations}
 \subsection{What the Matched Encoder Comparison Shows}
-The experiment is designed to isolate encoder choice within the implemented policy: both methods share PPO, candidate features, the actor--critic head, the action mask, and matched training and evaluation protocols. On this scenario matrix, LSTM-PPO completed more routes, had fewer conditional successful-route hops, and showed lower CPU actor-call p95 latency. The paired advantage appeared in all six season/time aggregates, but the per-seed ranges and 130 shared failures show that the result is not a guarantee for an arbitrary checkpoint or route. The LSTM processes node observations in a fixed topology order and receives no edge-index input; it is not a recurrent controller with persistent route-history memory. The results compare these two implementations in this simulator and do not establish that either encoder is generally superior across topologies, channel calibrations, or traffic regimes.
+Both methods share the PPO objective and budget, candidate features, feasibility mask, and downstream decision interface. In this held-out matrix, LSTM-PPO had higher route completion, fewer conditional successful-route hops, and lower measured actor-call latency. The comparison is evidence about these two implementations under this simulator's specified conditions, not a general ranking of encoder families.
+
+\subsection{Node-Order Sensitivity and Architectural Confounders}
+The LSTM reads node-feature rows in a fixed topology order and does not receive the graph's edge index. Its output can therefore depend on an arbitrary serialization of nodes: permuting equivalent node rows can change which features become sequential neighbors even when the underlying graph is unchanged. The hidden state is also reset at each action call, so this model does not use persistent route-history memory. GNN-PPO, by contrast, aggregates using graph connectivity. The shared PPO budget, candidate features, feasibility mask, and downstream interface reduce differences in the decision task, but do not equalize the encoders' inductive biases, effective capacity, or optimization behavior. No node-permutation, parameter-matched, graph-aware sequence, or persistent-memory ablation was run. Accordingly, the observed difference should be attributed to the implemented encoder-policy combinations, not to an intrinsic advantage of LSTMs over GNNs.
+
+\subsection{Training-Seed Variability}
+The five independently trained checkpoints are the replication units for training variation; the 540 held-out episodes per policy are paired scenario evaluations, not 540 independent training runs. Completion ranged from 18.5\% to 63.9\% for GNN-PPO and from 42.6\% to 89.8\% for LSTM-PPO. The nested intervals resample checkpoints and shared scenario IDs, but five checkpoints per architecture provide limited resolution for the tails of the training-seed distribution. The paired estimate is useful for this frozen protocol, while broader claims about run-to-run reliability require more independent training seeds.
+
+\subsection{Classical Comparators and Scope of the Ranking}
+The current matched study does not establish an advantage over strong classical routing algorithms. A hop-count BFS or a static shortest-path calculation would optimize a different objective and would not by itself represent changing channel availability, feasibility constraints, or key-pool state. A useful classical comparison should use the same topology, route termination rules, edge-feasibility checks, dynamic resource state, and held-out scenarios, with an explicit resource-aware cost or state-dependent replanning rule. Until such a baseline is evaluated under the matched environment, the reported ranking is limited to GNN-PPO versus LSTM-PPO.
 
 \subsection{What State Affects the Graph Policy?}
 Controlled paired-input counterfactuals on a selected GNN-PPO checkpoint hold route context fixed while varying one candidate feature; this is a policy-sensitivity diagnostic, not the GNN-PPO/LSTM-PPO route comparison. Across the tested range, FSO action probability increased from 0.311 to 0.638 as its normalized rate-proxy ratio to fiber rose from 0.25 to 4.0. With QBER below the feasibility threshold, action probability changed only slightly (approximately 0.473 to 0.472); at QBER 0.111 the candidate was masked. In a separate 32-trial turbulence-input sweep, a 100-fold $C_n^2$ multiplier reduced median FSO rate proxy from 0.202 to 0.183, while mean FSO action probability shifted from 0.749 to 0.740 and FSO remained selected in every trial. The checkpoint is sensitive to proxy-rate contrast and the hard mask, while this particular turbulence scaling had little effect on its local preference. These counterfactual inputs do not establish route-level benefits or calibrated atmospheric response.
@@ -360,7 +363,10 @@ Controlled paired-input counterfactuals on a selected GNN-PPO checkpoint hold ro
 \subsection{Model and Network Scope}
 The archived physical checks give internally consistent outputs for the configured equations: at 80 km and 1550 nm, modeled fiber loss including excess loss is 16.46 dB, detection probability is approximately 0.021 per incident photon, QBER proxy is 0.0105, and normalized rate proxy is 0.0175. The count-rate bound assumes one photon per pulse and is separate from the weak-coherent-pulse finite-key engineering mode. For a 10-km FSO span in the monsoon 22:00 scenario, configured availability is 88\% and a 1,000-sample check yielded 88.5\%; median normalized rate proxy conditional on availability was 0.2035. These are model checks, not device or field measurements.
 
-Several limits define the present interpretation. The city corridors are OpenStreetMap road proxies, not verified fiber routes; FSO line of sight and weather distributions are uncalibrated. Fiber and FSO parameter sets do not describe one characterized terminal pair. Key-pool state is normalized and single-route: there is no calibrated generation/consumption process, simultaneous demand, or network-wide blocking metric. Management traffic is not counted. The normalized rate proxy is not delivered secret-key throughput, and the optional finite-key estimator is not independently established as composably secure. The matched five-seed held-out comparison, CPU inference measurements, and reward audit remain simulator-only evidence. Node-order sensitivity of the LSTM and matched feature/reward ablations are additional limitations. Empirical calibration, multi-demand evaluation, and broader topology generalization are outside this revision's scope.
+The city corridors are OpenStreetMap road proxies, not verified fiber routes; FSO line of sight and weather distributions are uncalibrated, and the fiber and FSO settings do not describe one characterized terminal pair. The key-pool state is normalized and single-route: calibrated key generation/consumption, simultaneous demand, network-wide blocking, and management traffic are not modeled. The normalized rate proxy is not delivered secret-key throughput, and the optional finite-key estimator is not independently established as composably secure. Thus the channel, resource, routing, and latency results are simulator evidence only. Empirical calibration, multi-demand evaluation, broader topology testing, and the architecture and classical-baseline ablations above remain outside this revision's scope.
+
+\subsection{Separate Small-Graph Reward Oracle Check}
+The archived exact reward-oracle check uses a static toy graph and a different state/action setting. It is retained in the supplementary research package as a separate diagnostic and is not pooled with, or used to rank policies in, the matched encoder evaluation.
 
 \section{Conclusion}
 This work presents a matched simulator study of GNN-PPO and LSTM-PPO for constrained next-hop routing in a modeled hybrid fiber/FSO trusted-node network. In the five-seed, 540-scenario-per-policy held-out evaluation, LSTM-PPO route completion was 74.6\% versus 46.1\% for GNN-PPO (paired difference 28.5 percentage points; nested 95\% interval 20.6--37.2). This result is specific to the implemented ordered-node LSTM and graph-message-passing policies under the evaluated scenario matrix. The network and channel quantities remain uncalibrated proxies. Future work should test node-order and topology sensitivity and calibrate channels, key pools, and service demand against traceable network data before making deployment claims.

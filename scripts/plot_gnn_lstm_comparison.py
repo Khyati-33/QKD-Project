@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 COLORS = {"GNN-PPO": "#2878B5", "LSTM-PPO": "#D95F02"}
+HATCHES = {"GNN-PPO": "///", "LSTM-PPO": "xx"}
 
 
 def wilson_interval(successes: int, n: int, z: float = 1.96):
@@ -46,28 +47,50 @@ def plot_primary(report, output_dir: Path):
         vals = np.asarray([v for v in vals if v is not None], dtype=float)
         hop_means.append(float(vals.mean()) if len(vals) else 0.0)
         hop_sd.append(float(vals.std(ddof=1)) if len(vals) > 1 else 0.0)
-    fig, axes = plt.subplots(2, 1, figsize=(3.48, 4.5))
+    fig, axes = plt.subplots(1, 3, figsize=(7.16, 2.75),
+                             gridspec_kw={"width_ratios": [1, 1.12, 1]})
     x = np.arange(2)
-    axes[0].bar(x, rates, color=colors, edgecolor="black", linewidth=.45, width=.58)
+    bars = axes[0].bar(x, rates, color=colors, edgecolor="black", linewidth=.55,
+                       width=.58, zorder=3)
+    for bar, method in zip(bars, methods):
+        bar.set_hatch(HATCHES[method])
     axes[0].errorbar(x, rates, yerr=[lower, upper], fmt="none", ecolor="black",
-                     capsize=4, linewidth=1)
+                     capsize=4, linewidth=1.15, zorder=4)
     axes[0].set_xticks(x, methods)
     axes[0].set_ylim(0, 1.05)
     axes[0].set_ylabel("Route completion")
-    axes[0].set_title("Completion (nested 95% CI)")
+    axes[0].set_title("(a) Completion (95% CI)")
     axes[0].yaxis.set_major_formatter(plt.FuncFormatter(lambda y, _: f"{100*y:.0f}%"))
-    axes[1].bar(x, hop_means, yerr=hop_sd, color=colors, edgecolor="black",
-                linewidth=.45, width=.58, capsize=4)
-    axes[1].set_xticks(x, methods)
-    axes[1].set_ylabel("Successful-route hops")
-    axes[1].set_title("Mean checkpoint average (SD)")
+
+    paired = report["paired_success_difference"]
+    difference = 100 * float(paired["mean_difference"])
+    diff_low, diff_high = [100 * float(v) for v in paired["ci95"]]
+    axes[1].axvline(0, color="black", linewidth=.9, linestyle="--", zorder=1)
+    axes[1].errorbar(difference, 0,
+                     xerr=[[difference-diff_low], [diff_high-difference]],
+                     fmt="s", markersize=6, color=COLORS["LSTM-PPO"],
+                     ecolor="black", capsize=5, linewidth=1.25, zorder=3)
+    axes[1].set_xlim(-5, 50)
+    axes[1].set_ylim(-.7, .7)
+    axes[1].set_yticks([])
+    axes[1].set_xlabel("LSTM − GNN completion (pp)")
+    axes[1].set_title("(b) Paired difference (95% CI)")
+    axes[1].text(difference, -.43, f"{difference:.1f} pp", ha="center", va="top",
+                 fontsize=7.1, color=COLORS["LSTM-PPO"])
+
+    bars = axes[2].bar(x, hop_means, yerr=hop_sd, color=colors, edgecolor="black",
+                       linewidth=.55, width=.58, capsize=4, zorder=3)
+    for bar, method in zip(bars, methods):
+        bar.set_hatch(HATCHES[method])
+    axes[2].set_xticks(x, methods)
+    axes[2].set_ylabel("Successful-route hops")
+    axes[2].set_title("(c) Successful hops (SD)")
     for ax in axes:
         ax.grid(axis="y", linestyle="--", alpha=.3)
         ax.set_axisbelow(True)
-    for ax in axes:
         ax.tick_params(axis="both", labelsize=8)
-        ax.xaxis.label.set_size(8)
-        ax.yaxis.label.set_size(8)
+        ax.xaxis.label.set_size(7.5)
+        ax.yaxis.label.set_size(7.5)
     fig.tight_layout()
     save(fig, output_dir / "01_gnn_lstm_primary")
 
@@ -96,12 +119,14 @@ def plot_conditions(report, output_dir: Path):
             lows.append(sd)
             highs.append(sd)
         pos = x + (i-.5)*width
-        ax.bar(pos, means, width, label=method, color=COLORS[method],
-               edgecolor="black", linewidth=.4)
+        bars = ax.bar(pos, means, width, label=method, color=COLORS[method],
+                      edgecolor="black", linewidth=.4)
+        for bar in bars:
+            bar.set_hatch(HATCHES[method])
         ax.errorbar(pos, means, yerr=[lows, highs], fmt="none", ecolor="black",
                     capsize=2.5, linewidth=.8)
     ax.set_xticks(x, labels)
-    ax.set_ylim(0, 1.05)
+    ax.set_ylim(0, 1.0)
     ax.set_ylabel("Route completion")
     ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda y, _: f"{100*y:.0f}%"))
     ax.set_title("Completion by season/time")
@@ -131,8 +156,10 @@ def plot_latency(report, output_dir: Path):
               for m in methods]
     fig, ax = plt.subplots(figsize=(3.48, 2.4))
     x = np.arange(len(methods))
-    ax.bar(x, means, yerr=errors, color=[COLORS[m] for m in methods],
-           edgecolor="black", linewidth=.45, width=.58, capsize=4)
+    bars = ax.bar(x, means, yerr=errors, color=[COLORS[m] for m in methods],
+                  edgecolor="black", linewidth=.45, width=.58, capsize=4)
+    for bar, method in zip(bars, methods):
+        bar.set_hatch(HATCHES[method])
     ax.set_xticks(x, methods)
     ax.set_ylabel("p95 actor-call latency (ms)")
     ax.set_title("CPU actor-call p95 latency")
@@ -152,13 +179,14 @@ def plot_seed_variability(report, output_dir: Path):
     x = np.arange(len(seeds))
     for method in ("GNN-PPO", "LSTM-PPO"):
         rates = [report["per_training_seed"][method][str(seed)]["success_rate"] for seed in seeds]
-        ax.plot(x, rates, marker="o", linewidth=1.4, markersize=4,
-                color=COLORS[method], label=method)
+        ax.plot(x, rates, marker="o" if method == "GNN-PPO" else "s",
+                linestyle="-" if method == "GNN-PPO" else "--",
+                linewidth=1.5, markersize=4.2, color=COLORS[method], label=method)
     ax.set_xticks(x, labels)
     ax.set_xlabel("Training seed suffix")
     ax.set_ylabel("Held-out route completion")
     ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda y, _: f"{100*y:.0f}%"))
-    ax.set_ylim(0, 1.05)
+    ax.set_ylim(0, 1.0)
     ax.set_title("Completion across training seeds")
     ax.legend(frameon=False, ncol=2, fontsize=7)
     ax.tick_params(axis="both", labelsize=8)

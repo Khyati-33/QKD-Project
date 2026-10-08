@@ -59,10 +59,10 @@ def physical_pipeline():
     arrow(ax, (3.28, 1.72), (3.55, 1.72))
     arrow(ax, (5.04, 1.72), (5.30, 1.72))
     ax.text(3.58, 0.53,
-            "Candidate-edge vector: QBER · normalized rate · FSO flag · normalized distance · projected chain error · pool state · link switch · visited flag · destination progress",
-            ha="center", va="center", fontsize=6.65, color=INK, wrap=True)
+            "Candidate-edge vector: nine link and route features (see observation table)",
+            ha="center", va="center", fontsize=7.2, color=INK)
     ax.text(3.58, 0.16,
-            "The rate is a simulator utility; scenario weather and availability are modeled inputs, not field measurements.",
+            "Scenario channel and resource quantities are modeled inputs, not field measurements.",
             ha="center", va="center", fontsize=7.0, color="#56636D")
     fig.subplots_adjust(left=0.015, right=0.985, top=0.99, bottom=0.03)
     fig.savefig(OUT / "physical_state_pipeline.pdf", bbox_inches="tight", pad_inches=0.025)
@@ -106,7 +106,69 @@ def graph_policy():
     plt.close(fig)
 
 
+def matched_architecture():
+    """Matched GNN/LSTM encoder comparison and shared PPO decision path."""
+    gnn = "#2878B5"
+    lstm = "#D95F02"
+    ink = "#263746"
+    neutral = "#F4F6F8"
+    fig, ax = plt.subplots(figsize=(7.16, 3.25))
+    ax.set(xlim=(0, 7.16), ylim=(0, 3.25))
+    ax.axis("off")
+    ax.text(3.58, 3.15, "Matched encoders, shared constrained PPO decision path",
+            ha="center", va="top", fontsize=10.2, weight="bold", color=ink)
+
+    # Shared observation branches into the two encoder alternatives.
+    box(ax, (0.12, 1.35), (1.25, 1.05), "Shared\nobservation",
+        "node + graph state\ncurrent + destination\n9 candidate features",
+        fc=neutral, fontsize=7.0, body_size=6.7)
+    box(ax, (1.70, 1.90), (1.58, 0.82), "GNN encoder",
+        "message passing over\nQBER/rate-valid edges",
+        fc="#E7F0F7", title_color=gnn, body_size=7.2)
+    box(ax, (1.70, 0.92), (1.58, 0.82), "LSTM encoder",
+        "ordered node-feature rows;\nno edge-index input",
+        fc="#FBEDE3", title_color=lstm, body_size=7.2)
+    ax.text(2.49, 2.80, "GNN-PPO", ha="center", va="center", color=gnn,
+            fontsize=8.0, weight="bold")
+    ax.text(2.49, 0.73, "LSTM-PPO", ha="center", va="center", color=lstm,
+            fontsize=8.0, weight="bold")
+    arrow(ax, (1.37, 2.02), (1.68, 2.32), color=gnn, lw=1.25)
+    arrow(ax, (1.37, 1.72), (1.68, 1.32), color=lstm, lw=1.25)
+
+    box(ax, (3.56, 1.35), (1.23, 1.05), "Candidate\nscorer",
+        "encoder embedding +\nroute-context features\nscore each adjacent node",
+        fc=neutral, fontsize=7.0, body_size=6.6)
+    arrow(ax, (3.28, 2.31), (3.54, 2.08), color=gnn, lw=1.25)
+    arrow(ax, (3.28, 1.32), (3.54, 1.67), color=lstm, lw=1.25)
+
+    box(ax, (5.03, 1.35), (1.05, 1.05), "Feasibility\nmask",
+        "adjacent; QBER and\nchain error < threshold;\nrate > 0",
+        fc="#F4E6C3", fontsize=7.0, body_size=6.35)
+    arrow(ax, (4.79, 1.88), (5.01, 1.88))
+
+    box(ax, (6.32, 1.92), (0.72, 0.66), "Actor",
+        "masked\nsoftmax",
+        fc="#E6EFF6", title_color=gnn, fontsize=7.4, body_size=6.7)
+    box(ax, (6.32, 1.04), (0.72, 0.66), "Critic",
+        "value\nestimate",
+        fc=neutral, fontsize=7.4, body_size=6.7)
+    arrow(ax, (6.08, 2.02), (6.30, 2.22))
+    arrow(ax, (6.08, 1.72), (6.30, 1.37))
+    ax.text(6.68, 2.88, "Selected feasible\nnext hop", ha="center", va="center",
+            fontsize=7.0, color=ink)
+    arrow(ax, (6.68, 2.59), (6.68, 2.70), color=ink)
+
+    box(ax, (2.48, 0.05), (2.25, 0.46), "Shared PPO update",
+        "clipped policy objective; value loss; entropy",
+        fc=neutral, fontsize=7.5, body_size=6.5)
+    arrow(ax, (6.67, 1.02), (4.73, 0.38), color="#758796", lw=0.9, rad=-0.08)
+
+    fig.subplots_adjust(left=0.01, right=0.99, top=0.98, bottom=0.03)
+    fig.savefig(OUT / "matched_architecture.pdf", bbox_inches="tight", pad_inches=0.025)
+    plt.close(fig)
+
+
 if __name__ == "__main__":
     OUT.mkdir(exist_ok=True)
     physical_pipeline()
-    graph_policy()
+    matched_architecture()
