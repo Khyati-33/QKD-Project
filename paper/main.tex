@@ -51,19 +51,13 @@ Quantum key distribution, trusted-node networks, routing, graph neural networks,
 \end{IEEEkeywords}
 
 \section{Introduction}
-Trusted-node quantum key distribution (QKD) networks extend point-to-point key generation by relaying keys across intermediate nodes. A route determines which links must be available and which stored key resources are consumed, so network-level key delivery depends on more than geometric distance \cite{scarani2009,munro2015,ituY3800,ituY3803}. Routing therefore connects physical channel conditions to resource availability and end-to-end service feasibility.
+Trusted-node quantum key distribution (QKD) networks extend point-to-point key generation by relaying keys through intermediate nodes. A route determines which links must be available and which stored key resources are consumed, so network-level delivery depends on channel state and resource availability as well as geometric distance \cite{scarani2009,munro2015,ituY3800,ituY3803}. Routing therefore links physical conditions to end-to-end service feasibility.
 
-In QKD networks, link error, usable key-rate state, stored key pools, and time-varying availability can change which next hop is feasible and desirable \cite{mehic2020,johann2024}. A controller that sees these quantities must choose among feasible alternatives while the state evolves over the episode. This paper asks: \emph{Does graph message passing improve constrained next-hop routing over a matched LSTM-PPO node-sequence encoder in a hybrid fiber/FSO trusted-node QKD network?}
+This decision is especially state-dependent in hybrid fiber and free-space optical (FSO) networks. Fiber attenuation varies with span length and device parameters, while FSO links also depend on atmospheric attenuation, turbulence, pointing, and availability. Link error, usable key-rate state, stored key pools, and time-varying availability can change which next hop is feasible and desirable \cite{mehic2020,johann2024}. We ask: \emph{Does graph message passing improve constrained next-hop routing over a matched LSTM-PPO node-sequence encoder in a hybrid fiber/FSO trusted-node QKD network?} We study one route per episode, rather than traffic-level routing, wavelength/time-slot assignment, or demand blocking.
 
-The question is particularly relevant to hybrid fiber and free-space optical (FSO) links. Fiber attenuation varies predictably with span length and device parameters, whereas an FSO link also depends on atmospheric attenuation, turbulence, pointing, and availability. Under changing scenario state, neighboring links can have different quality and feasibility even when their topological positions are unchanged. A useful routing formulation must expose this state to the decision rule.
+Prior QKD-routing studies address related but distinct decisions. Sharma \emph{et al.} jointly optimize routing and optical-resource assignment for QKD lightpath requests under traffic load \cite{sharma2023}; Johann \emph{et al.} study route selection in meshed trusted-node networks with key-store state and network-level requests \cite{johann2024}. Learning-based routing, including PPO-based entanglement routing, is also established, so reinforcement learning itself is not the contribution claimed here \cite{roik2024routing,amer2023dynamic}. The present study instead tests graph-structured sequential next-hop decisions with fiber/FSO channel and normalized resource state in the observation, against a matched ordered-node LSTM policy.
 
-Prior QKD-routing studies address related but distinct decision problems. Sharma \emph{et al.} formulate routing and resource assignment for QKD-secured optical lightpath requests, jointly considering route and optical-resource allocation under traffic load \cite{sharma2023}. Johann \emph{et al.} study routing in meshed trusted-node networks with key-store state and network-level route selection \cite{johann2024}. Learning-based routing has also been studied in quantum networks, including PPO-based entanglement routing; the use of reinforcement learning itself is therefore not the contribution claimed here \cite{roik2024routing,amer2023dynamic}. We instead examine graph-structured sequential next-hop decisions where fiber/FSO physical state and normalized resource state enter the policy observation. The task is route selection in a single-episode simulator, not traffic-level routing, wavelength/time-slot assignment, or demand blocking.
-
-We model a scenario-dependent network as a graph with node and link observations. Invalid candidate actions are excluded by an explicit feasibility mask; a three-layer graph neural network (GNN) encodes graph context, and a proximal policy optimization (PPO) actor selects a next hop among the remaining candidates. PPO supplies the optimization procedure, while the research question concerns whether this graph representation and state coupling produce useful choices among feasible alternatives.
-
-The contributions are threefold: (1) a hybrid fiber/FSO trusted-node simulator coupling scenario-dependent channel and normalized key-pool state to routing observations; (2) an implementation-matched GNN-PPO versus LSTM-PPO comparison with independent training seeds and paired held-out scenarios; and (3) route-completion, route-length, condition, seed-variability, inference-cost, and reward-component diagnostics. The comparison isolates the encoder choice within this simulator; it does not establish field performance or secret-key service capacity.
-
-Section II reviews QKD links, trusted-node networking, and related routing methods. Section III describes the simulator and matched experimental protocol. Section IV formulates the constrained routing policy and the LSTM-PPO comparator. Section V reports the paired architecture evaluation and route-level diagnostics. Section VI interprets the findings and their limits, and Section VII concludes.
+We contribute (1) a hybrid fiber/FSO trusted-node simulator coupling scenario-dependent channel and normalized key-pool state to routing observations; (2) a matched GNN-PPO/LSTM-PPO comparison using five independent training seeds and paired held-out scenarios; and (3) route-completion, route-length, condition, seed-variability, inference-cost, and reward-component analyses. Across the frozen 540-scenario held-out matrix, LSTM-PPO completed 74.6\% of routes versus 46.1\% for GNN-PPO, a paired difference of 28.5 percentage points (nested 95\% interval: 20.6--37.2). This answers the stated question in favor of the tested LSTM implementation under this simulator; its fixed node order and per-decision state reset limit that interpretation. The result does not establish field performance or secret-key service capacity. Section II reviews related work; Section III describes the simulator and protocol; Section IV formulates the routing policy and comparator; Section V reports results; Section VI discusses interpretation and limits; and Section VII concludes.
 
 \section{Background and Related Work}
 \subsection{QKD and Trusted-Node Networking}
@@ -84,10 +78,10 @@ Classical shortest-path methods provide reproducible baselines but optimize a fi
 Sequential decision methods can represent state-dependent link availability; dynamic programming provides a classical foundation for sequential optimization \cite{bellman1957}. PPO is a clipped policy-gradient method, and generalized advantage estimation reduces variance in its return estimates \cite{schulman2017,schulman2016gae}. The partially observed formulation follows standard POMDP and reinforcement-learning foundations \cite{kaelbling1998,sutton2018}. Graph neural networks encode neighborhoods by message passing, for example
 \begin{equation}
  h_v^{(\ell+1)}=\phi\!\left(h_v^{(\ell)},\operatorname{AGG}_{u\in\mathcal N(v)}
- \psi(h_v^{(\ell)},h_u^{(\ell)},e_{uv})\right),
+ \psi(h_v^{(\ell)},h_u^{(\ell)},e_{uv})\right).
  \label{eq:message-passing}
 \end{equation}
-with graph convolution, neighborhood aggregation, and attention providing established operators \cite{kipf2017,hamilton2017,velickovic2018}. This representation is relevant when candidate actions are neighboring nodes and link state must be combined with route context. Whether it improves decisions over a matched non-graph policy remains an empirical question.
+Here, $h_v^{(\ell)}$ is the embedding of node $v$ at layer $\ell$, $e_{uv}$ is the edge feature, $\psi$ is a learned message map, $\operatorname{AGG}$ combines incoming messages, and $\phi$ updates the node embedding. Graph convolution, neighborhood aggregation, and attention are established choices for these operators \cite{kipf2017,hamilton2017,velickovic2018}. This representation is relevant when candidate actions are neighboring nodes and link state must be combined with route context. Whether it improves decisions over a matched non-graph policy remains an empirical question.
 
 \section{Simulator Architecture and Experimental Setup}
 \subsection{Architecture}
@@ -146,11 +140,17 @@ The default rate mode is an asymptotic, normalized proxy of the form
  r_{\mathrm{proxy}} = p_{\mathrm{det}}\left[1-2h_2(Q)\right],
  \label{eq:proxy}
 \end{equation}
-where $p_{\mathrm{det}}$ is modeled detection probability, $Q$ is modeled QBER, and $h_2$ is binary entropy. An opt-in decoy-state mode estimates finite-key contributions and uncertainty; its engineering estimate is not a composable security proof.
+where $p_{\mathrm{det}}$ is modeled detection probability, $Q$ is modeled QBER, and $h_2(Q)=-Q\log_2 Q-(1-Q)\log_2(1-Q)$ is binary entropy, with endpoint values defined by continuity. This asymptotic expression is used as a normalized simulator proxy. An opt-in decoy-state mode estimates finite-key contributions and uncertainty; that engineering estimate is not a composable security proof.
 
 
 \subsubsection{Environment and Protected Conditions}
-The observation uses relative node features and candidate-edge features; absolute coordinates and node identifiers are excluded in the evaluated configuration. Candidate actions are adjacent nodes only. Let $\mathcal{N}(v_t)$ be the neighbors of the current node and define $m_{t,u}=1$ only if edge $(v_t,u)$ has QBER below $Q_{\max}$, positive normalized rate proxy, and projected chain error below $Q_{\max}$. The feasible action set is
+The observation uses relative node features and candidate-edge features; absolute coordinates and node identifiers are excluded in the evaluated configuration. Candidate actions are adjacent nodes only. Within each untrusted segment, the model assumes independent hop errors $Q_i$. Their cumulative parity-error probability after $k$ hops is
+\begin{equation}
+ Q_{\mathrm{chain},k}=\frac{1-\prod_{i=1}^{k}(1-2Q_i)}{2},
+ \qquad Q_{\mathrm{chain},0}=0.
+ \label{eq:chain-error}
+\end{equation}
+The accumulator resets to zero on arrival at a full trusted node. Let $\mathcal{N}(v_t)$ be the neighbors of the current node and define $m_{t,u}=1$ only if edge $(v_t,u)$ has QBER below $Q_{\max}$, positive normalized rate proxy, and projected segment error from (\ref{eq:chain-error}) below $Q_{\max}$. The feasible action set is
 \begin{equation}
  \mathcal{A}_{\mathrm{feasible}}(s_t)=\{u\in\mathcal{N}(v_t):m_{t,u}=1\},
  \label{eq:feasible-actions}
@@ -257,19 +257,21 @@ subject to the action constraint in (\ref{eq:feasible-actions}). The reward in (
 \subsubsection{Graph Policy and Action Mask}
 For each node $v$, the message-passing stack computes an embedding $h_v$ from node features and graph connectivity. The encoder uses QBER and positive rate proxy to filter invalid full-graph edges; the message function itself aggregates learned transformations of endpoint embeddings. The actor's attention head then combines current, destination, and candidate-neighbor embeddings with the candidate's nine route-context features. It produces logits $z_{v,u}$ for adjacent candidates. Invalid candidates are assigned negative infinity before softmax:
 \begin{equation}
- \pi_\theta(u\mid o_t)=\operatorname{softmax}_{u\in\mathcal{A}(o_t)}(z_{v_t,u}).
+ \pi_\theta(u\mid o_t)=\frac{\exp(z_{v_t,u})}{\sum_{w\in\mathcal{A}_{\mathrm{feasible}}(s_t)}\exp(z_{v_t,w})},\quad u\in\mathcal{A}_{\mathrm{feasible}}(s_t).
 \end{equation}
-Invalid links contribute no message in either direction, and the candidate mask additionally enforces projected chain error. This separates the environment's feasibility filter from the learned preference: the policy chooses among feasible alternatives.
+The distribution is normalized over the feasible set defined in (\ref{eq:feasible-actions}). Invalid links contribute no message in either direction, and the candidate mask additionally enforces projected chain error. If this set is empty, the evaluator records a no-valid-action failure rather than sampling from an empty distribution. This separates the environment's feasibility filter from the learned preference: the policy chooses among feasible alternatives.
 
 In the optional attention variant, candidate embeddings are combined using learned compatibility scores, following neighborhood attention formulations \cite{velickovic2018}. Attention is treated as an architectural choice. Its value must be established by an ablation with the same training budget and seed distribution. The current results do not isolate a causal benefit from attention.
 
 \subsubsection{PPO Training}
 The policy is updated by maximizing the clipped surrogate objective
 \begin{equation}
- L^{\mathrm{clip}}(\theta)=\mathbb{E}_t\left[\min\left(\rho_t(\theta)\hat A_t,
- \operatorname{clip}(\rho_t(\theta),1-\epsilon,1+\epsilon)\hat A_t\right)\right],
+\begin{aligned}
+ L^{\mathrm{clip}}(\theta)=\mathbb{E}_t\Bigl[\min\Bigl(&\rho_t(\theta)\hat A_t,\\
+ &\operatorname{clip}(\rho_t(\theta),1-\epsilon,1+\epsilon)\hat A_t\Bigr)\Bigr],
+\end{aligned}
 \end{equation}
-where $\rho_t(\theta)$ is the new-to-old action probability ratio and $\hat A_t$ is the estimated advantage. PPO is combined with a value loss and entropy regularization. Hyperparameters are resolved from a versioned YAML file and included with the experiment artifact. The settings for the transfer-evaluation checkpoint and paired episode seeds are archived in the supplementary package.
+where $\rho_t(\theta)=\pi_\theta(a_t\mid o_t)/\pi_{\theta_{\mathrm{old}}}(a_t\mid o_t)$ is the new-to-old action-probability ratio, $\hat A_t$ is the estimated advantage, and $\epsilon$ is the clipping threshold. PPO is combined with a value loss and entropy regularization. Hyperparameters are resolved from a versioned YAML file and included with the experiment artifact. The settings for the transfer-evaluation checkpoint and paired episode seeds are archived in the supplementary package.
 
 \subsection{Encoder-Level Comparison}
 Fig.~\ref{fig:matched-architecture} summarizes the shared and encoder-specific components.
@@ -369,7 +371,9 @@ The city corridors are OpenStreetMap road proxies, not verified fiber routes; FS
 The archived exact reward-oracle check uses a static toy graph and a different state/action setting. It is retained in the supplementary research package as a separate diagnostic and is not pooled with, or used to rank policies in, the matched encoder evaluation.
 
 \section{Conclusion}
-This work presents a matched simulator study of GNN-PPO and LSTM-PPO for constrained next-hop routing in a modeled hybrid fiber/FSO trusted-node network. In the five-seed, 540-scenario-per-policy held-out evaluation, LSTM-PPO route completion was 74.6\% versus 46.1\% for GNN-PPO (paired difference 28.5 percentage points; nested 95\% interval 20.6--37.2). This result is specific to the implemented ordered-node LSTM and graph-message-passing policies under the evaluated scenario matrix. The network and channel quantities remain uncalibrated proxies. Future work should test node-order and topology sensitivity and calibrate channels, key pools, and service demand against traceable network data before making deployment claims.
+In this five-seed evaluation of 540 paired scenarios, LSTM-PPO completed 74.6\% of routes versus 46.1\% for GNN-PPO (difference: 28.5 percentage points; nested 95\% interval: 20.6--37.2). This supports the tested LSTM implementation only within this simulator and scenario matrix; it is not a general architecture ranking. Network and channel values remain uncalibrated proxies.
+
+Open questions include the effects of node permutations, parameter-matched and graph-aware sequence encoders, persistent LSTM state, more training seeds, and broader topologies. Calibrated channel and key-pool dynamics and classical resource-aware baselines under the same held-out conditions are needed before assessing field performance or delivered secret-key service.
 
 \section*{Acknowledgment}
 Funding and institutional acknowledgments are to be supplied by the authors.
