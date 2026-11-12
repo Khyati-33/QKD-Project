@@ -1,0 +1,1020 @@
+{
+  "status": "complete",
+  "created_utc": "2026-11-12T10:05:00.825137+00:00",
+  "source_report": "experiments\\final_gnn_lstm_holdout_20261007.json",
+  "protocol": {
+    "checkpoints": 5,
+    "matched_training_seeds": [
+      20261002,
+      20261003,
+      20261004,
+      20261005,
+      20261006
+    ],
+    "scenarios_per_checkpoint": 108,
+    "thread_counts": [
+      1,
+      4,
+      8
+    ],
+    "measured_repeats_per_scenario": 10,
+    "timed_operation": "one deterministic LSTM-PPO actor call (forward, masked distribution, argmax)",
+    "warmup": "one pass through the 108 held-out reset observations per cache mode",
+    "cache": "exact-byte node-feature key; max 32 embeddings; encoder-only memoization",
+    "environment": "same frozen 108-scenario matrix, CPU, no environment stepping timed",
+    "note": "Warm-cache latency applies after a feature matrix has been encoded; cold miss cost is not included in the reported warm-call quantiles.",
+    "original_latency_protocol_replication": {
+      "observation": "Delhi-to-Mumbai, normal, 02:00, seed 700000",
+      "warmup_calls": 100,
+      "measured_calls": 1000
+    }
+  },
+  "host": {
+    "platform": "Windows-11-10.0.26300-SP0",
+    "processor": "Intel64 Family 6 Model 141 Stepping 1, GenuineIntel",
+    "logical_cpu_count": 16,
+    "physical_cpu_count": 8,
+    "torch_version": "2.14.0+cpu",
+    "other_python_processes": []
+  },
+  "aggregate_by_threads": {
+    "1": {
+      "cache_off": {
+        "checkpoint_mean_p50_ms": 7.03245,
+        "checkpoint_sd_p50_ms": 1.0228451025204155,
+        "checkpoint_mean_p95_ms": 9.796625,
+        "checkpoint_sd_p95_ms": 1.7243465404683014,
+        "checkpoint_mean_p99_ms": 11.838492600000004
+      },
+      "cache_on": {
+        "checkpoint_mean_p50_ms": 0.7744500000000001,
+        "checkpoint_sd_p50_ms": 0.13240375277914143,
+        "checkpoint_mean_p95_ms": 1.332744,
+        "checkpoint_sd_p95_ms": 0.2341463173797531,
+        "checkpoint_mean_p99_ms": 1.704609200000002
+      },
+      "mean_checkpoint_p95_reduction_percent": 86.3258754144201,
+      "all_outputs_exact": true
+    },
+    "4": {
+      "cache_off": {
+        "checkpoint_mean_p50_ms": 11.33235,
+        "checkpoint_sd_p50_ms": 1.409887812469488,
+        "checkpoint_mean_p95_ms": 15.498484999999999,
+        "checkpoint_sd_p95_ms": 1.8404487057033136,
+        "checkpoint_mean_p99_ms": 18.99462660000001
+      },
+      "cache_on": {
+        "checkpoint_mean_p50_ms": 0.97563,
+        "checkpoint_sd_p50_ms": 0.04961125880281612,
+        "checkpoint_mean_p95_ms": 1.7460010000000001,
+        "checkpoint_sd_p95_ms": 0.14205711054009246,
+        "checkpoint_mean_p99_ms": 2.2412576000000053
+      },
+      "mean_checkpoint_p95_reduction_percent": 88.50634604414059,
+      "all_outputs_exact": true
+    },
+    "8": {
+      "cache_off": {
+        "checkpoint_mean_p50_ms": 16.692659999999997,
+        "checkpoint_sd_p50_ms": 0.9745922592294688,
+        "checkpoint_mean_p95_ms": 20.642018999999998,
+        "checkpoint_sd_p95_ms": 1.7671256456510098,
+        "checkpoint_mean_p99_ms": 25.056569400000008
+      },
+      "cache_on": {
+        "checkpoint_mean_p50_ms": 1.18234,
+        "checkpoint_sd_p50_ms": 0.08040189207972653,
+        "checkpoint_mean_p95_ms": 1.9965579999999996,
+        "checkpoint_sd_p95_ms": 0.1615120383516348,
+        "checkpoint_mean_p99_ms": 2.392212000000001
+      },
+      "mean_checkpoint_p95_reduction_percent": 90.21807054180482,
+      "all_outputs_exact": true
+    }
+  },
+  "per_checkpoint": [
+    {
+      "training_seed": 20261002,
+      "checkpoint": "experiments\\runs\\final_holdout_lstm_20261002_20261007T134429Z_f031bb85\\checkpoints\\LSTM\\best_by_success_rate.pt",
+      "checkpoint_sha256": "80e673c1a26e44128305edc6022f4f4c9dc4ac08fffdf63baa3645e2007ff0f7",
+      "threads": {
+        "1": {
+          "cache_off": {
+            "calls": 1080,
+            "mean_ms": 5.3747771296296305,
+            "p50_ms": 5.2269000000000005,
+            "p95_ms": 7.14945,
+            "p99_ms": 8.357261000000001
+          },
+          "cache_on": {
+            "calls": 1080,
+            "mean_ms": 0.6253090740740741,
+            "p50_ms": 0.55955,
+            "p95_ms": 0.9402799999999996,
+            "p99_ms": 1.3034290000000002
+          },
+          "cache_entries_after_warmup": 5,
+          "p95_reduction_percent": 86.84821909377645,
+          "p50_reduction_percent": 89.29480189022175,
+          "equivalence": {
+            "observations": 108,
+            "max_logit_abs_difference": 0.0,
+            "max_value_abs_difference": 0.0,
+            "deterministic_action_mismatches": 0
+          }
+        },
+        "4": {
+          "cache_off": {
+            "calls": 1080,
+            "mean_ms": 9.287673425925927,
+            "p50_ms": 8.904250000000001,
+            "p95_ms": 12.736429999999999,
+            "p99_ms": 17.518271000000002
+          },
+          "cache_on": {
+            "calls": 1080,
+            "mean_ms": 1.2015260185185184,
+            "p50_ms": 1.04205,
+            "p95_ms": 1.98506,
+            "p99_ms": 3.2028060000000225
+          },
+          "cache_entries_after_warmup": 5,
+          "p95_reduction_percent": 84.4143139011481,
+          "p50_reduction_percent": 88.2971614678384,
+          "equivalence": {
+            "observations": 108,
+            "max_logit_abs_difference": 0.0,
+            "max_value_abs_difference": 0.0,
+            "deterministic_action_mismatches": 0
+          }
+        },
+        "8": {
+          "cache_off": {
+            "calls": 1080,
+            "mean_ms": 17.18458777777778,
+            "p50_ms": 16.772599999999997,
+            "p95_ms": 22.667384999999992,
+            "p99_ms": 31.434021000000012
+          },
+          "cache_on": {
+            "calls": 1080,
+            "mean_ms": 1.1747653703703702,
+            "p50_ms": 1.0933000000000002,
+            "p95_ms": 1.7629299999999999,
+            "p99_ms": 2.114342000000003
+          },
+          "cache_entries_after_warmup": 5,
+          "p95_reduction_percent": 92.22261412156718,
+          "p50_reduction_percent": 93.48163075492172,
+          "equivalence": {
+            "observations": 108,
+            "max_logit_abs_difference": 0.0,
+            "max_value_abs_difference": 0.0,
+            "deterministic_action_mismatches": 0
+          }
+        }
+      },
+      "original_latency_protocol": {
+        "1": {
+          "cache_off": {
+            "calls": 1000,
+            "mean_ms": 5.6374059999999995,
+            "p50_ms": 5.59955,
+            "p95_ms": 7.198169999999998,
+            "p99_ms": 8.042983
+          },
+          "cache_on": {
+            "calls": 1000,
+            "mean_ms": 0.7107745999999999,
+            "p50_ms": 0.61435,
+            "p95_ms": 1.215395,
+            "p99_ms": 1.4950099999999997
+          },
+          "equivalence": {
+            "max_logit_abs_difference": 0.0,
+            "logits_exact_including_mask": true,
+            "max_value_abs_difference": 0.0,
+            "deterministic_action_mismatch": 0
+          },
+          "p95_reduction_percent": 83.11522234123395
+        },
+        "4": {
+          "cache_off": {
+            "calls": 1000,
+            "mean_ms": 9.782154700000001,
+            "p50_ms": 9.574950000000001,
+            "p95_ms": 12.449459999999995,
+            "p99_ms": 14.232612999999999
+          },
+          "cache_on": {
+            "calls": 1000,
+            "mean_ms": 0.9640112,
+            "p50_ms": 0.8839,
+            "p95_ms": 1.532455,
+            "p99_ms": 1.824604
+          },
+          "equivalence": {
+            "max_logit_abs_difference": 0.0,
+            "logits_exact_including_mask": true,
+            "max_value_abs_difference": 0.0,
+            "deterministic_action_mismatch": 0
+          },
+          "p95_reduction_percent": 87.69059059589732
+        },
+        "8": {
+          "cache_off": {
+            "calls": 1000,
+            "mean_ms": 13.6271835,
+            "p50_ms": 13.7238,
+            "p95_ms": 16.456945,
+            "p99_ms": 17.819594
+          },
+          "cache_on": {
+            "calls": 1000,
+            "mean_ms": 1.1145691,
+            "p50_ms": 1.0316,
+            "p95_ms": 1.6349349999999994,
+            "p99_ms": 1.9161009999999998
+          },
+          "equivalence": {
+            "max_logit_abs_difference": 0.0,
+            "logits_exact_including_mask": true,
+            "max_value_abs_difference": 0.0,
+            "deterministic_action_mismatch": 0
+          },
+          "p95_reduction_percent": 90.0653796922819
+        }
+      }
+    },
+    {
+      "training_seed": 20261003,
+      "checkpoint": "experiments\\runs\\final_holdout_lstm_20261003_20261007T140907Z_40d53aa9\\checkpoints\\LSTM\\best_by_success_rate.pt",
+      "checkpoint_sha256": "c1c9a21cb9598d602355fbe80e1fa12046e9ef1d7d147de0989f7c361086e46e",
+      "threads": {
+        "1": {
+          "cache_off": {
+            "calls": 1080,
+            "mean_ms": 7.914839074074075,
+            "p50_ms": 7.416449999999999,
+            "p95_ms": 11.90748,
+            "p99_ms": 16.104914
+          },
+          "cache_on": {
+            "calls": 1080,
+            "mean_ms": 0.8156939814814815,
+            "p50_ms": 0.7386,
+            "p95_ms": 1.322115,
+            "p99_ms": 1.8567760000000038
+          },
+          "cache_entries_after_warmup": 5,
+          "p95_reduction_percent": 88.89676908968144,
+          "p50_reduction_percent": 90.04105737920435,
+          "equivalence": {
+            "observations": 108,
+            "max_logit_abs_difference": 0.0,
+            "max_value_abs_difference": 0.0,
+            "deterministic_action_mismatches": 0
+          }
+        },
+        "4": {
+          "cache_off": {
+            "calls": 1080,
+            "mean_ms": 11.877696203703703,
+            "p50_ms": 11.3525,
+            "p95_ms": 15.281804999999999,
+            "p99_ms": 17.18915600000001
+          },
+          "cache_on": {
+            "calls": 1080,
+            "mean_ms": 1.0971162962962964,
+            "p50_ms": 0.9975,
+            "p95_ms": 1.7344849999999998,
+            "p99_ms": 1.9645550000000003
+          },
+          "cache_entries_after_warmup": 5,
+          "p95_reduction_percent": 88.64999913295583,
+          "p50_reduction_percent": 91.21338912133889,
+          "equivalence": {
+            "observations": 108,
+            "max_logit_abs_difference": 0.0,
+            "max_value_abs_difference": 0.0,
+            "deterministic_action_mismatches": 0
+          }
+        },
+        "8": {
+          "cache_off": {
+            "calls": 1080,
+            "mean_ms": 16.964687962962962,
+            "p50_ms": 16.6031,
+            "p95_ms": 19.942804999999996,
+            "p99_ms": 22.410510000000006
+          },
+          "cache_on": {
+            "calls": 1080,
+            "mean_ms": 1.2367369444444445,
+            "p50_ms": 1.09765,
+            "p95_ms": 2.02446,
+            "p99_ms": 2.2689470000000003
+          },
+          "cache_entries_after_warmup": 5,
+          "p95_reduction_percent": 89.8486697332697,
+          "p50_reduction_percent": 93.388885208184,
+          "equivalence": {
+            "observations": 108,
+            "max_logit_abs_difference": 0.0,
+            "max_value_abs_difference": 0.0,
+            "deterministic_action_mismatches": 0
+          }
+        }
+      },
+      "original_latency_protocol": {
+        "1": {
+          "cache_off": {
+            "calls": 1000,
+            "mean_ms": 5.718922500000001,
+            "p50_ms": 5.638999999999999,
+            "p95_ms": 7.39928,
+            "p99_ms": 8.316151999999999
+          },
+          "cache_on": {
+            "calls": 1000,
+            "mean_ms": 0.744443,
+            "p50_ms": 0.6678999999999999,
+            "p95_ms": 1.2488799999999995,
+            "p99_ms": 1.612585
+          },
+          "equivalence": {
+            "max_logit_abs_difference": 0.0,
+            "logits_exact_including_mask": true,
+            "max_value_abs_difference": 0.0,
+            "deterministic_action_mismatch": 0
+          },
+          "p95_reduction_percent": 83.12160102063986
+        },
+        "4": {
+          "cache_off": {
+            "calls": 1000,
+            "mean_ms": 9.706901,
+            "p50_ms": 9.5948,
+            "p95_ms": 12.112639999999999,
+            "p99_ms": 13.551412
+          },
+          "cache_on": {
+            "calls": 1000,
+            "mean_ms": 0.9246987,
+            "p50_ms": 0.8248,
+            "p95_ms": 1.5144249999999997,
+            "p99_ms": 1.7724369999999998
+          },
+          "equivalence": {
+            "max_logit_abs_difference": 0.0,
+            "logits_exact_including_mask": true,
+            "max_value_abs_difference": 0.0,
+            "deterministic_action_mismatch": 0
+          },
+          "p95_reduction_percent": 87.4971517357075
+        },
+        "8": {
+          "cache_off": {
+            "calls": 1000,
+            "mean_ms": 13.8422858,
+            "p50_ms": 13.982800000000001,
+            "p95_ms": 16.644000000000002,
+            "p99_ms": 18.128234
+          },
+          "cache_on": {
+            "calls": 1000,
+            "mean_ms": 1.0943831,
+            "p50_ms": 1.0337,
+            "p95_ms": 1.53454,
+            "p99_ms": 1.918819
+          },
+          "equivalence": {
+            "max_logit_abs_difference": 0.0,
+            "logits_exact_including_mask": true,
+            "max_value_abs_difference": 0.0,
+            "deterministic_action_mismatch": 0
+          },
+          "p95_reduction_percent": 90.78022110069695
+        }
+      }
+    },
+    {
+      "training_seed": 20261004,
+      "checkpoint": "experiments\\runs\\final_holdout_lstm_20261004_20261007T143836Z_dbbcdc1c\\checkpoints\\LSTM\\best_by_success_rate.pt",
+      "checkpoint_sha256": "70e1590178cfa63b9403f5cd1c915467fba2839cf67c1aa90ec96776445381f4",
+      "threads": {
+        "1": {
+          "cache_off": {
+            "calls": 1080,
+            "mean_ms": 7.648204444444444,
+            "p50_ms": 7.37115,
+            "p95_ms": 10.18554,
+            "p99_ms": 11.808920000000006
+          },
+          "cache_on": {
+            "calls": 1080,
+            "mean_ms": 0.9179259259259259,
+            "p50_ms": 0.8638,
+            "p95_ms": 1.5338,
+            "p99_ms": 1.925345000000003
+          },
+          "cache_entries_after_warmup": 5,
+          "p95_reduction_percent": 84.94139731423175,
+          "p50_reduction_percent": 88.2813400894026,
+          "equivalence": {
+            "observations": 108,
+            "max_logit_abs_difference": 0.0,
+            "max_value_abs_difference": 0.0,
+            "deterministic_action_mismatches": 0
+          }
+        },
+        "4": {
+          "cache_off": {
+            "calls": 1080,
+            "mean_ms": 12.734067592592591,
+            "p50_ms": 12.40725,
+            "p95_ms": 16.197509999999998,
+            "p99_ms": 20.608122000000005
+          },
+          "cache_on": {
+            "calls": 1080,
+            "mean_ms": 1.067175925925926,
+            "p50_ms": 0.9813000000000001,
+            "p95_ms": 1.70699,
+            "p99_ms": 2.0350550000000007
+          },
+          "cache_entries_after_warmup": 5,
+          "p95_reduction_percent": 89.46140487025475,
+          "p50_reduction_percent": 92.09091458622983,
+          "equivalence": {
+            "observations": 108,
+            "max_logit_abs_difference": 0.0,
+            "max_value_abs_difference": 0.0,
+            "deterministic_action_mismatches": 0
+          }
+        },
+        "8": {
+          "cache_off": {
+            "calls": 1080,
+            "mean_ms": 17.95181185185185,
+            "p50_ms": 17.6117,
+            "p95_ms": 21.882345,
+            "p99_ms": 26.462442000000006
+          },
+          "cache_on": {
+            "calls": 1080,
+            "mean_ms": 1.325435462962963,
+            "p50_ms": 1.2618,
+            "p95_ms": 1.9970399999999997,
+            "p99_ms": 2.2948060000000012
+          },
+          "cache_entries_after_warmup": 5,
+          "p95_reduction_percent": 90.8737386235342,
+          "p50_reduction_percent": 92.835444619202,
+          "equivalence": {
+            "observations": 108,
+            "max_logit_abs_difference": 0.0,
+            "max_value_abs_difference": 0.0,
+            "deterministic_action_mismatches": 0
+          }
+        }
+      },
+      "original_latency_protocol": {
+        "1": {
+          "cache_off": {
+            "calls": 1000,
+            "mean_ms": 5.841038899999999,
+            "p50_ms": 5.67615,
+            "p95_ms": 7.719734999999999,
+            "p99_ms": 8.853039999999998
+          },
+          "cache_on": {
+            "calls": 1000,
+            "mean_ms": 0.7322875,
+            "p50_ms": 0.6234999999999999,
+            "p95_ms": 1.2628749999999997,
+            "p99_ms": 1.5716039999999998
+          },
+          "equivalence": {
+            "max_logit_abs_difference": 0.0,
+            "logits_exact_including_mask": true,
+            "max_value_abs_difference": 0.0,
+            "deterministic_action_mismatch": 0
+          },
+          "p95_reduction_percent": 83.64095399647786
+        },
+        "4": {
+          "cache_off": {
+            "calls": 1000,
+            "mean_ms": 9.5694658,
+            "p50_ms": 9.4473,
+            "p95_ms": 11.81515,
+            "p99_ms": 13.197232
+          },
+          "cache_on": {
+            "calls": 1000,
+            "mean_ms": 0.9456191000000002,
+            "p50_ms": 0.8552,
+            "p95_ms": 1.4381,
+            "p99_ms": 1.66703
+          },
+          "equivalence": {
+            "max_logit_abs_difference": 0.0,
+            "logits_exact_including_mask": true,
+            "max_value_abs_difference": 0.0,
+            "deterministic_action_mismatch": 0
+          },
+          "p95_reduction_percent": 87.8283390392843
+        },
+        "8": {
+          "cache_off": {
+            "calls": 1000,
+            "mean_ms": 13.8065019,
+            "p50_ms": 13.884699999999999,
+            "p95_ms": 16.45592,
+            "p99_ms": 18.107369
+          },
+          "cache_on": {
+            "calls": 1000,
+            "mean_ms": 1.1191035999999999,
+            "p50_ms": 1.0279,
+            "p95_ms": 1.67252,
+            "p99_ms": 2.036441
+          },
+          "equivalence": {
+            "max_logit_abs_difference": 0.0,
+            "logits_exact_including_mask": true,
+            "max_value_abs_difference": 0.0,
+            "deterministic_action_mismatch": 0
+          },
+          "p95_reduction_percent": 89.83636284084999
+        }
+      }
+    },
+    {
+      "training_seed": 20261005,
+      "checkpoint": "experiments\\runs\\final_holdout_lstm_20261005_20261007T150415Z_2dc7ae9e\\checkpoints\\LSTM\\best_by_success_rate.pt",
+      "checkpoint_sha256": "05134f74195f445ccb85a2377c8f36d739d4743b6d7022f5783223c559214e05",
+      "threads": {
+        "1": {
+          "cache_off": {
+            "calls": 1080,
+            "mean_ms": 7.5923329629629634,
+            "p50_ms": 7.37845,
+            "p95_ms": 9.504185,
+            "p99_ms": 10.6362
+          },
+          "cache_on": {
+            "calls": 1080,
+            "mean_ms": 0.8586121296296295,
+            "p50_ms": 0.82645,
+            "p95_ms": 1.3872649999999997,
+            "p99_ms": 1.6557570000000015
+          },
+          "cache_entries_after_warmup": 5,
+          "p95_reduction_percent": 85.40364060674324,
+          "p50_reduction_percent": 88.79913803034512,
+          "equivalence": {
+            "observations": 108,
+            "max_logit_abs_difference": 0.0,
+            "max_value_abs_difference": 0.0,
+            "deterministic_action_mismatches": 0
+          }
+        },
+        "4": {
+          "cache_off": {
+            "calls": 1080,
+            "mean_ms": 12.452846759259257,
+            "p50_ms": 11.92425,
+            "p95_ms": 15.458099999999998,
+            "p99_ms": 18.810708000000027
+          },
+          "cache_on": {
+            "calls": 1080,
+            "mean_ms": 1.0348783333333333,
+            "p50_ms": 0.9446,
+            "p95_ms": 1.69726,
+            "p99_ms": 2.028757000000001
+          },
+          "cache_entries_after_warmup": 5,
+          "p95_reduction_percent": 89.02025475317147,
+          "p50_reduction_percent": 92.07832777742836,
+          "equivalence": {
+            "observations": 108,
+            "max_logit_abs_difference": 0.0,
+            "max_value_abs_difference": 0.0,
+            "deterministic_action_mismatches": 0
+          }
+        },
+        "8": {
+          "cache_off": {
+            "calls": 1080,
+            "mean_ms": 17.71306111111111,
+            "p50_ms": 17.36195,
+            "p95_ms": 20.59735,
+            "p99_ms": 24.171931000000004
+          },
+          "cache_on": {
+            "calls": 1080,
+            "mean_ms": 1.309365,
+            "p50_ms": 1.22935,
+            "p95_ms": 1.981025,
+            "p99_ms": 2.2132390000000006
+          },
+          "cache_entries_after_warmup": 5,
+          "p95_reduction_percent": 90.3821365369817,
+          "p50_reduction_percent": 92.9192861400937,
+          "equivalence": {
+            "observations": 108,
+            "max_logit_abs_difference": 0.0,
+            "max_value_abs_difference": 0.0,
+            "deterministic_action_mismatches": 0
+          }
+        }
+      },
+      "original_latency_protocol": {
+        "1": {
+          "cache_off": {
+            "calls": 1000,
+            "mean_ms": 5.6919326,
+            "p50_ms": 5.6051,
+            "p95_ms": 7.440804999999999,
+            "p99_ms": 8.151745
+          },
+          "cache_on": {
+            "calls": 1000,
+            "mean_ms": 0.7184859,
+            "p50_ms": 0.60795,
+            "p95_ms": 1.2472899999999996,
+            "p99_ms": 1.4296689999999999
+          },
+          "equivalence": {
+            "max_logit_abs_difference": 0.0,
+            "logits_exact_including_mask": true,
+            "max_value_abs_difference": 0.0,
+            "deterministic_action_mismatch": 0
+          },
+          "p95_reduction_percent": 83.23716318328461
+        },
+        "4": {
+          "cache_off": {
+            "calls": 1000,
+            "mean_ms": 9.747512500000001,
+            "p50_ms": 9.5525,
+            "p95_ms": 12.743644999999997,
+            "p99_ms": 14.343651999999999
+          },
+          "cache_on": {
+            "calls": 1000,
+            "mean_ms": 0.9382189000000001,
+            "p50_ms": 0.8421000000000001,
+            "p95_ms": 1.509915,
+            "p99_ms": 1.7852899999999998
+          },
+          "equivalence": {
+            "max_logit_abs_difference": 0.0,
+            "logits_exact_including_mask": true,
+            "max_value_abs_difference": 0.0,
+            "deterministic_action_mismatch": 0
+          },
+          "p95_reduction_percent": 88.15162380935753
+        },
+        "8": {
+          "cache_off": {
+            "calls": 1000,
+            "mean_ms": 13.761096100000001,
+            "p50_ms": 13.81665,
+            "p95_ms": 17.018265,
+            "p99_ms": 19.545899
+          },
+          "cache_on": {
+            "calls": 1000,
+            "mean_ms": 1.1546855,
+            "p50_ms": 1.07145,
+            "p95_ms": 1.7105099999999998,
+            "p99_ms": 1.9883239999999998
+          },
+          "equivalence": {
+            "max_logit_abs_difference": 0.0,
+            "logits_exact_including_mask": true,
+            "max_value_abs_difference": 0.0,
+            "deterministic_action_mismatch": 0
+          },
+          "p95_reduction_percent": 89.94897540965545
+        }
+      }
+    },
+    {
+      "training_seed": 20261006,
+      "checkpoint": "experiments\\runs\\final_holdout_lstm_20261006_20261007T162513Z_1454bc73\\checkpoints\\LSTM\\best_by_success_rate.pt",
+      "checkpoint_sha256": "574497ad1806d337242336255137efd257d37b166b21b26db24f05c2999ec893",
+      "threads": {
+        "1": {
+          "cache_off": {
+            "calls": 1080,
+            "mean_ms": 8.010040833333331,
+            "p50_ms": 7.7693,
+            "p95_ms": 10.236469999999999,
+            "p99_ms": 12.285168000000006
+          },
+          "cache_on": {
+            "calls": 1080,
+            "mean_ms": 0.9192534259259258,
+            "p50_ms": 0.88385,
+            "p95_ms": 1.48026,
+            "p99_ms": 1.7817390000000013
+          },
+          "cache_entries_after_warmup": 5,
+          "p95_reduction_percent": 85.53935096766757,
+          "p50_reduction_percent": 88.62381424323942,
+          "equivalence": {
+            "observations": 108,
+            "max_logit_abs_difference": 0.0,
+            "max_value_abs_difference": 0.0,
+            "deterministic_action_mismatches": 0
+          }
+        },
+        "4": {
+          "cache_off": {
+            "calls": 1080,
+            "mean_ms": 12.669415740740742,
+            "p50_ms": 12.0735,
+            "p95_ms": 17.81858,
+            "p99_ms": 20.846876
+          },
+          "cache_on": {
+            "calls": 1080,
+            "mean_ms": 1.0024034259259258,
+            "p50_ms": 0.9127,
+            "p95_ms": 1.6062099999999995,
+            "p99_ms": 1.9751150000000002
+          },
+          "cache_entries_after_warmup": 5,
+          "p95_reduction_percent": 90.98575756317283,
+          "p50_reduction_percent": 92.44046879529549,
+          "equivalence": {
+            "observations": 108,
+            "max_logit_abs_difference": 0.0,
+            "max_value_abs_difference": 0.0,
+            "deterministic_action_mismatches": 0
+          }
+        },
+        "8": {
+          "cache_off": {
+            "calls": 1080,
+            "mean_ms": 15.36475277777778,
+            "p50_ms": 15.113949999999999,
+            "p95_ms": 18.120209999999997,
+            "p99_ms": 20.803943
+          },
+          "cache_on": {
+            "calls": 1080,
+            "mean_ms": 1.3735849074074074,
+            "p50_ms": 1.2296,
+            "p95_ms": 2.2173349999999994,
+            "p99_ms": 3.0697260000000015
+          },
+          "cache_entries_after_warmup": 5,
+          "p95_reduction_percent": 87.76319369367133,
+          "p50_reduction_percent": 91.86446957942827,
+          "equivalence": {
+            "observations": 108,
+            "max_logit_abs_difference": 0.0,
+            "max_value_abs_difference": 0.0,
+            "deterministic_action_mismatches": 0
+          }
+        }
+      },
+      "original_latency_protocol": {
+        "1": {
+          "cache_off": {
+            "calls": 1000,
+            "mean_ms": 5.7176800000000005,
+            "p50_ms": 5.62025,
+            "p95_ms": 7.289469999999999,
+            "p99_ms": 8.189697999999998
+          },
+          "cache_on": {
+            "calls": 1000,
+            "mean_ms": 0.7202431,
+            "p50_ms": 0.60985,
+            "p95_ms": 1.2297799999999999,
+            "p99_ms": 1.549533
+          },
+          "equivalence": {
+            "max_logit_abs_difference": 0.0,
+            "logits_exact_including_mask": true,
+            "max_value_abs_difference": 0.0,
+            "deterministic_action_mismatch": 0
+          },
+          "p95_reduction_percent": 83.12936331447966
+        },
+        "4": {
+          "cache_off": {
+            "calls": 1000,
+            "mean_ms": 9.734060600000001,
+            "p50_ms": 9.6223,
+            "p95_ms": 12.1181,
+            "p99_ms": 13.655152
+          },
+          "cache_on": {
+            "calls": 1000,
+            "mean_ms": 0.9464257,
+            "p50_ms": 0.86095,
+            "p95_ms": 1.4869499999999995,
+            "p99_ms": 1.7810519999999999
+          },
+          "equivalence": {
+            "max_logit_abs_difference": 0.0,
+            "logits_exact_including_mask": true,
+            "max_value_abs_difference": 0.0,
+            "deterministic_action_mismatch": 0
+          },
+          "p95_reduction_percent": 87.7295120522194
+        },
+        "8": {
+          "cache_off": {
+            "calls": 1000,
+            "mean_ms": 13.927631799999999,
+            "p50_ms": 14.079,
+            "p95_ms": 16.63295,
+            "p99_ms": 18.149915
+          },
+          "cache_on": {
+            "calls": 1000,
+            "mean_ms": 1.1094977,
+            "p50_ms": 1.0281,
+            "p95_ms": 1.6140050000000001,
+            "p99_ms": 1.9249229999999997
+          },
+          "equivalence": {
+            "max_logit_abs_difference": 0.0,
+            "logits_exact_including_mask": true,
+            "max_value_abs_difference": 0.0,
+            "deterministic_action_mismatch": 0
+          },
+          "p95_reduction_percent": 90.29633949479798
+        }
+      }
+    }
+  ],
+  "original_latency_protocol_aggregate_by_threads": {
+    "1": {
+      "cache_off_mean_checkpoint_p50_ms": 5.628010000000001,
+      "cache_off_mean_checkpoint_p95_ms": 7.409492,
+      "cache_off_sd_checkpoint_p95_ms": 0.19773579350360443,
+      "cache_on_mean_checkpoint_p50_ms": 0.62471,
+      "cache_on_mean_checkpoint_p95_ms": 1.2408439999999998,
+      "cache_on_sd_checkpoint_p95_ms": 0.018449640037138792,
+      "mean_checkpoint_p95_reduction_percent": 83.24886077122319,
+      "all_outputs_exact": true
+    },
+    "4": {
+      "cache_off_mean_checkpoint_p50_ms": 9.55837,
+      "cache_off_mean_checkpoint_p95_ms": 12.247798999999997,
+      "cache_off_sd_checkpoint_p95_ms": 0.3566529677852114,
+      "cache_on_mean_checkpoint_p50_ms": 0.8533899999999999,
+      "cache_on_mean_checkpoint_p95_ms": 1.4963689999999998,
+      "cache_on_sd_checkpoint_p95_ms": 0.03638580276014257,
+      "mean_checkpoint_p95_reduction_percent": 87.77944344649322,
+      "all_outputs_exact": true
+    },
+    "8": {
+      "cache_off_mean_checkpoint_p50_ms": 13.897390000000001,
+      "cache_off_mean_checkpoint_p95_ms": 16.641616,
+      "cache_off_sd_checkpoint_p95_ms": 0.22941863201906662,
+      "cache_on_mean_checkpoint_p50_ms": 1.03855,
+      "cache_on_mean_checkpoint_p95_ms": 1.6333019999999998,
+      "cache_on_sd_checkpoint_p95_ms": 0.06638542823918506,
+      "mean_checkpoint_p95_reduction_percent": 90.18545570765646,
+      "all_outputs_exact": true
+    }
+  },
+  "gnn_per_checkpoint_original_latency_protocol": [
+    {
+      "training_seed": 20261002,
+      "checkpoint": "experiments\\runs\\final_holdout_gnn_20261002_20261003T133025Z_d46ea887\\checkpoints\\GNN\\best_by_success_rate.pt",
+      "checkpoint_sha256": "e656c49c2aeb4416c9b8e077fe0bf8f2694c74fd28cb359809a4f1de773d0af3",
+      "threads": {
+        "1": {
+          "calls": 1000,
+          "mean_ms": 17.4928846,
+          "p50_ms": 17.282899999999998,
+          "p95_ms": 20.80235,
+          "p99_ms": 23.147146
+        },
+        "4": {
+          "calls": 1000,
+          "mean_ms": 10.751715599999999,
+          "p50_ms": 11.02855,
+          "p95_ms": 13.727735000000001,
+          "p99_ms": 15.097256999999999
+        }
+      }
+    },
+    {
+      "training_seed": 20261003,
+      "checkpoint": "experiments\\runs\\final_holdout_gnn_20261003_20261003T143248Z_53404958\\checkpoints\\GNN\\best_by_success_rate.pt",
+      "checkpoint_sha256": "66d659363c6892f3a90102a4633c2d1b8a2294f7224d96d5922706d78eba3103",
+      "threads": {
+        "1": {
+          "calls": 1000,
+          "mean_ms": 17.404900800000004,
+          "p50_ms": 17.20755,
+          "p95_ms": 20.422555,
+          "p99_ms": 23.200096
+        },
+        "4": {
+          "calls": 1000,
+          "mean_ms": 10.494016499999999,
+          "p50_ms": 10.55475,
+          "p95_ms": 13.533695,
+          "p99_ms": 14.698385
+        }
+      }
+    },
+    {
+      "training_seed": 20261004,
+      "checkpoint": "experiments\\runs\\final_holdout_gnn_20261004_20261003T154054Z_5aa0f387\\checkpoints\\GNN\\best_by_success_rate.pt",
+      "checkpoint_sha256": "4b6e9b67d83658f0db5a4bc9df969549e50e96b4cd4263536f7245a87c0040e0",
+      "threads": {
+        "1": {
+          "calls": 1000,
+          "mean_ms": 17.4627644,
+          "p50_ms": 17.33325,
+          "p95_ms": 20.194229999999997,
+          "p99_ms": 22.712844999999994
+        },
+        "4": {
+          "calls": 1000,
+          "mean_ms": 10.5837838,
+          "p50_ms": 10.61945,
+          "p95_ms": 13.817159999999998,
+          "p99_ms": 15.241484
+        }
+      }
+    },
+    {
+      "training_seed": 20261005,
+      "checkpoint": "experiments\\runs\\final_holdout_gnn_20261005_20261003T164153Z_aaa15163\\checkpoints\\GNN\\best_by_success_rate.pt",
+      "checkpoint_sha256": "beaf60a980a5bd7fbbc02745947feecfb34a0ea5344fc6aa0ecdf5636f2e40cb",
+      "threads": {
+        "1": {
+          "calls": 1000,
+          "mean_ms": 17.4493235,
+          "p50_ms": 17.27845,
+          "p95_ms": 20.385769999999997,
+          "p99_ms": 23.119277
+        },
+        "4": {
+          "calls": 1000,
+          "mean_ms": 10.294220700000002,
+          "p50_ms": 10.31955,
+          "p95_ms": 13.4663,
+          "p99_ms": 14.385898
+        }
+      }
+    },
+    {
+      "training_seed": 20261006,
+      "checkpoint": "experiments\\runs\\final_holdout_gnn_20261006_20261006T061745Z_f3c42ed4\\checkpoints\\GNN\\best_by_success_rate.pt",
+      "checkpoint_sha256": "0090b27201caddd538c954c7cdc6aa51d08eb2f557d6187c0b694fbc3e6e1a98",
+      "threads": {
+        "1": {
+          "calls": 1000,
+          "mean_ms": 17.338352999999998,
+          "p50_ms": 17.1601,
+          "p95_ms": 19.917324999999998,
+          "p99_ms": 22.555476
+        },
+        "4": {
+          "calls": 1000,
+          "mean_ms": 10.4482377,
+          "p50_ms": 10.40895,
+          "p95_ms": 13.780069999999998,
+          "p99_ms": 15.074231999999999
+        }
+      }
+    }
+  ],
+  "matched_architecture_latency_comparison": {
+    "1": {
+      "gnn_uncached_mean_checkpoint_p95_ms": 20.344445999999998,
+      "gnn_uncached_sd_checkpoint_p95_ms": 0.3249930604528359,
+      "lstm_uncached_mean_checkpoint_p95_ms": 7.409492,
+      "lstm_cached_mean_checkpoint_p95_ms": 1.2408439999999998,
+      "cached_lstm_p95_reduction_vs_gnn_percent": 93.90082187541505,
+      "cached_lstm_p95_reduction_vs_uncached_lstm_percent": 83.25331885100896
+    },
+    "4": {
+      "gnn_uncached_mean_checkpoint_p95_ms": 13.664991999999998,
+      "gnn_uncached_sd_checkpoint_p95_ms": 0.15576596501643014,
+      "lstm_uncached_mean_checkpoint_p95_ms": 12.247798999999997,
+      "lstm_cached_mean_checkpoint_p95_ms": 1.4963689999999998,
+      "cached_lstm_p95_reduction_vs_gnn_percent": 89.04961671400905,
+      "cached_lstm_p95_reduction_vs_uncached_lstm_percent": 87.78254770510196
+    }
+  }
+}
